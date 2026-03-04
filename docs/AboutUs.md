@@ -19,11 +19,11 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 * Role: Project Advisor
 
-### Jane Doe
+### Muhammad Nazeef Bin Abdul Jalil
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/nazeeeef007.png" width="200px">
 
-[[github](http://github.com/johndoe)]
+[[github](http://github.com/nazeeeef007)]
 [[portfolio](team/johndoe.md)]
 
 * Role: Team Lead
