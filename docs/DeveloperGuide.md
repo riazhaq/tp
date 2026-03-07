@@ -275,29 +275,56 @@ _{Explain here how the data archiving feature will be implemented}_
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                     | So that I can…​                                                        |
-| -------- | ------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `* * *`  | new user                                   | see usage instructions         | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person               |                                                                        |
-| `* * *`  | user                                       | delete a person                | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name          | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details   | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name           | locate a person easily                                                 |
+| Priority | As a …​                 | I want to …​                           | So that I can…​                                                        |
+|----------|-------------------------|----------------------------------------|------------------------------------------------------------------------|
+| `* * *`  | new user                | see usage instructions                 | refer to instructions when I forget how to use the App                 |
+| `* * *`  | user                    | add a new person                       | track debts with specific people                                       |
+| `* * *`  | user                    | delete a person                        | remove entries that I no longer need                                   |
+| `* * *`  | user                    | record money I owe someone             | remember my debts                                                      |
+| `* * *`  | user                    | record money someone owes me           | keep track of loans I gave                                             |
+| `* * *`  | user                    | list outstanding balances              | quickly see who owes what                                              |
+| `* * *`  | user                    | settle a transaction                   | mark debts as paid                                                     |
+| `* * *`  | user                    | delete an incorrect entry              | remove mistakes                                                        |
+| `* * *`  | user                    | find a person by name                  | locate details of persons without having to go through the entire list |
+| `* *`    | user                    | add descriptions to transactions       | remember why the transaction happened                                  |
+| `* *`    | user                    | view transaction history with a person | track past financial interactions                                      |
+| `* *`    | user                    | hide private contact details           | minimize chance of someone else seeing them by accident                |
+| `*`      | user with many contacts | sort persons by name                   | locate a person easily to see their debts and loans                    |
+| `*`      | careful user            | undo recent changes                    | recover from mistakes                                                  |
+
 
 *{More to be added}*
 
 ### Use cases
 
-(For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+(For all use cases below, the **System** is the `IOU` and the **Actor** is the `user`, unless specified otherwise)
+
+**Use case: Add a person**
+
+**MSS**
+
+1.  User requests to add a person
+2.  IOU adds the person
+
+    Use case ends.
+
+**Extensions**
+
+* 2a. The given information for the person is wrong/insufficient
+
+    * 2a1. IOU shows an error message.
+
+      Use case ends.
+
 
 **Use case: Delete a person**
 
 **MSS**
 
 1.  User requests to list persons
-2.  AddressBook shows a list of persons
+2.  IOU shows a list of persons
 3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
+4.  IOU deletes the person
 
     Use case ends.
 
@@ -309,9 +336,66 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * 3a. The given index is invalid.
 
-    * 3a1. AddressBook shows an error message.
+    * 3a1. IOU shows an error message.
 
       Use case resumes at step 2.
+
+
+**Use Case: Record a debt**
+
+**MSS**
+
+1.  User requests to list persons.
+2.  IOU displays the list of persons.
+3.  User requests to record a debt using the person index.
+4.  IOU records the debt under the selected person.
+5.  IOU updates the outstanding balance.
+
+    Use case ends.
+
+**Extensions**
+
+* 4a. Invalid person index.
+
+    * 4a1. IOU displays an error message.
+
+      Use case resumes at step 2.
+
+* 4b. Invalid amount format.
+
+    * 4b1. IOU displays validation error message.
+
+      Use case ends.
+
+
+**Use Case: Settle a transaction**
+
+**MSS**
+
+1.  User requests to list persons.
+2.  IOU displays the list of persons.
+3.  User requests to view a particular person. 
+4.  IOU shows the view of the person to the user.
+5.  User views a person's transaction list.
+6.  User requests to settle a transaction.
+7.  IOU marks the transaction as settled.
+8.  IOU recalculates the person’s balance.
+9.  IOU updates the UI.
+    Use case ends.
+
+Extensions
+
+* 1a. Transaction index invalid.
+
+    * 1a1. IOU displays error message.
+
+    Use case ends.
+
+* 6b. Transaction already settled.
+
+    * 6b1. IOU informs user the transaction is already settled.
+
+    Use case ends.
 
 *{More to be added}*
 
@@ -320,6 +404,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 1.  Should work on any _mainstream OS_ as long as it has Java `17` or above installed.
 2.  Should be able to hold up to 1000 persons without a noticeable sluggishness in performance for typical usage.
 3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
+4.  Typical commands should execute within 1 second under normal conditions.
+5.  The application should automatically save data after each modifying command to prevent data loss.
+6.  The system should store data in a human-readable JSON format.
+7.  A user with average typing speed should be able to record transactions faster using commands than mouse interactions.
+8.  The application should continue functioning even if optional fields such as phone or email are missing.
+9.  The application should provide clear error messages when invalid commands are entered.
 
 *{More to be added}*
 
@@ -327,6 +417,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * **Mainstream OS**: Windows, Linux, Unix, MacOS
 * **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Debt**: Money that the user owes another person.
+* **Loan**: Money that another person owes the user.
+* **Transaction**: A record representing either a debt or a loan between the user and another person.
+* **Outstanding Balance**: The total amount currently owed or receivable that has not yet been settled.
+* **Person Index**: The numerical position of a person in the current displayed list.
+* **Transaction Index**: The position of a transaction within a person’s transaction history.
 
 --------------------------------------------------------------------------------------------------------------------
 
