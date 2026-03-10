@@ -48,3 +48,4 @@ public class InterestRateTest {
         assertNotEquals(rate1, null);
     }
 }
+

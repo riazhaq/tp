@@ -374,7 +374,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 1.  User requests to list persons.
 2.  IOU displays the list of persons.
-3.  User requests to view a particular person. 
+3.  User requests to view a particular person.
 4.  IOU shows the view of the person to the user.
 5.  User views a person's transaction list.
 6.  User requests to settle a transaction.

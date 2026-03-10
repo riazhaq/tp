@@ -1,7 +1,7 @@
 [![Java CI](https://github.com/AY2526S2-CS2103T-T16-2/tp/actions/workflows/gradle.yml/badge.svg?branch=master)](https://github.com/AY2526S2-CS2103T-T16-2/tp/actions/workflows/gradle.yml)
 ![Ui](docs/images/Ui.png)
 
-# IOU – Simple Debt Tracking for Friends and Colleagues 
+# IOU – Simple Debt Tracking for Friends and Colleagues
 
 IOU is a desktop application designed to help users track small debts and loans among friends, colleagues, or roommates. It allows users to quickly record who owes whom, how much money is involved, and whether the transaction has been settled. The application is optimized for users who prefer typing commands to perform actions quickly while still benefiting from a graphical user interface to view their records.
 
