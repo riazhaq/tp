@@ -8,7 +8,7 @@ public class LoanTest {
 
     private static class TestLoan extends Loan {
 
-        public TestLoan(double amount, InterestRate rate, String description) {
+        public TestLoan(double amount, double rate, String description) {
             super(amount, rate, description);
         }
 
@@ -21,7 +21,7 @@ public class LoanTest {
 
     @Test
     public void payLoan_reducesAmount() {
-        Loan loan = new TestLoan(100, new InterestRate(5), "test loan");
+        Loan loan = new TestLoan(100, 5, "test loan");
 
         loan.payLoan(20);
 
@@ -30,7 +30,7 @@ public class LoanTest {
 
     @Test
     public void payLoan_updatesLoanBeforePayment() {
-        Loan loan = new TestLoan(100, new InterestRate(5), "test loan");
+        Loan loan = new TestLoan(100, 5, "test loan");
 
         loan.lastRecalculatedDate = loan.lastRecalculatedDate.minusDays(1);
 
@@ -42,7 +42,7 @@ public class LoanTest {
 
     @Test
     public void getNumberOfMonthsSinceLastPaid() {
-        Loan loan = new TestLoan(100, new InterestRate(5), "test loan");
+        Loan loan = new TestLoan(100, 5, "test loan");
 
         loan.lastRecalculatedDate = loan.lastRecalculatedDate.minusMonths(3);
 
@@ -51,7 +51,7 @@ public class LoanTest {
 
     @Test
     public void getNumberOfYearsSinceLastPaid() {
-        Loan loan = new TestLoan(100, new InterestRate(5), "test loan");
+        Loan loan = new TestLoan(100, 5, "test loan");
 
         loan.lastRecalculatedDate = loan.lastRecalculatedDate.minusYears(2);
 

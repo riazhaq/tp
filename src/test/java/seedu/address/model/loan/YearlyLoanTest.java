@@ -8,7 +8,7 @@ public class YearlyLoanTest {
 
     @Test
     public void updateLoanAmount_appliesYearlyInterest() {
-        YearlyLoan loan = new YearlyLoan(1000, new InterestRate(10), "test loan");
+        YearlyLoan loan = new YearlyLoan(1000, 10, "test loan");
 
         loan.lastRecalculatedDate = loan.lastRecalculatedDate.minusYears(2);
 
@@ -20,7 +20,7 @@ public class YearlyLoanTest {
 
     @Test
     public void updateLoanAmount_noYearsPassed_noChange() {
-        YearlyLoan loan = new YearlyLoan(1000, new InterestRate(10), "test loan");
+        YearlyLoan loan = new YearlyLoan(1000, 10, "test loan");
 
         loan.updateLoanAmount();
 

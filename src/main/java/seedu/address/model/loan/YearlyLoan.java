@@ -12,7 +12,7 @@ public class YearlyLoan extends Loan {
      * @param interestRate the interest rate applied yearly
      * @param description the description for the loan
      */
-    public YearlyLoan(double currAmount, InterestRate interestRate, String description) {
+    public YearlyLoan(double currAmount, double interestRate, String description) {
         super(currAmount, interestRate, description);
     }
 

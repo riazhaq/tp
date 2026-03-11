@@ -31,9 +31,9 @@ public abstract class Loan {
      * @param interestRate the interest rate applied to the loan
      * @param description the description for the loan
      */
-    public Loan(double currAmount, InterestRate interestRate, String description) {
+    public Loan(double currAmount, double interestRate, String description) {
         this.currAmount = currAmount;
-        this.interestRate = interestRate;
+        this.interestRate = new InterestRate(interestRate);
         this.description = description;
         this.lastRecalculatedDate = LocalDate.now();
     }

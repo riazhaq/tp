@@ -8,7 +8,7 @@ public class MonthlyLoanTest {
 
     @Test
     public void updateLoanAmount_appliesMonthlyInterest() {
-        MonthlyLoan loan = new MonthlyLoan(1000, new InterestRate(10), "test loan");
+        MonthlyLoan loan = new MonthlyLoan(1000, 10, "test loan");
 
         loan.lastRecalculatedDate = loan.lastRecalculatedDate.minusMonths(2);
 
@@ -20,7 +20,7 @@ public class MonthlyLoanTest {
 
     @Test
     public void updateLoanAmount_noMonthsPassed_noChange() {
-        MonthlyLoan loan = new MonthlyLoan(1000, new InterestRate(10), "test loan");
+        MonthlyLoan loan = new MonthlyLoan(1000, 10, "test loan");
 
         loan.updateLoanAmount();
 
