@@ -140,17 +140,20 @@ public class EditCommand extends Command {
         private Email email;
         private Address address;
         private Set<Tag> tags;
-        private Set<Loan> loans; // NEW
+        private Set<Loan> loans;
 
         public EditPersonDescriptor() {}
 
+        /**
+         * @param toCopy another EditPersonDescriptor to be copied over
+         */
         public EditPersonDescriptor(EditPersonDescriptor toCopy) {
             setName(toCopy.name);
             setPhone(toCopy.phone);
             setEmail(toCopy.email);
             setAddress(toCopy.address);
             setTags(toCopy.tags);
-            setLoans(toCopy.loans); // NEW
+            setLoans(toCopy.loans);
         }
 
         public boolean isAnyFieldEdited() {
@@ -206,10 +209,19 @@ public class EditCommand extends Command {
             return (tags != null) ? Optional.of(Collections.unmodifiableSet(tags)) : Optional.empty();
         }
 
+        /**
+         * Sets {@code loans} to this object's {@code loans}.
+         * A defensive copy of {@code loans} is used internally.
+         */
         public void setLoans(Set<Loan> loans) {
             this.loans = (loans != null) ? new HashSet<>(loans) : null;
         }
 
+        /**
+         * Returns an unmodifiable loan set, which throws {@code UnsupportedOperationException}
+         * if modification is attempted.
+         * Returns {@code Optional#empty()} if {@code loans} is null.
+         */
         public Optional<Set<Loan>> getLoans() {
             return (loans != null) ? Optional.of(Collections.unmodifiableSet(loans)) : Optional.empty();
         }

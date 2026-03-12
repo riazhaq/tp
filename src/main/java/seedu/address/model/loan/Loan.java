@@ -16,7 +16,8 @@ import java.util.Objects;
  */
 public class Loan {
 
-    public static final String MESSAGE_CONSTRAINTS = "Loan Details should be in the form '(type) amount, interest rate, description' ";
+    public static final String MESSAGE_CONSTRAINTS =
+            "Loan Details should be in the form '(type) amount, interest rate, description' ";
 
     /** Current outstanding loan amount. */
     protected double currAmount;
@@ -147,8 +148,12 @@ public class Loan {
 
     @Override
     public boolean equals(Object other) {
-        if (other == this) return true;
-        if (!(other instanceof Loan)) return false;
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Loan)) {
+            return false;
+        }
         Loan o = (Loan) other;
         return Double.compare(o.currAmount, currAmount) == 0
                 && Double.compare(o.getInterest(), getInterest()) == 0
