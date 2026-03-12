@@ -83,13 +83,18 @@ public class EditPersonDescriptorBuilder {
         return this;
     }
 
-    public EditPersonDescriptor build() {
-        return descriptor;
-    }
-
+    /**
+     * Parses the {@code loans} into a {@code Set<Loan>} and set it to the {@code EditPersonDescriptor}
+     * that we are building.
+     */
     public EditPersonDescriptorBuilder withLoans(Loan... loans) {
         Set<Loan> loanSet = Stream.of(loans).collect(Collectors.toSet());
         descriptor.setLoans(loanSet);
         return this;
     }
+
+    public EditPersonDescriptor build() {
+        return descriptor;
+    }
+
 }

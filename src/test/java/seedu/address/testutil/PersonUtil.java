@@ -43,7 +43,9 @@ public class PersonUtil {
         person.getTags().stream().forEach(
             s -> sb.append(PREFIX_TAG + s.tagName + " ")
         );
-        person.getLoans().forEach(loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" "));
+        person.getLoans().forEach(
+                loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" ")
+        );
         return sb.toString();
     }
 
@@ -73,6 +75,14 @@ public class PersonUtil {
                 sb.append(PREFIX_TAG);
             } else {
                 tags.forEach(s -> sb.append(PREFIX_TAG).append(s.tagName).append(" "));
+            }
+        }
+        if (descriptor.getLoans().isPresent()) {
+            Set<Loan> loans = descriptor.getLoans().get();
+            if (loans.isEmpty()) {
+                sb.append(PREFIX_LOAN);
+            } else {
+                loans.forEach(loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" "));
             }
         }
         return sb.toString();
