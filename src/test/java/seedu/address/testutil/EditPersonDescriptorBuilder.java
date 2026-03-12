@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -37,6 +38,7 @@ public class EditPersonDescriptorBuilder {
         descriptor.setEmail(person.getEmail());
         descriptor.setAddress(person.getAddress());
         descriptor.setTags(person.getTags());
+        descriptor.setLoans(person.getLoans());
     }
 
     /**
@@ -83,5 +85,11 @@ public class EditPersonDescriptorBuilder {
 
     public EditPersonDescriptor build() {
         return descriptor;
+    }
+
+    public EditPersonDescriptorBuilder withLoans(Loan... loans) {
+        Set<Loan> loanSet = Stream.of(loans).collect(Collectors.toSet());
+        descriptor.setLoans(loanSet);
+        return this;
     }
 }

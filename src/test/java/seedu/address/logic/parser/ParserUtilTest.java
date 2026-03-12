@@ -14,6 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -26,6 +27,7 @@ public class ParserUtilTest {
     private static final String INVALID_ADDRESS = " ";
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
+    private static final String INVALID_LOAN = "ten, 5, lunch"; // invalid amount
 
     private static final String VALID_NAME = "Rachel Walker";
     private static final String VALID_PHONE = "123456";
@@ -33,6 +35,8 @@ public class ParserUtilTest {
     private static final String VALID_EMAIL = "rachel@example.com";
     private static final String VALID_TAG_1 = "friend";
     private static final String VALID_TAG_2 = "neighbour";
+    private static final Loan VALID_LOAN_1 = new Loan(10, 0, "lunch");
+    private static final Loan VALID_LOAN_2 = new Loan(20, 1, "dinner");
 
     private static final String WHITESPACE = " \t\r\n";
 
@@ -192,5 +196,51 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = new HashSet<Tag>(Arrays.asList(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2)));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseLoan_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseLoan(null));
+    }
+
+    @Test
+    public void parseLoan_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseLoan(INVALID_LOAN));
+    }
+
+    @Test
+    public void parseLoan_validValueWithoutWhitespace_returnsLoan() throws Exception {
+        Loan expectedLoan = VALID_LOAN_1;
+        assertEquals(expectedLoan, ParserUtil.parseLoan("10,0,lunch"));
+    }
+
+    @Test
+    public void parseLoan_validValueWithWhitespace_returnsLoan() throws Exception {
+        Loan expectedLoan = VALID_LOAN_1;
+        String loanWithWhitespace = WHITESPACE + "10, 0, lunch" + WHITESPACE;
+        assertEquals(expectedLoan, ParserUtil.parseLoan(loanWithWhitespace));
+    }
+
+    @Test
+    public void parseLoans_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseLoans(null));
+    }
+
+    @Test
+    public void parseLoans_emptyCollection_returnsEmptySet() throws Exception {
+        assertTrue(ParserUtil.parseLoans(Collections.emptyList()).isEmpty());
+    }
+
+    @Test
+    public void parseLoans_collectionWithValidLoans_returnsLoanSet() throws Exception {
+        Set<Loan> actualLoanSet = ParserUtil.parseLoans(Arrays.asList("10, 0, lunch", "20, 1, dinner"));
+        Set<Loan> expectedLoanSet = new HashSet<>(Arrays.asList(VALID_LOAN_1, VALID_LOAN_2));
+
+        assertEquals(expectedLoanSet, actualLoanSet);
+    }
+
+    @Test
+    public void parseLoans_collectionWithInvalidLoan_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseLoans(Arrays.asList("10,0,lunch", INVALID_LOAN)));
     }
 }
