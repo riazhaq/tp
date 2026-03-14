@@ -2,6 +2,7 @@ package seedu.address.model.loan;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 /**
  * Represents a generic loan.
@@ -9,8 +10,14 @@ import java.time.temporal.ChronoUnit;
  * A loan contains a current outstanding amount, an interest rate,
  * and the date when the loan was last recalculated.
  * Subclasses define how often interest is applied.
+ * <p>
+ * Positive amount  -> user owes the person.
+ * Negative amount  -> the person owes the user.
  */
-public abstract class Loan {
+public class Loan {
+
+    public static final String MESSAGE_CONSTRAINTS =
+            "Loan Details should be in the form '(type) amount, interest rate, description' ";
 
     /** Current outstanding loan amount. */
     protected double currAmount;
@@ -39,10 +46,42 @@ public abstract class Loan {
     }
 
     /**
+     * Checks if the trimmedLoanDetails are in a valid format for it to be parsed
+     *
+     * @param trimmedLoanDetails the {@code String} to be parsed
+     */
+    public static boolean isValidLoanArguments(String trimmedLoanDetails) {
+        String lowercasedLoanDetails = trimmedLoanDetails.toLowerCase();
+        String loanDetailsWithoutType = trimmedLoanDetails;
+
+        if (lowercasedLoanDetails.startsWith("m ") || lowercasedLoanDetails.startsWith("y ")) {
+            loanDetailsWithoutType = trimmedLoanDetails.substring(2);
+        }
+
+        String[] parts = loanDetailsWithoutType.split("\\s*,\\s*", 3);
+
+        if (parts.length != 3) {
+            return false;
+        }
+
+        try {
+            double amount = Double.parseDouble(parts[0]);
+            double rate = Double.parseDouble(parts[1]);
+            String description = parts[2];
+
+            return rate <= 100 && rate >= 0 && !description.isEmpty();
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
      * Updates the loan amount by applying interest
      * based on the time elapsed since the last recalculation.
      */
-    public abstract void updateLoanAmount();
+    public void updateLoanAmount() {
+
+    }
 
     /**
      * Pays part of the loan.
@@ -95,5 +134,34 @@ public abstract class Loan {
 
     public String getDescription() {
         return description;
+    }
+
+    public double getInterest() {
+        return interestRate.getInterest();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[Amount: %.2f, Rate: %.2f%%, Desc: %s]",
+                currAmount, getInterest(), description);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Loan)) {
+            return false;
+        }
+        Loan o = (Loan) other;
+        return Double.compare(o.currAmount, currAmount) == 0
+                && Double.compare(o.getInterest(), getInterest()) == 0
+                && description.equals(o.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currAmount, interestRate, description);
     }
 }

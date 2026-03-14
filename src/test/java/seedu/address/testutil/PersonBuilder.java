@@ -3,6 +3,7 @@ package seedu.address.testutil;
 import java.util.HashSet;
 import java.util.Set;
 
+import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -12,7 +13,12 @@ import seedu.address.model.tag.Tag;
 import seedu.address.model.util.SampleDataUtil;
 
 /**
- * A utility class to help with building Person objects.
+ * A utility class to build {@link Person} objects for tests.
+ * <p>
+ * This builder provides a convenient way to construct {@code Person} instances
+ * with default values that can be customised using the provided {@code withX()}
+ * methods. It is mainly used in test cases to reduce boilerplate code when
+ * creating {@code Person} objects.
  */
 public class PersonBuilder {
 
@@ -26,9 +32,10 @@ public class PersonBuilder {
     private Email email;
     private Address address;
     private Set<Tag> tags;
+    private Set<Loan> loans;
 
     /**
-     * Creates a {@code PersonBuilder} with the default details.
+     * Creates a {@code PersonBuilder} with default details.
      */
     public PersonBuilder() {
         name = new Name(DEFAULT_NAME);
@@ -36,10 +43,13 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         address = new Address(DEFAULT_ADDRESS);
         tags = new HashSet<>();
+        loans = new HashSet<>(); // default empty
     }
 
     /**
-     * Initializes the PersonBuilder with the data of {@code personToCopy}.
+     * Initializes the {@code PersonBuilder} with the data of the given {@code Person}.
+     *
+     * @param personToCopy The person whose data will be used to initialise the builder.
      */
     public PersonBuilder(Person personToCopy) {
         name = personToCopy.getName();
@@ -47,10 +57,14 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         address = personToCopy.getAddress();
         tags = new HashSet<>(personToCopy.getTags());
+        loans = new HashSet<>(personToCopy.getLoans());
     }
 
     /**
-     * Sets the {@code Name} of the {@code Person} that we are building.
+     * Sets the {@link Name} of the {@code Person} to be built.
+     *
+     * @param name The name of the person.
+     * @return This builder instance for chaining.
      */
     public PersonBuilder withName(String name) {
         this.name = new Name(name);
@@ -58,23 +72,10 @@ public class PersonBuilder {
     }
 
     /**
-     * Parses the {@code tags} into a {@code Set<Tag>} and set it to the {@code Person} that we are building.
-     */
-    public PersonBuilder withTags(String ... tags) {
-        this.tags = SampleDataUtil.getTagSet(tags);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Address} of the {@code Person} that we are building.
-     */
-    public PersonBuilder withAddress(String address) {
-        this.address = new Address(address);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Phone} of the {@code Person} that we are building.
+     * Sets the {@link Phone} of the {@code Person} to be built.
+     *
+     * @param phone The phone number of the person.
+     * @return This builder instance for chaining.
      */
     public PersonBuilder withPhone(String phone) {
         this.phone = new Phone(phone);
@@ -82,15 +83,58 @@ public class PersonBuilder {
     }
 
     /**
-     * Sets the {@code Email} of the {@code Person} that we are building.
+     * Sets the {@link Email} of the {@code Person} to be built.
+     *
+     * @param email The email address of the person.
+     * @return This builder instance for chaining.
      */
     public PersonBuilder withEmail(String email) {
         this.email = new Email(email);
         return this;
     }
 
-    public Person build() {
-        return new Person(name, phone, email, address, tags);
+    /**
+     * Sets the {@link Address} of the {@code Person} to be built.
+     *
+     * @param address The address of the person.
+     * @return This builder instance for chaining.
+     */
+    public PersonBuilder withAddress(String address) {
+        this.address = new Address(address);
+        return this;
     }
 
+    /**
+     * Parses the provided tags and sets them for the {@code Person} to be built.
+     *
+     * @param tags The tags associated with the person.
+     * @return This builder instance for chaining.
+     */
+    public PersonBuilder withTags(String... tags) {
+        this.tags = SampleDataUtil.getTagSet(tags);
+        return this;
+    }
+
+    /**
+     * Sets the {@link Loan}s associated with the {@code Person}.
+     *
+     * @param loans The loans to assign to the person.
+     * @return This builder instance for chaining.
+     */
+    public PersonBuilder withLoans(Loan... loans) {
+        this.loans = new HashSet<>();
+        for (Loan loan : loans) {
+            this.loans.add(loan);
+        }
+        return this;
+    }
+
+    /**
+     * Builds and returns a {@link Person} instance using the current state of the builder.
+     *
+     * @return A new {@code Person} object.
+     */
+    public Person build() {
+        return new Person(name, phone, email, address, tags, loans);
+    }
 }

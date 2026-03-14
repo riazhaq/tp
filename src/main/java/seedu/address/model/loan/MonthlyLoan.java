@@ -27,4 +27,10 @@ public class MonthlyLoan extends Loan {
 
         updateLastRecalculatedDate();
     }
+
+    @Override
+    public String toString() {
+        return String.format("[Amount: %.2f, Rate: %.2f%%, Desc: %s, Type: Monthly]",
+                currAmount, getInterest(), description);
+    }
 }

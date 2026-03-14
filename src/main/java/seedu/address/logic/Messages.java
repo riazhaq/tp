@@ -44,7 +44,11 @@ public class Messages {
                 .append("; Address: ")
                 .append(person.getAddress())
                 .append("; Tags: ");
-        person.getTags().forEach(builder::append);
+        person.getTags().forEach(tag -> builder.append(tag).append(" "));
+
+        builder.append("; Loans: ");
+        person.getLoans().forEach(loan -> builder.append(loan).append(" "));
+
         return builder.toString();
     }
 

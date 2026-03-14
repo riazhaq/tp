@@ -1,46 +1,82 @@
 {
-  "_comment": "AddressBook save file which contains the same Person values as in TypicalPersons#getTypicalAddressBook()",
   "persons" : [ {
     "name" : "Alice Pauline",
     "phone" : "94351253",
     "email" : "alice@example.com",
     "address" : "123, Jurong West Ave 6, #08-111",
-    "tags" : [ "friends" ]
+    "tags" : [ "friends" ],
+    "loans" : [ {
+      "loanType" : "m",
+      "amount" : 2000.0,
+      "rate" : 5.0,
+      "description" : "Rent"
+    }, {
+      "loanType" : "y",
+      "amount" : -300.0,
+      "rate" : 0.0,
+      "description" : "Insurance"
+    } ]
   }, {
     "name" : "Benson Meier",
     "phone" : "98765432",
     "email" : "johnd@example.com",
     "address" : "311, Clementi Ave 2, #02-25",
-    "tags" : [ "owesMoney", "friends" ]
+    "tags" : [ "owesMoney", "friends" ],
+    "loans" : [ {
+      "loanType" : "m",
+      "amount" : 1000.0,
+      "rate" : 5.0,
+      "description" : "Rent"
+    }, {
+      "loanType" : "y",
+      "amount" : -200.0,
+      "rate" : 0.0,
+      "description" : "Lunch"
+    } ]
   }, {
     "name" : "Carl Kurz",
     "phone" : "95352563",
     "email" : "heinz@example.com",
     "address" : "wall street",
-    "tags" : [ ]
+    "tags" : [ ],
+    "loans" : [ {
+      "loanType" : "m",
+      "amount" : 500.0,
+      "rate" : 3.0,
+      "description" : "Car"
+    } ]
   }, {
     "name" : "Daniel Meier",
     "phone" : "87652533",
     "email" : "cornelia@example.com",
     "address" : "10th street",
-    "tags" : [ "friends" ]
+    "tags" : [ "friends" ],
+    "loans" : [ {
+      "loanType" : "y",
+      "amount" : 1200.0,
+      "rate" : 2.5,
+      "description" : "Mortgage"
+    } ]
   }, {
     "name" : "Elle Meyer",
     "phone" : "9482224",
     "email" : "werner@example.com",
     "address" : "michegan ave",
-    "tags" : [ ]
+    "tags" : [ ],
+    "loans" : [ ]
   }, {
     "name" : "Fiona Kunz",
     "phone" : "9482427",
     "email" : "lydia@example.com",
     "address" : "little tokyo",
-    "tags" : [ ]
+    "tags" : [ ],
+    "loans" : [ ]
   }, {
     "name" : "George Best",
     "phone" : "9482442",
     "email" : "anna@example.com",
     "address" : "4th street",
-    "tags" : [ ]
+    "tags" : [ ],
+    "loans" : [ ]
   } ]
 }

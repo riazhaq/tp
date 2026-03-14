@@ -9,6 +9,9 @@ import java.util.Set;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.loan.Loan;
+import seedu.address.model.loan.MonthlyLoan;
+import seedu.address.model.loan.YearlyLoan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -120,5 +123,52 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    /**
+     * Parses a {@code String loanArguments} into a {@code Loan}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given {@code loanDetails} is invalid.
+     */
+    public static Loan parseLoan(String loanDetails) throws ParseException {
+        requireNonNull(loanDetails);
+        String trimmedLoanDetails = loanDetails.trim();
+        if (!Loan.isValidLoanArguments(trimmedLoanDetails)) {
+            throw new ParseException(Loan.MESSAGE_CONSTRAINTS);
+        }
+
+        String lowercasedLoanDetails = trimmedLoanDetails.toLowerCase();
+        String loanDetailsWithoutType = trimmedLoanDetails;
+
+        if (lowercasedLoanDetails.startsWith("m ") || lowercasedLoanDetails.startsWith("y ")) {
+            loanDetailsWithoutType = trimmedLoanDetails.substring(2);
+        }
+
+        String[] parts = loanDetailsWithoutType.split("\\s*,\\s*", 3);
+
+        double amount = Double.parseDouble(parts[0]);
+        double rate = Double.parseDouble(parts[1]);
+        String description = parts[2];
+
+        if (lowercasedLoanDetails.startsWith("m ")) {
+            return new MonthlyLoan(amount, rate, description);
+        } else if (lowercasedLoanDetails.startsWith("y ")) {
+            return new YearlyLoan(amount, rate, description);
+        } else {
+            return new Loan(amount, rate, description);
+        }
+    }
+
+    /**
+     * Parses {@code Collection<String> loans} into a {@code Set<Loan>}.
+     */
+    public static Set<Loan> parseLoans(Collection<String> loans) throws ParseException {
+        requireNonNull(loans);
+        final Set<Loan> loanSet = new HashSet<>();
+        for (String loanDetails : loans) {
+            loanSet.add(parseLoan(loanDetails));
+        }
+        return loanSet;
     }
 }

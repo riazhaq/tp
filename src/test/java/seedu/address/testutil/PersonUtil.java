@@ -2,6 +2,7 @@ package seedu.address.testutil;
 
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_LOAN;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
@@ -10,8 +11,13 @@ import java.util.Set;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.model.loan.Loan;
+import seedu.address.model.loan.MonthlyLoan;
+import seedu.address.model.loan.YearlyLoan;
 import seedu.address.model.person.Person;
 import seedu.address.model.tag.Tag;
+
+
 
 /**
  * A utility class for Person.
@@ -37,7 +43,21 @@ public class PersonUtil {
         person.getTags().stream().forEach(
             s -> sb.append(PREFIX_TAG + s.tagName + " ")
         );
+        person.getLoans().forEach(
+                loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" ")
+        );
         return sb.toString();
+    }
+
+    /** Helper to convert loan to string representation */
+    private static String formatLoan(Loan loan) {
+        String type = "";
+        if (loan instanceof MonthlyLoan) {
+            type = "m ";
+        } else if (loan instanceof YearlyLoan) {
+            type = "y ";
+        }
+        return type + loan.getCurrAmount() + ", " + loan.getInterest() + ", " + loan.getDescription();
     }
 
     /**
@@ -55,6 +75,14 @@ public class PersonUtil {
                 sb.append(PREFIX_TAG);
             } else {
                 tags.forEach(s -> sb.append(PREFIX_TAG).append(s.tagName).append(" "));
+            }
+        }
+        if (descriptor.getLoans().isPresent()) {
+            Set<Loan> loans = descriptor.getLoans().get();
+            if (loans.isEmpty()) {
+                sb.append(PREFIX_LOAN);
+            } else {
+                loans.forEach(loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" "));
             }
         }
         return sb.toString();
