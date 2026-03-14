@@ -81,8 +81,23 @@ public class Person {
             return true;
         }
 
-        return otherPerson != null
-                && otherPerson.getName().equals(getName());
+        if (otherPerson == null) {
+            return false;
+        }
+
+        String thisNameNormalised = normaliseName(getName().toString());
+        String otherNameNormalised = normaliseName(otherPerson.getName().toString());
+
+        return thisNameNormalised.equalsIgnoreCase(otherNameNormalised);
+    }
+
+    /**
+     * Normalises a name for identity comparison by trimming leading/trailing whitespace
+     * and collapsing internal whitespace sequences into a single space.
+     */
+    private String normaliseName(String name) {
+        String trimmed = name.trim();
+        return trimmed.replaceAll("\\s+", " ");
     }
 
     /**
