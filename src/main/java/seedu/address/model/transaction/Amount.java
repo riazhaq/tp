@@ -29,7 +29,6 @@ public class Amount {
         requireNonNull(amount);
         checkArgument(isValidAmount(amount), MESSAGE_CONSTRAINTS);
         this.value = Double.parseDouble(amount);
-        checkArgument(this.value > 0, MESSAGE_CONSTRAINTS);
     }
 
     /**
