@@ -10,6 +10,11 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.index.Index;
@@ -17,6 +22,7 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Person;
 
 /**
@@ -80,9 +86,57 @@ public class DeleteCommandTest {
     }
 
     @Test
+    public void execute_validTransactionIndexUnfilteredList_success() {
+        Index transactionIndex = Index.fromOneBased(1);
+        Person personToModify = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, transactionIndex);
+
+
+        List<Loan> loans = new ArrayList<>(personToModify.getLoans());
+        Loan loanToDelete = loans.get(transactionIndex.getZeroBased());
+        Set<Loan> updatedLoans = new HashSet<>(personToModify.getLoans());
+        updatedLoans.remove(loanToDelete);
+        Person updatedPerson = new Person(personToModify.getName(), personToModify.getPhone(),
+                personToModify.getEmail(), personToModify.getAddress(), personToModify.getTags(), updatedLoans);
+
+
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setPerson(personToModify, updatedPerson);
+
+
+        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_TRANSACTION_SUCCESS,
+                transactionIndex.getOneBased());
+
+
+        assertCommandSuccess(deleteCommand, model, expectedMessage, expectedModel);
+    }
+
+
+    @Test
+    public void execute_invalidTransactionIndex_throwsCommandException() {
+        DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, Index.fromOneBased(3));
+        assertCommandFailure(deleteCommand, model, DeleteCommand.MESSAGE_INVALID_TRANSACTION_DISPLAYED_INDEX);
+    }
+
+
+    @Test
+    public void execute_noTransactionsFound_throwsCommandException() {
+        Index personIndex = Index.fromOneBased(5);
+        DeleteCommand deleteCommand = new DeleteCommand(personIndex, Index.fromOneBased(1));
+        Person person = model.getFilteredPersonList().get(personIndex.getZeroBased());
+        String expectedMessage = String.format(DeleteCommand.MESSAGE_NO_TRANSACTIONS, person.getName());
+
+
+        assertCommandFailure(deleteCommand, model, expectedMessage);
+    }
+
+    @Test
     public void equals() {
         DeleteCommand deleteFirstCommand = new DeleteCommand(INDEX_FIRST_PERSON);
         DeleteCommand deleteSecondCommand = new DeleteCommand(INDEX_SECOND_PERSON);
+
+        DeleteCommand deleteFirstTransactionCommand = new DeleteCommand(INDEX_FIRST_PERSON, Index.fromOneBased(1));
+        DeleteCommand deleteSecondTransactionCommand = new DeleteCommand(INDEX_FIRST_PERSON, Index.fromOneBased(2));
 
         // same object -> returns true
         assertTrue(deleteFirstCommand.equals(deleteFirstCommand));
@@ -90,6 +144,11 @@ public class DeleteCommandTest {
         // same values -> returns true
         DeleteCommand deleteFirstCommandCopy = new DeleteCommand(INDEX_FIRST_PERSON);
         assertTrue(deleteFirstCommand.equals(deleteFirstCommandCopy));
+
+        DeleteCommand deleteFirstTransactionCommandCopy =
+                new DeleteCommand(INDEX_FIRST_PERSON, Index.fromOneBased(1));
+
+        assertTrue(deleteFirstTransactionCommand.equals(deleteFirstTransactionCommandCopy));
 
         // different types -> returns false
         assertFalse(deleteFirstCommand.equals(1));
@@ -99,13 +158,20 @@ public class DeleteCommandTest {
 
         // different person -> returns false
         assertFalse(deleteFirstCommand.equals(deleteSecondCommand));
+
+        // different transaction index -> returns false
+        assertFalse(deleteFirstTransactionCommand.equals(deleteSecondTransactionCommand));
+
+        // different command type -> returns false
+        assertFalse(deleteFirstCommand.equals(deleteFirstTransactionCommand));
     }
 
     @Test
     public void toStringMethod() {
         Index targetIndex = Index.fromOneBased(1);
         DeleteCommand deleteCommand = new DeleteCommand(targetIndex);
-        String expected = DeleteCommand.class.getCanonicalName() + "{targetIndex=" + targetIndex + "}";
+        String expected = DeleteCommand.class.getCanonicalName()
+                + "{targetIndex=" + targetIndex + ", transactionIndex=null}";
         assertEquals(expected, deleteCommand.toString());
     }
 
