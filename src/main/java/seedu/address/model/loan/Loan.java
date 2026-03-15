@@ -140,6 +140,10 @@ public class Loan {
         return interestRate.getInterest();
     }
 
+    public LocalDate getLastRecalculatedDate() {
+        return lastRecalculatedDate;
+    }
+
     @Override
     public String toString() {
         return String.format("[Amount: %.2f, Rate: %.2f%%, Desc: %s]",
