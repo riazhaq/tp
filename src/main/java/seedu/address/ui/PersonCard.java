@@ -61,7 +61,7 @@ public class PersonCard extends UiPart<Region> {
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
     }
 
-    private String formatBalance(Person person) {
+    static String formatBalance(Person person) {
         double total = person.getLoans().stream()
                 .mapToDouble(Loan::getCurrAmount)
                 .sum();
