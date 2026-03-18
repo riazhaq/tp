@@ -3,13 +3,13 @@ package seedu.address.testutil;
 import java.util.HashSet;
 import java.util.Set;
 
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Transaction;
 import seedu.address.model.util.SampleDataUtil;
 
 /**
@@ -32,7 +32,7 @@ public class PersonBuilder {
     private Email email;
     private Address address;
     private Set<Tag> tags;
-    private Set<Loan> loans;
+    private Set<Transaction> transactions;
 
     /**
      * Creates a {@code PersonBuilder} with default details.
@@ -43,7 +43,7 @@ public class PersonBuilder {
         email = new Email(DEFAULT_EMAIL);
         address = new Address(DEFAULT_ADDRESS);
         tags = new HashSet<>();
-        loans = new HashSet<>(); // default empty
+        transactions = new HashSet<>(); // default empty
     }
 
     /**
@@ -57,7 +57,7 @@ public class PersonBuilder {
         email = personToCopy.getEmail();
         address = personToCopy.getAddress();
         tags = new HashSet<>(personToCopy.getTags());
-        loans = new HashSet<>(personToCopy.getLoans());
+        transactions = new HashSet<>(personToCopy.getTransactions());
     }
 
     /**
@@ -116,15 +116,15 @@ public class PersonBuilder {
     }
 
     /**
-     * Sets the {@link Loan}s associated with the {@code Person}.
+     * Sets the {@link Transaction}s associated with the {@code Person}.
      *
-     * @param loans The loans to assign to the person.
+     * @param transactions The transactions to assign to the person.
      * @return This builder instance for chaining.
      */
-    public PersonBuilder withLoans(Loan... loans) {
-        this.loans = new HashSet<>();
-        for (Loan loan : loans) {
-            this.loans.add(loan);
+    public PersonBuilder withTransactions(Transaction... transactions) {
+        this.transactions = new HashSet<>();
+        for (Transaction transaction : transactions) {
+            this.transactions.add(transaction);
         }
         return this;
     }
@@ -135,6 +135,6 @@ public class PersonBuilder {
      * @return A new {@code Person} object.
      */
     public Person build() {
-        return new Person(name, phone, email, address, tags, loans);
+        return new Person(name, phone, email, address, tags, transactions);
     }
 }

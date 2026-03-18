@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * A utility class to help with building EditPersonDescriptor objects.
@@ -38,7 +38,7 @@ public class EditPersonDescriptorBuilder {
         descriptor.setEmail(person.getEmail());
         descriptor.setAddress(person.getAddress());
         descriptor.setTags(person.getTags());
-        descriptor.setLoans(person.getLoans());
+        descriptor.setTransactions(person.getTransactions());
     }
 
     /**
@@ -84,12 +84,12 @@ public class EditPersonDescriptorBuilder {
     }
 
     /**
-     * Parses the {@code loans} into a {@code Set<Loan>} and set it to the {@code EditPersonDescriptor}
+     * Parses the {@code transactions} into a {@code Set<Transaction>} and set it to the {@code EditPersonDescriptor}
      * that we are building.
      */
-    public EditPersonDescriptorBuilder withLoans(Loan... loans) {
-        Set<Loan> loanSet = Stream.of(loans).collect(Collectors.toSet());
-        descriptor.setLoans(loanSet);
+    public EditPersonDescriptorBuilder withTransactions(Transaction... transactions) {
+        Set<Transaction> transactionSet = Stream.of(transactions).collect(Collectors.toSet());
+        descriptor.setTransactions(transactionSet);
         return this;
     }
 

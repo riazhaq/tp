@@ -9,14 +9,14 @@ import java.util.Set;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.loan.Loan;
-import seedu.address.model.loan.MonthlyLoan;
-import seedu.address.model.loan.YearlyLoan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.MonthlyTransaction;
+import seedu.address.model.transaction.Transaction;
+import seedu.address.model.transaction.YearlyTransaction;
 
 /**
  * Contains utility methods used for parsing strings in the various *Parser classes.
@@ -126,49 +126,49 @@ public class ParserUtil {
     }
 
     /**
-     * Parses a {@code String loanArguments} into a {@code Loan}.
+     * Parses a {@code String transactionArguments} into a {@code Transaction}.
      * Leading and trailing whitespaces will be trimmed.
      *
-     * @throws ParseException if the given {@code loanDetails} is invalid.
+     * @throws ParseException if the given {@code transactionDetails} is invalid.
      */
-    public static Loan parseLoan(String loanDetails) throws ParseException {
-        requireNonNull(loanDetails);
-        String trimmedLoanDetails = loanDetails.trim();
-        if (!Loan.isValidLoanArguments(trimmedLoanDetails)) {
-            throw new ParseException(Loan.MESSAGE_CONSTRAINTS);
+    public static Transaction parseTransaction(String transactionDetails) throws ParseException {
+        requireNonNull(transactionDetails);
+        String trimmedTransactionDetails = transactionDetails.trim();
+        if (!Transaction.isValidTransactionArguments(trimmedTransactionDetails)) {
+            throw new ParseException(Transaction.MESSAGE_CONSTRAINTS);
         }
 
-        String lowercasedLoanDetails = trimmedLoanDetails.toLowerCase();
-        String loanDetailsWithoutType = trimmedLoanDetails;
+        String lowercasedTransactionDetails = trimmedTransactionDetails.toLowerCase();
+        String transactionDetailsWithoutType = trimmedTransactionDetails;
 
-        if (lowercasedLoanDetails.startsWith("m ") || lowercasedLoanDetails.startsWith("y ")) {
-            loanDetailsWithoutType = trimmedLoanDetails.substring(2);
+        if (lowercasedTransactionDetails.startsWith("m ") || lowercasedTransactionDetails.startsWith("y ")) {
+            transactionDetailsWithoutType = trimmedTransactionDetails.substring(2);
         }
 
-        String[] parts = loanDetailsWithoutType.split("\\s*,\\s*", 3);
+        String[] parts = transactionDetailsWithoutType.split("\\s*,\\s*", 3);
 
         double amount = Double.parseDouble(parts[0]);
         double rate = Double.parseDouble(parts[1]);
         String description = parts[2];
 
-        if (lowercasedLoanDetails.startsWith("m ")) {
-            return new MonthlyLoan(amount, rate, description);
-        } else if (lowercasedLoanDetails.startsWith("y ")) {
-            return new YearlyLoan(amount, rate, description);
+        if (lowercasedTransactionDetails.startsWith("m ")) {
+            return new MonthlyTransaction(amount, rate, description);
+        } else if (lowercasedTransactionDetails.startsWith("y ")) {
+            return new YearlyTransaction(amount, rate, description);
         } else {
-            return new Loan(amount, rate, description);
+            return new Transaction(amount, rate, description);
         }
     }
 
     /**
-     * Parses {@code Collection<String> loans} into a {@code Set<Loan>}.
+     * Parses {@code Collection<String> transactions} into a {@code Set<Transaction>}.
      */
-    public static Set<Loan> parseLoans(Collection<String> loans) throws ParseException {
-        requireNonNull(loans);
-        final Set<Loan> loanSet = new HashSet<>();
-        for (String loanDetails : loans) {
-            loanSet.add(parseLoan(loanDetails));
+    public static Set<Transaction> parseTransactions(Collection<String> transactions) throws ParseException {
+        requireNonNull(transactions);
+        final Set<Transaction> transactionSet = new HashSet<>();
+        for (String transactionDetails : transactions) {
+            transactionSet.add(parseTransaction(transactionDetails));
         }
-        return loanSet;
+        return transactionSet;
     }
 }

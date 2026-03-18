@@ -22,8 +22,8 @@ import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for
@@ -92,12 +92,12 @@ public class DeleteCommandTest {
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, transactionIndex);
 
 
-        List<Loan> loans = new ArrayList<>(personToModify.getLoans());
-        Loan loanToDelete = loans.get(transactionIndex.getZeroBased());
-        Set<Loan> updatedLoans = new HashSet<>(personToModify.getLoans());
-        updatedLoans.remove(loanToDelete);
+        List<Transaction> transactions = new ArrayList<>(personToModify.getTransactions());
+        Transaction transactionToDelete = transactions.get(transactionIndex.getZeroBased());
+        Set<Transaction> updatedTransactions = new HashSet<>(personToModify.getTransactions());
+        updatedTransactions.remove(transactionToDelete);
         Person updatedPerson = new Person(personToModify.getName(), personToModify.getPhone(),
-                personToModify.getEmail(), personToModify.getAddress(), personToModify.getTags(), updatedLoans);
+                personToModify.getEmail(), personToModify.getAddress(), personToModify.getTags(), updatedTransactions);
 
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());

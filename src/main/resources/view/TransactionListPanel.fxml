@@ -5,9 +5,9 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" spacing="6" styleClass="loan-list-panel">
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" spacing="6" styleClass="transaction-list-panel">
   <Label fx:id="title" text="Transactions - Select a person" styleClass="panel-title" />
-  <TableView fx:id="loanTable" VBox.vgrow="ALWAYS">
+  <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS">
     <columns>
       <TableColumn fx:id="indexColumn" text="#" prefWidth="40" />
       <TableColumn fx:id="typeColumn" text="Type" prefWidth="80" />

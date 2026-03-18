@@ -1,27 +1,27 @@
-package seedu.address.model.loan;
+package seedu.address.model.transaction;
 
 /**
- * Represents a loan where interest is compounded yearly.
+ * Represents a transaction where interest is compounded yearly.
  */
-public class YearlyLoan extends Loan {
+public class YearlyTransaction extends Transaction {
 
     /**
-     * Constructs a YearlyLoan.
+     * Constructs a YearlyTransaction.
      *
-     * @param currAmount the initial loan amount
+     * @param currAmount the initial transaction amount
      * @param interestRate the interest rate applied yearly
-     * @param description the description for the loan
+     * @param description the description for the transaction
      */
-    public YearlyLoan(double currAmount, double interestRate, String description) {
+    public YearlyTransaction(double currAmount, double interestRate, String description) {
         super(currAmount, interestRate, description);
     }
 
     /**
-     * Updates the loan amount by applying interest for each
+     * Updates the transaction amount by applying interest for each
      * year that has passed since the last recalculation.
      */
     @Override
-    public void updateLoanAmount() {
+    public void updateTransactionAmount() {
         long years = getNumberOfYearsSinceLastPaid();
 
         currAmount = interestRate.applyInterestRate(currAmount, years);

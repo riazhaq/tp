@@ -1,10 +1,10 @@
-package seedu.address.model.loan;
+package seedu.address.model.transaction;
 
 /**
- * Represents the interest rate applied to a loan.
+ * Represents the interest rate applied to a transaction.
  * <p>
  * The interest rate must be between 0 and 100 (inclusive).
- * It is used to calculate compounded interest on a loan amount.
+ * It is used to calculate compounded interest on a transaction amount.
  */
 public class InterestRate {
 
@@ -51,7 +51,7 @@ public class InterestRate {
     /**
      * Applies compound interest to a principal amount.
      *
-     * @param principal the original loan amount
+     * @param principal the original transaction amount
      * @param numberOfTimes the number of times interest is compounded
      * @return the updated amount after interest is applied
      */

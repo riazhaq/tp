@@ -46,8 +46,8 @@ public class Messages {
                 .append("; Tags: ");
         person.getTags().forEach(tag -> builder.append(tag).append(" "));
 
-        builder.append("; Loans: ");
-        person.getLoans().forEach(loan -> builder.append(loan).append(" "));
+        builder.append("; Transactions: ");
+        person.getTransactions().forEach(transaction -> builder.append(transaction).append(" "));
 
         return builder.toString();
     }

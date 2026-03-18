@@ -7,8 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * An UI component that displays information of a {@code Person}.
@@ -93,11 +93,11 @@ public class PersonCard extends UiPart<Region> {
     }
 
     static String formatBalance(Person person) {
-        double total = person.getLoans().stream()
-                .mapToDouble(Loan::getCurrAmount)
+        double total = person.getTransactions().stream()
+                .mapToDouble(Transaction::getCurrAmount)
                 .sum();
 
-        if (person.getLoans().isEmpty() || Math.abs(total) < NEAR_ZERO_THRESHOLD) {
+        if (person.getTransactions().isEmpty() || Math.abs(total) < NEAR_ZERO_THRESHOLD) {
             return "Balance: $0.00";
         }
 
@@ -119,11 +119,11 @@ public class PersonCard extends UiPart<Region> {
     }
 
     static ActiveDebtsModel activeDebtsModelFor(Person person) {
-        double total = person.getLoans().stream()
-                .mapToDouble(Loan::getCurrAmount)
+        double total = person.getTransactions().stream()
+                .mapToDouble(Transaction::getCurrAmount)
                 .sum();
 
-        if (person.getLoans().isEmpty() || Math.abs(total) < NEAR_ZERO_THRESHOLD) {
+        if (person.getTransactions().isEmpty() || Math.abs(total) < NEAR_ZERO_THRESHOLD) {
             return new ActiveDebtsModel("$0.00", "", null);
         }
 

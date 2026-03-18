@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import seedu.address.commons.util.ToStringBuilder;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * Represents a Person in the address book.
@@ -25,19 +25,19 @@ public class Person {
     // Data fields
     private final Address address;
     private final Set<Tag> tags = new HashSet<>();
-    private final Set<Loan> loans = new HashSet<>();
+    private final Set<Transaction> transactions = new HashSet<>();
 
     /**
      * Every field must be present and not null.
      */
-    public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags, Set<Loan> loans) {
-        requireAllNonNull(name, phone, email, address, tags, loans);
+    public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags, Set<Transaction> transactions) {
+        requireAllNonNull(name, phone, email, address, tags, transactions);
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.tags.addAll(tags);
-        this.loans.addAll(loans);
+        this.transactions.addAll(transactions);
     }
 
     public Name getName() {
@@ -65,11 +65,11 @@ public class Person {
     }
 
     /**
-     * Returns an immutable loan set, which throws {@code UnsupportedOperationException}
+     * Returns an immutable transaction set, which throws {@code UnsupportedOperationException}
      * if modification is attempted.
      */
-    public Set<Loan> getLoans() {
-        return Collections.unmodifiableSet(loans);
+    public Set<Transaction> getTransactions() {
+        return Collections.unmodifiableSet(transactions);
     }
 
     /**
@@ -121,13 +121,13 @@ public class Person {
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
                 && tags.equals(otherPerson.tags)
-                && loans.equals(otherPerson.loans);
+                && transactions.equals(otherPerson.transactions);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags, loans);
+        return Objects.hash(name, phone, email, address, tags, transactions);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Person {
                 .add("email", email)
                 .add("address", address)
                 .add("tags", tags)
-                .add("loans", loans)
+                .add("transactions", transactions)
                 .toString();
     }
 

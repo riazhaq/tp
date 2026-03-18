@@ -15,15 +15,15 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Region;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.Transaction;
 
 /**
- * Panel that displays transactions (loans) for the currently selected person.
+ * Panel that displays transactions (transactions) for the currently selected person.
  */
-public class LoanListPanel extends UiPart<Region> {
+public class TransactionListPanel extends UiPart<Region> {
 
-    private static final String FXML = "LoanListPanel.fxml";
+    private static final String FXML = "TransactionListPanel.fxml";
 
     private static final String NO_SELECTION_TITLE = "Transactions - Select a person";
     private static final String STATUS_PENDING = "Pending";
@@ -34,19 +34,19 @@ public class LoanListPanel extends UiPart<Region> {
 
     static final class DisplayModel {
         private final String title;
-        private final List<Loan> loans;
+        private final List<Transaction> transactions;
 
-        private DisplayModel(String title, List<Loan> loans) {
+        private DisplayModel(String title, List<Transaction> transactions) {
             this.title = title;
-            this.loans = loans;
+            this.transactions = transactions;
         }
 
         String getTitle() {
             return title;
         }
 
-        List<Loan> getLoans() {
-            return loans;
+        List<Transaction> getTransactions() {
+            return transactions;
         }
     }
 
@@ -72,30 +72,30 @@ public class LoanListPanel extends UiPart<Region> {
     private Label title;
 
     @FXML
-    private TableView<Loan> loanTable;
+    private TableView<Transaction> transactionTable;
 
     @FXML
-    private TableColumn<Loan, Number> indexColumn;
+    private TableColumn<Transaction, Number> indexColumn;
 
     @FXML
-    private TableColumn<Loan, String> typeColumn;
+    private TableColumn<Transaction, String> typeColumn;
 
     @FXML
-    private TableColumn<Loan, String> amountColumn;
+    private TableColumn<Transaction, String> amountColumn;
 
     @FXML
-    private TableColumn<Loan, String> descriptionColumn;
+    private TableColumn<Transaction, String> descriptionColumn;
 
     @FXML
-    private TableColumn<Loan, String> statusColumn;
+    private TableColumn<Transaction, String> statusColumn;
 
     @FXML
-    private TableColumn<Loan, String> dateColumn;
+    private TableColumn<Transaction, String> dateColumn;
 
     /**
-     * Creates a loan list panel showing no selection initially.
+     * Creates a transaction list panel showing no selection initially.
      */
-    public LoanListPanel() {
+    public TransactionListPanel() {
         super(FXML);
         showNoSelection();
     }
@@ -103,7 +103,7 @@ public class LoanListPanel extends UiPart<Region> {
     @FXML
     private void initialize() {
         indexColumn.setCellValueFactory(cellData ->
-                indexCellValue(loanTable.getItems(), cellData.getValue()));
+                indexCellValue(transactionTable.getItems(), cellData.getValue()));
 
         typeColumn.setCellValueFactory(cellData -> {
             return new ReadOnlyStringWrapper(typeText(cellData.getValue().getCurrAmount()));
@@ -125,20 +125,20 @@ public class LoanListPanel extends UiPart<Region> {
     }
 
     /**
-     * Displays the transactions (loans) belonging to the given person.
+     * Displays the transactions (transactions) belonging to the given person.
      *
      * @param person The selected person. If null, the panel resets to the no-selection state.
      */
     public void displayPerson(Person person) {
         DisplayModel model = displayModelFor(person);
         title.setText(model.getTitle());
-        loanTable.setItems(FXCollections.observableArrayList(model.getLoans()));
+        transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
     }
 
     private void showNoSelection() {
         DisplayModel model = displayModelFor(null);
         title.setText(model.getTitle());
-        loanTable.setItems(FXCollections.observableArrayList(model.getLoans()));
+        transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
     }
 
     /**
@@ -156,7 +156,7 @@ public class LoanListPanel extends UiPart<Region> {
     }
 
     /**
-     * Returns the display text for a loan type based on the current amount.
+     * Returns the display text for a transaction type based on the current amount.
      */
     static String typeText(double amount) {
         return amount >= 0 ? TYPE_OWE : TYPE_LENT;
@@ -172,26 +172,26 @@ public class LoanListPanel extends UiPart<Region> {
     /**
      * Returns the description text shown in the table.
      */
-    static String descriptionText(Loan loan) {
-        Objects.requireNonNull(loan);
-        return loan.getDescription();
+    static String descriptionText(Transaction transaction) {
+        Objects.requireNonNull(transaction);
+        return transaction.getDescription();
     }
 
     /**
      * Returns the date text shown in the table.
      */
-    static String dateText(Loan loan) {
-        Objects.requireNonNull(loan);
-        return loan.getLastRecalculatedDate().toString();
+    static String dateText(Transaction transaction) {
+        Objects.requireNonNull(transaction);
+        return transaction.getLastRecalculatedDate().toString();
     }
 
     /**
-     * Sorts loans by current amount in descending order.
+     * Sorts transactions by current amount in descending order.
      */
-    static List<Loan> sortedLoans(Iterable<Loan> loans) {
-        Objects.requireNonNull(loans);
-        return StreamSupport.stream(loans.spliterator(), false)
-                .sorted(Comparator.comparingDouble(Loan::getCurrAmount).reversed())
+    static List<Transaction> sortedTransactions(Iterable<Transaction> transactions) {
+        Objects.requireNonNull(transactions);
+        return StreamSupport.stream(transactions.spliterator(), false)
+                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -204,9 +204,9 @@ public class LoanListPanel extends UiPart<Region> {
             return new DisplayModel(noSelectionTitle(), List.of());
         }
 
-        String displayTitle = UiMessages.transactionsTitle(person.getLoans().size(), person.getName().fullName);
-        List<Loan> loans = sortedLoans(person.getLoans());
-        return new DisplayModel(displayTitle, loans);
+        String displayTitle = UiMessages.transactionsTitle(person.getTransactions().size(), person.getName().fullName);
+        List<Transaction> transactions = sortedTransactions(person.getTransactions());
+        return new DisplayModel(displayTitle, transactions);
     }
 
     /**
@@ -218,7 +218,7 @@ public class LoanListPanel extends UiPart<Region> {
         return items.indexOf(value) + 1;
     }
 
-    static ReadOnlyObjectWrapper<Number> indexCellValue(List<Loan> items, Loan value) {
+    static ReadOnlyObjectWrapper<Number> indexCellValue(List<Transaction> items, Transaction value) {
         return new ReadOnlyObjectWrapper<>(oneBasedIndexOf(items, value));
     }
 
@@ -247,7 +247,7 @@ public class LoanListPanel extends UiPart<Region> {
         return new TypeCellModel(item, styleClassForType(item));
     }
 
-    private static class TransactionTypeCell extends TableCell<Loan, String> {
+    private static class TransactionTypeCell extends TableCell<Transaction, String> {
         @Override
         protected void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);

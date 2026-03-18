@@ -35,7 +35,7 @@ public class MainWindow extends UiPart<Stage> {
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
-    private LoanListPanel loanListPanel;
+    private TransactionListPanel transactionListPanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
 
@@ -49,7 +49,7 @@ public class MainWindow extends UiPart<Stage> {
     private StackPane personListPanelPlaceholder;
 
     @FXML
-    private StackPane loanListPanelPlaceholder;
+    private StackPane transactionListPanelPlaceholder;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -164,9 +164,9 @@ public class MainWindow extends UiPart<Stage> {
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
 
-        loanListPanel = new LoanListPanel();
-        loanListPanelPlaceholder.getChildren().add(loanListPanel.getRoot());
-        personListPanel.setSelectionListener(loanListPanel::displayPerson);
+        transactionListPanel = new TransactionListPanel();
+        transactionListPanelPlaceholder.getChildren().add(transactionListPanel.getRoot());
+        personListPanel.setSelectionListener(transactionListPanel::displayPerson);
 
         updateActiveContactsCount();
         logic.getFilteredPersonList().addListener((ListChangeListener<Person>) c -> updateActiveContactsCount());

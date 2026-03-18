@@ -1,26 +1,26 @@
-package seedu.address.model.loan;
+package seedu.address.model.transaction;
 
 /**
- * Represents a loan where interest is compounded monthly.
+ * Represents a transaction where interest is compounded monthly.
  */
-public class MonthlyLoan extends Loan {
+public class MonthlyTransaction extends Transaction {
 
     /**
-     * Constructs a MonthlyLoan.
+     * Constructs a MonthlyTransaction.
      *
-     * @param currAmount the initial loan amount
+     * @param currAmount the initial transaction amount
      * @param interestRate the interest rate applied monthly
      */
-    public MonthlyLoan(double currAmount, double interestRate, String description) {
+    public MonthlyTransaction(double currAmount, double interestRate, String description) {
         super(currAmount, interestRate, description);
     }
 
     /**
-     * Updates the loan amount by applying interest for each
+     * Updates the transaction amount by applying interest for each
      * month that has passed since the last recalculation.
      */
     @Override
-    public void updateLoanAmount() {
+    public void updateTransactionAmount() {
         long months = getNumberOfMonthsSinceLastPaid();
 
         currAmount = interestRate.applyInterestRate(currAmount, months);
@@ -34,3 +34,4 @@ public class MonthlyLoan extends Loan {
                 currAmount, getInterest(), description);
     }
 }
+

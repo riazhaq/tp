@@ -10,13 +10,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * Jackson-friendly version of {@link Person}.
@@ -30,7 +30,7 @@ class JsonAdaptedPerson {
     private final String email;
     private final String address;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
-    private final List<JsonAdaptedLoan> loans = new ArrayList<>();
+    private final List<JsonAdaptedTransaction> transactions = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
@@ -41,7 +41,7 @@ class JsonAdaptedPerson {
                              @JsonProperty("email") String email,
                              @JsonProperty("address") String address,
                              @JsonProperty("tags") List<JsonAdaptedTag> tags,
-                             @JsonProperty("loans") List<JsonAdaptedLoan> loans) {
+                             @JsonProperty("transactions") List<JsonAdaptedTransaction> transactions) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -49,8 +49,8 @@ class JsonAdaptedPerson {
         if (tags != null) {
             this.tags.addAll(tags);
         }
-        if (loans != null) {
-            this.loans.addAll(loans);
+        if (transactions != null) {
+            this.transactions.addAll(transactions);
         }
     }
 
@@ -67,8 +67,8 @@ class JsonAdaptedPerson {
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
 
-        loans.addAll(source.getLoans().stream()
-                .map(JsonAdaptedLoan::new)
+        transactions.addAll(source.getTransactions().stream()
+                .map(JsonAdaptedTransaction::new)
                 .collect(Collectors.toList()));
     }
 
@@ -83,9 +83,9 @@ class JsonAdaptedPerson {
             personTags.add(tag.toModelType());
         }
 
-        final List<Loan> personLoans = new ArrayList<>();
-        for (JsonAdaptedLoan loan : loans) {
-            personLoans.add(loan.toModelType());
+        final List<Transaction> personTransactions = new ArrayList<>();
+        for (JsonAdaptedTransaction transaction : transactions) {
+            personTransactions.add(transaction.toModelType());
         }
 
         if (name == null) {
@@ -121,8 +121,8 @@ class JsonAdaptedPerson {
         final Address modelAddress = new Address(address);
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        final Set<Loan> modelLoans = new HashSet<>(personLoans);
+        final Set<Transaction> modelTransactions = new HashSet<>(personTransactions);
 
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelTags, modelLoans);
+        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelTags, modelTransactions);
     }
 }

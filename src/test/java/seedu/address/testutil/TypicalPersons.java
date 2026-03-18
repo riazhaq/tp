@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import seedu.address.model.AddressBook;
-import seedu.address.model.loan.MonthlyLoan;
-import seedu.address.model.loan.YearlyLoan;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.MonthlyTransaction;
+import seedu.address.model.transaction.YearlyTransaction;
 
 /**
  * A utility class containing a list of {@code Person} objects to be used in tests.
@@ -29,9 +29,9 @@ public class TypicalPersons {
             .withAddress("123, Jurong West Ave 6, #08-111").withEmail("alice@example.com")
             .withPhone("94351253")
             .withTags("friends")
-            .withLoans(
-                    new MonthlyLoan(2000.0, 5.0, "Rent"),
-                    new YearlyLoan(-300.0, 0.0, "Insurance") // negative loan allowed
+            .withTransactions(
+                    new MonthlyTransaction(2000.0, 5.0, "Rent"),
+                    new YearlyTransaction(-300.0, 0.0, "Insurance") // negative transaction allowed
             ).build();
     public static final Person BENSON = new PersonBuilder()
             .withName("Benson Meier")
@@ -39,21 +39,21 @@ public class TypicalPersons {
             .withEmail("johnd@example.com")
             .withPhone("98765432")
             .withTags("owesMoney", "friends")
-            .withLoans(
-                    new MonthlyLoan(1000.0, 5.0, "Rent"),
-                    new YearlyLoan(-200.0, 0.0, "Lunch") // negative loan allowed
+            .withTransactions(
+                    new MonthlyTransaction(1000.0, 5.0, "Rent"),
+                    new YearlyTransaction(-200.0, 0.0, "Lunch") // negative transaction allowed
             ).build();
     public static final Person CARL = new PersonBuilder().withName("Carl Kurz").withPhone("95352563")
             .withEmail("heinz@example.com").withAddress("wall street")
-            .withLoans(new MonthlyLoan(500.0, 3.0, "Car"))
+            .withTransactions(new MonthlyTransaction(500.0, 3.0, "Car"))
             .build();
 
     public static final Person DANIEL = new PersonBuilder().withName("Daniel Meier").withPhone("87652533")
             .withEmail("cornelia@example.com").withAddress("10th street").withTags("friends")
-            .withLoans(new YearlyLoan(1200.0, 2.5, "Mortgage"))
+            .withTransactions(new YearlyTransaction(1200.0, 2.5, "Mortgage"))
             .build();
 
-    // No loans — tests that persons without loans are handled correctly
+    // No transactions — tests that persons without transactions are handled correctly
     public static final Person ELLE = new PersonBuilder().withName("Elle Meyer").withPhone("9482224")
             .withEmail("werner@example.com").withAddress("michegan ave").build();
 
@@ -63,15 +63,15 @@ public class TypicalPersons {
     public static final Person GEORGE = new PersonBuilder().withName("George Best").withPhone("9482442")
             .withEmail("anna@example.com").withAddress("4th street").build();
 
-    // Manually added — used in storage roundtrip tests, so loans are important here
+    // Manually added — used in storage roundtrip tests, so transactions are important here
     public static final Person HOON = new PersonBuilder().withName("Hoon Meier").withPhone("8482424")
             .withEmail("stefan@example.com").withAddress("little india")
-            .withLoans(new MonthlyLoan(750.0, 1.5, "Phone"))
+            .withTransactions(new MonthlyTransaction(750.0, 1.5, "Phone"))
             .build();
 
     public static final Person IDA = new PersonBuilder().withName("Ida Mueller").withPhone("8482131")
             .withEmail("hans@example.com").withAddress("chicago ave")
-            .withLoans(new YearlyLoan(600.0, 4.0, "Gym"))
+            .withTransactions(new YearlyTransaction(600.0, 4.0, "Gym"))
             .build();
 
     // Manually added - Person's details found in {@code CommandTestUtil}

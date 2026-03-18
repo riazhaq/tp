@@ -1,44 +1,44 @@
-package seedu.address.model.loan;
+package seedu.address.model.transaction;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /**
- * Represents a generic loan.
+ * Represents a financial transaction associated with a person.
+ * A transaction consists of a current amount, an interest rate, a description,
+ * and the date when the transaction was last recalculated.
+ *
  * <p>
- * A loan contains a current outstanding amount, an interest rate,
- * and the date when the loan was last recalculated.
- * Subclasses define how often interest is applied.
- * <p>
- * Positive amount  -> user owes the person.
- * Negative amount  -> the person owes the user.
+ * The transaction supports basic operations such as validating input format,
+ * applying payments, and tracking elapsed time since the last update.
+ * </p>
  */
-public class Loan {
+public class Transaction {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Loan Details should be in the form '(type) amount, interest rate, description' ";
+            "Transaction Details should be in the form '(type) amount, interest rate, description' ";
 
-    /** Current outstanding loan amount. */
+    /** Current outstanding transaction amount. */
     protected double currAmount;
 
-    /** Interest rate applied to the loan. */
+    /** Interest rate applied to the transaction. */
     protected final InterestRate interestRate;
 
-    /** Description for the loan. **/
+    /** Description for the transaction. **/
     protected String description;
 
-    /** The last date the loan amount was recalculated. */
+    /** The last date the transaction amount was recalculated. */
     protected LocalDate lastRecalculatedDate;
 
     /**
-     * Constructs a loan.
+     * Constructs a transaction.
      *
-     * @param currAmount the initial loan amount
-     * @param interestRate the interest rate applied to the loan
-     * @param description the description for the loan
+     * @param currAmount the initial transaction amount
+     * @param interestRate the interest rate applied to the transaction
+     * @param description the description for the transaction
      */
-    public Loan(double currAmount, double interestRate, String description) {
+    public Transaction(double currAmount, double interestRate, String description) {
         this.currAmount = currAmount;
         this.interestRate = new InterestRate(interestRate);
         this.description = description;
@@ -46,19 +46,19 @@ public class Loan {
     }
 
     /**
-     * Checks if the trimmedLoanDetails are in a valid format for it to be parsed
+     * Checks if the trimmedTransactionDetails are in a valid format for it to be parsed
      *
-     * @param trimmedLoanDetails the {@code String} to be parsed
+     * @param trimmedTransactionDetails the {@code String} to be parsed
      */
-    public static boolean isValidLoanArguments(String trimmedLoanDetails) {
-        String lowercasedLoanDetails = trimmedLoanDetails.toLowerCase();
-        String loanDetailsWithoutType = trimmedLoanDetails;
+    public static boolean isValidTransactionArguments(String trimmedTransactionDetails) {
+        String lowercasedTransactionDetails = trimmedTransactionDetails.toLowerCase();
+        String transactionDetailsWithoutType = trimmedTransactionDetails;
 
-        if (lowercasedLoanDetails.startsWith("m ") || lowercasedLoanDetails.startsWith("y ")) {
-            loanDetailsWithoutType = trimmedLoanDetails.substring(2);
+        if (lowercasedTransactionDetails.startsWith("m ") || lowercasedTransactionDetails.startsWith("y ")) {
+            transactionDetailsWithoutType = trimmedTransactionDetails.substring(2);
         }
 
-        String[] parts = loanDetailsWithoutType.split("\\s*,\\s*", 3);
+        String[] parts = transactionDetailsWithoutType.split("\\s*,\\s*", 3);
 
         if (parts.length != 3) {
             return false;
@@ -76,24 +76,24 @@ public class Loan {
     }
 
     /**
-     * Updates the loan amount by applying interest
+     * Updates the transaction amount by applying interest
      * based on the time elapsed since the last recalculation.
      */
-    public void updateLoanAmount() {
+    public void updateTransactionAmount() {
 
     }
 
     /**
-     * Pays part of the loan.
+     * Pays part of the transaction.
      * <p>
-     * If the loan has not been updated today, interest will first be applied
+     * If the transaction has not been updated today, interest will first be applied
      * before deducting the payment.
      *
-     * @param amount the amount to pay towards the loan
+     * @param amount the amount to pay towards the transaction
      */
-    public void payLoan(double amount) {
+    public void payTransaction(double amount) {
         if (!this.lastRecalculatedDate.equals(LocalDate.now())) {
-            this.updateLoanAmount();
+            this.updateTransactionAmount();
         }
 
         currAmount -= amount;
@@ -102,7 +102,7 @@ public class Loan {
     }
 
     /**
-     * Returns the number of months since the loan was last recalculated.
+     * Returns the number of months since the transaction was last recalculated.
      *
      * @return number of months elapsed
      */
@@ -112,7 +112,7 @@ public class Loan {
     }
 
     /**
-     * Returns the number of years since the loan was last recalculated.
+     * Returns the number of years since the transaction was last recalculated.
      *
      * @return number of years elapsed
      */
@@ -155,10 +155,10 @@ public class Loan {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof Loan)) {
+        if (!(other instanceof Transaction)) {
             return false;
         }
-        Loan o = (Loan) other;
+        Transaction o = (Transaction) other;
         return Double.compare(o.currAmount, currAmount) == 0
                 && Double.compare(o.getInterest(), getInterest()) == 0
                 && description.equals(o.description);
@@ -169,3 +169,4 @@ public class Loan {
         return Objects.hash(currAmount, interestRate, description);
     }
 }
+

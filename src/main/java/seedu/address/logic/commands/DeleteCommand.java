@@ -13,8 +13,8 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.loan.Loan;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * Deletes a person or a specific transaction using the displayed indexes.
@@ -75,7 +75,7 @@ public class DeleteCommand extends Command {
      * Deletes a specific transaction from the given {@code person}.
      */
     private CommandResult deleteTransaction(Model model, Person person) throws CommandException {
-        List<Loan> transactions = new ArrayList<>(person.getLoans());
+        List<Transaction> transactions = new ArrayList<>(person.getTransactions());
         if (transactions.isEmpty()) {
             throw new CommandException(String.format(MESSAGE_NO_TRANSACTIONS, person.getName()));
         }
@@ -84,8 +84,8 @@ public class DeleteCommand extends Command {
             throw new CommandException(MESSAGE_INVALID_TRANSACTION_DISPLAYED_INDEX);
         }
 
-        Loan transactionToDelete = transactions.get(targetTransactionIndex.getZeroBased());
-        Person updatedPerson = createPersonWithoutLoan(person, transactionToDelete);
+        Transaction transactionToDelete = transactions.get(targetTransactionIndex.getZeroBased());
+        Person updatedPerson = createPersonWithoutTransaction(person, transactionToDelete);
 
         model.setPerson(person, updatedPerson);
         return new CommandResult(String.format(MESSAGE_DELETE_TRANSACTION_SUCCESS,
@@ -94,14 +94,14 @@ public class DeleteCommand extends Command {
 
     /**
      * Creates and returns a {@code Person} with the details of {@code person}
-     * but without {@code loanToRemove}.
+     * but without {@code transactionToRemove}.
      */
-    private static Person createPersonWithoutLoan(Person person, Loan loanToRemove) {
-        Set<Loan> updatedLoans = new HashSet<>(person.getLoans());
-        updatedLoans.remove(loanToRemove);
+    private static Person createPersonWithoutTransaction(Person person, Transaction transactionToRemove) {
+        Set<Transaction> updatedTransactions = new HashSet<>(person.getTransactions());
+        updatedTransactions.remove(transactionToRemove);
 
         return new Person(person.getName(), person.getPhone(), person.getEmail(), person.getAddress(),
-                person.getTags(), updatedLoans);
+                person.getTags(), updatedTransactions);
     }
 
     @Override

@@ -5,13 +5,13 @@
     "email" : "alice@example.com",
     "address" : "123, Jurong West Ave 6, #08-111",
     "tags" : [ "friends" ],
-    "loans" : [ {
-      "loanType" : "m",
+    "transactions" : [ {
+      "transactionType" : "m",
       "amount" : 2000.0,
       "rate" : 5.0,
       "description" : "Rent"
     }, {
-      "loanType" : "y",
+      "transactionType" : "y",
       "amount" : -300.0,
       "rate" : 0.0,
       "description" : "Insurance"
@@ -22,13 +22,13 @@
     "email" : "johnd@example.com",
     "address" : "311, Clementi Ave 2, #02-25",
     "tags" : [ "owesMoney", "friends" ],
-    "loans" : [ {
-      "loanType" : "m",
+    "transactions" : [ {
+      "transactionType" : "m",
       "amount" : 1000.0,
       "rate" : 5.0,
       "description" : "Rent"
     }, {
-      "loanType" : "y",
+      "transactionType" : "y",
       "amount" : -200.0,
       "rate" : 0.0,
       "description" : "Lunch"
@@ -39,8 +39,8 @@
     "email" : "heinz@example.com",
     "address" : "wall street",
     "tags" : [ ],
-    "loans" : [ {
-      "loanType" : "m",
+    "transactions" : [ {
+      "transactionType" : "m",
       "amount" : 500.0,
       "rate" : 3.0,
       "description" : "Car"
@@ -51,8 +51,8 @@
     "email" : "cornelia@example.com",
     "address" : "10th street",
     "tags" : [ "friends" ],
-    "loans" : [ {
-      "loanType" : "y",
+    "transactions" : [ {
+      "transactionType" : "y",
       "amount" : 1200.0,
       "rate" : 2.5,
       "description" : "Mortgage"
@@ -63,20 +63,20 @@
     "email" : "werner@example.com",
     "address" : "michegan ave",
     "tags" : [ ],
-    "loans" : [ ]
+    "transactions" : [ ]
   }, {
     "name" : "Fiona Kunz",
     "phone" : "9482427",
     "email" : "lydia@example.com",
     "address" : "little tokyo",
     "tags" : [ ],
-    "loans" : [ ]
+    "transactions" : [ ]
   }, {
     "name" : "George Best",
     "phone" : "9482442",
     "email" : "anna@example.com",
     "address" : "4th street",
     "tags" : [ ],
-    "loans" : [ ]
+    "transactions" : [ ]
   } ]
 }

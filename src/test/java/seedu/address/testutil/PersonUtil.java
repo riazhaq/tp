@@ -2,20 +2,20 @@ package seedu.address.testutil;
 
 import static seedu.address.logic.parser.CliSyntax.PREFIX_ADDRESS;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_LOAN;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_TRANSACTION;
 
 import java.util.Set;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
-import seedu.address.model.loan.Loan;
-import seedu.address.model.loan.MonthlyLoan;
-import seedu.address.model.loan.YearlyLoan;
 import seedu.address.model.person.Person;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.MonthlyTransaction;
+import seedu.address.model.transaction.Transaction;
+import seedu.address.model.transaction.YearlyTransaction;
 
 
 
@@ -43,21 +43,22 @@ public class PersonUtil {
         person.getTags().stream().forEach(
             s -> sb.append(PREFIX_TAG + s.tagName + " ")
         );
-        person.getLoans().forEach(
-                loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" ")
+        person.getTransactions().forEach(
+                transaction -> sb.append(PREFIX_TRANSACTION).append(formatTransaction(transaction)).append(" ")
         );
         return sb.toString();
     }
 
-    /** Helper to convert loan to string representation */
-    private static String formatLoan(Loan loan) {
+    /** Helper to convert transaction to string representation */
+    private static String formatTransaction(Transaction transaction) {
         String type = "";
-        if (loan instanceof MonthlyLoan) {
+        if (transaction instanceof MonthlyTransaction) {
             type = "m ";
-        } else if (loan instanceof YearlyLoan) {
+        } else if (transaction instanceof YearlyTransaction) {
             type = "y ";
         }
-        return type + loan.getCurrAmount() + ", " + loan.getInterest() + ", " + loan.getDescription();
+        return type + transaction.getCurrAmount() + ", "
+                + transaction.getInterest() + ", " + transaction.getDescription();
     }
 
     /**
@@ -77,12 +78,13 @@ public class PersonUtil {
                 tags.forEach(s -> sb.append(PREFIX_TAG).append(s.tagName).append(" "));
             }
         }
-        if (descriptor.getLoans().isPresent()) {
-            Set<Loan> loans = descriptor.getLoans().get();
-            if (loans.isEmpty()) {
-                sb.append(PREFIX_LOAN);
+        if (descriptor.getTransactions().isPresent()) {
+            Set<Transaction> transactions = descriptor.getTransactions().get();
+            if (transactions.isEmpty()) {
+                sb.append(PREFIX_TRANSACTION);
             } else {
-                loans.forEach(loan -> sb.append(PREFIX_LOAN).append(formatLoan(loan)).append(" "));
+                transactions.forEach(transaction -> sb.append(PREFIX_TRANSACTION)
+                        .append(formatTransaction(transaction)).append(" "));
             }
         }
         return sb.toString();
