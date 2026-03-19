@@ -30,7 +30,15 @@ public class Person {
     private final Set<Transaction> transactions = new HashSet<>();
 
     /**
-     * Every field must be present and not null.
+     * Constructs a {@code Person} with the specified details.
+     *
+     * @param name The person's name.
+     * @param phone The person's phone number.
+     * @param email The person's email address.
+     * @param address The person's address.
+     * @param tags The set of tags associated with the person.
+     * @param transactions The set of transactions associated with the person.
+     * @throws NullPointerException if any argument is null.
      */
     public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags, Set<Transaction> transactions) {
         requireAllNonNull(name, phone, email, address, tags, transactions);
@@ -75,8 +83,10 @@ public class Person {
     }
 
     /**
-     * Returns true if both persons have the same name.
-     * This defines a weaker notion of equality between two persons.
+     * Returns an unmodifiable view of the transactions set.
+     * Attempts to modify the returned set will result in an {@code UnsupportedOperationException}.
+     *
+     * @return An unmodifiable set of transactions.
      */
     public boolean isSamePerson(Person otherPerson) {
         if (otherPerson == this) {
@@ -94,8 +104,11 @@ public class Person {
     }
 
     /**
-     * Normalises a name for identity comparison by trimming leading/trailing whitespace
-     * and collapsing internal whitespace sequences into a single space.
+     * Normalises a name for identity comparison by trimming leading and trailing whitespace
+     * and collapsing multiple internal whitespace characters into a single space.
+     *
+     * @param name The name string to normalise.
+     * @return The normalised name string.
      */
     private String normaliseName(String name) {
         String trimmed = name.trim();
@@ -105,6 +118,9 @@ public class Person {
     /**
      * Returns true if both persons have the same identity and data fields.
      * This defines a stronger notion of equality between two persons.
+     *
+     * @param other The object to compare against.
+     * @return True if both persons are equal, false otherwise.
      */
     @Override
     public boolean equals(Object other) {

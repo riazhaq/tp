@@ -46,9 +46,11 @@ public class Transaction {
     }
 
     /**
-     * Checks if the trimmedTransactionDetails are in a valid format for it to be parsed
+     * Returns true if the given string is in a valid format for a transaction.
+     * The expected format is "(type) amount, interest rate, description".
      *
-     * @param trimmedTransactionDetails the {@code String} to be parsed
+     * @param trimmedTransactionDetails The string to validate.
+     * @return True if the input is valid, false otherwise.
      */
     public static boolean isValidTransactionArguments(String trimmedTransactionDetails) {
         String lowercasedTransactionDetails = trimmedTransactionDetails.toLowerCase();
