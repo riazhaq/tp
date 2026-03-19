@@ -32,8 +32,11 @@ public class Amount {
     }
 
     /**
-     * Returns true if a given string is a valid amount.
-     * Must be a positive number with up to 2 decimal places and no currency symbols.
+     * Returns true if the given string is a valid amount.
+     * A valid amount is a positive number with up to 2 decimal places and no currency symbols.
+     *
+     * @param test The string to validate.
+     * @return True if the string is a valid amount, false otherwise.
      */
     public static boolean isValidAmount(String test) {
         if (test == null || !test.matches(VALIDATION_REGEX)) {
