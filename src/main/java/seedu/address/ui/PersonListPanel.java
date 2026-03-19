@@ -43,6 +43,12 @@ public class PersonListPanel extends UiPart<Region> {
                 selectionChangeListener(listener));
     }
 
+    /**
+     * Creates the ChangeListener used to notify a consumer about selection changes.
+     *
+     * @param listener consumer to invoke with the new selection
+     * @return a ChangeListener that forwards the new selection to {@code listener}
+     */
     static javafx.beans.value.ChangeListener<Person> selectionChangeListener(Consumer<Person> listener) {
         requireNonNull(listener);
         return (observable, oldValue, newValue) -> listener.accept(newValue);

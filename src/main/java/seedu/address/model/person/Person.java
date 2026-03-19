@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.tag.Tag;
@@ -16,6 +17,7 @@ import seedu.address.model.transaction.Transaction;
  * Guarantees: details are present and not null, field values are validated, immutable.
  */
 public class Person {
+    private static final Pattern MULTIPLE_WHITESPACE = Pattern.compile("\\s+");
 
     // Identity fields
     private final Name name;
@@ -97,7 +99,7 @@ public class Person {
      */
     private String normaliseName(String name) {
         String trimmed = name.trim();
-        return trimmed.replaceAll("\\s+", " ");
+        return MULTIPLE_WHITESPACE.matcher(trimmed).replaceAll(" ");
     }
 
     /**
