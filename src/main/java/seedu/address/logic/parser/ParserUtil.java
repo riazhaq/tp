@@ -14,6 +14,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Amount;
 import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
 import seedu.address.model.transaction.YearlyTransaction;
@@ -158,6 +159,21 @@ public class ParserUtil {
         } else {
             return new Transaction(amount, rate, description);
         }
+    }
+
+    /**
+     * Parses a {@code String amount} into an {@code Amount}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * @throws ParseException if the given {@code amount} is invalid.
+     */
+    public static Amount parseAmount(String amount) throws ParseException {
+        requireNonNull(amount);
+        String trimmedAmount = amount.trim();
+        if (!Amount.isValidAmount(trimmedAmount)) {
+            throw new ParseException(Amount.MESSAGE_CONSTRAINTS);
+        }
+        return new Amount(trimmedAmount);
     }
 
     /**

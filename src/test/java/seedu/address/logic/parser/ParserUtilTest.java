@@ -19,6 +19,7 @@ import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
+import seedu.address.model.transaction.Amount;
 import seedu.address.model.transaction.Transaction;
 
 public class ParserUtilTest {
@@ -206,6 +207,24 @@ public class ParserUtilTest {
     @Test
     public void parseTransaction_invalidValue_throwsParseException() {
         assertThrows(ParseException.class, () -> ParserUtil.parseTransaction(INVALID_TRANSACTION));
+    }
+    @Test
+    public void parseAmount_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseAmount(null));
+    }
+
+    @Test
+    public void parseAmount_invalidAmount_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseAmount(""));
+        assertThrows(ParseException.class, () -> ParserUtil.parseAmount("0"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseAmount("-5"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseAmount("$5.00"));
+    }
+
+    @Test
+    public void parseAmount_validAmount_returnsAmount() throws Exception {
+        assertEquals(new Amount("12.50"), ParserUtil.parseAmount("12.50"));
+        assertEquals(new Amount("12.50"), ParserUtil.parseAmount("  12.50  ")); // trims whitespace
     }
 
     @Test
