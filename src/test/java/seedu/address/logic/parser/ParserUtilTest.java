@@ -227,8 +227,8 @@ public class ParserUtilTest {
 
     @Test
     public void parseCompoundingType_invalidValue_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE,
-                () -> ParserUtil.parseCompoundingType("weekly"));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE, () ->
+                ParserUtil.parseCompoundingType("weekly"));
     }
 
     @Test
@@ -245,27 +245,27 @@ public class ParserUtilTest {
 
     @Test
     public void parseTransactionDescriptor_invalidAmount_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT,
-                () -> ParserUtil.parseTransactionDescriptor("0", "5", "lunch", ""));
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT,
-                () -> ParserUtil.parseTransactionDescriptor("-1", "5", "lunch", ""));
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT,
-                () -> ParserUtil.parseTransactionDescriptor("ten", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("0", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("-1", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("ten", "5", "lunch", ""));
     }
 
     @Test
     public void parseTransactionDescriptor_invalidRate_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE,
-                () -> ParserUtil.parseTransactionDescriptor("10", "-1", "lunch", ""));
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE,
-                () -> ParserUtil.parseTransactionDescriptor("10", "101", "lunch", ""));
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE,
-                () -> ParserUtil.parseTransactionDescriptor("10", "five", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "-1", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "101", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "five", "lunch", ""));
     }
 
     @Test
     public void parseTransactionDescriptor_invalidCompoundingType_throwsParseException() {
-        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE,
-                () -> ParserUtil.parseTransactionDescriptor("10", "5", "lunch", "weekly"));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "5", "lunch", "weekly"));
     }
 }
