@@ -6,7 +6,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_EMAIL;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TRANSACTION;
 import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PERSONS;
 
 import java.util.Collections;
@@ -46,7 +45,6 @@ public class EditCommand extends Command {
             + "[" + PREFIX_EMAIL + "EMAIL] "
             + "[" + PREFIX_ADDRESS + "ADDRESS] "
             + "[" + PREFIX_TAG + "TAG]...\n"
-            + "[" + PREFIX_TRANSACTION + "TRANSACTION]...\n"
             + "Example: " + COMMAND_WORD + " 1 "
             + PREFIX_PHONE + "91234567 "
             + PREFIX_EMAIL + "johndoe@example.com";
@@ -103,10 +101,22 @@ public class EditCommand extends Command {
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
         Address updatedAddress = editPersonDescriptor.getAddress().orElse(personToEdit.getAddress());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
-        Set<Transaction> updatedTransactions = editPersonDescriptor.getTransactions()
-                .orElse(personToEdit.getTransactions());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags, updatedTransactions);
+        // Create the new person first with the existing transactions carried over
+        Person editedPerson = new Person(updatedName, updatedPhone, updatedEmail, updatedAddress, updatedTags,
+                personToEdit.getTransactions());
+
+        // Update every transaction that references the old person to point to the new person instead
+        for (Transaction transaction : editedPerson.getTransactions()) {
+            if (transaction.getDebtor().isSamePerson(personToEdit)) {
+                transaction.setDebtor(editedPerson);
+            }
+            if (transaction.getCreditor().isSamePerson(personToEdit)) {
+                transaction.setCreditor(editedPerson);
+            }
+        }
+
+        return editedPerson;
     }
 
     @Override
@@ -143,7 +153,6 @@ public class EditCommand extends Command {
         private Email email;
         private Address address;
         private Set<Tag> tags;
-        private Set<Transaction> transactions;
 
         public EditPersonDescriptor() {}
 
@@ -156,11 +165,10 @@ public class EditCommand extends Command {
             setEmail(toCopy.email);
             setAddress(toCopy.address);
             setTags(toCopy.tags);
-            setTransactions(toCopy.transactions);
         }
 
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags, transactions);
+            return CollectionUtil.isAnyNonNull(name, phone, email, address, tags);
         }
 
         public void setName(Name name) {
@@ -212,23 +220,6 @@ public class EditCommand extends Command {
             return (tags != null) ? Optional.of(Collections.unmodifiableSet(tags)) : Optional.empty();
         }
 
-        /**
-         * Sets {@code transactions} to this object's {@code transactions}.
-         * A defensive copy of {@code transactions} is used internally.
-         */
-        public void setTransactions(Set<Transaction> transactions) {
-            this.transactions = (transactions != null) ? new HashSet<>(transactions) : null;
-        }
-
-        /**
-         * Returns an unmodifiable transaction set, which throws {@code UnsupportedOperationException}
-         * if modification is attempted.
-         * Returns {@code Optional#empty()} if {@code transactions} is null.
-         */
-        public Optional<Set<Transaction>> getTransactions() {
-            return (transactions != null) ? Optional.of(Collections.unmodifiableSet(transactions)) : Optional.empty();
-        }
-
         @Override
         public boolean equals(Object other) {
             if (other == this) {
@@ -245,8 +236,7 @@ public class EditCommand extends Command {
                     && Objects.equals(phone, otherEditPersonDescriptor.phone)
                     && Objects.equals(email, otherEditPersonDescriptor.email)
                     && Objects.equals(address, otherEditPersonDescriptor.address)
-                    && Objects.equals(tags, otherEditPersonDescriptor.tags)
-                    && Objects.equals(transactions, otherEditPersonDescriptor.transactions);
+                    && Objects.equals(tags, otherEditPersonDescriptor.tags);
         }
 
         @Override
@@ -257,7 +247,6 @@ public class EditCommand extends Command {
                     .add("email", email)
                     .add("address", address)
                     .add("tags", tags)
-                    .add("transactions", transactions)
                     .toString();
         }
     }

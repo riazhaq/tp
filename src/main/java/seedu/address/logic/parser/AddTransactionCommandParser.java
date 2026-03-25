@@ -1,7 +1,14 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TRANSACTION;
+import static seedu.address.logic.commands.AddTransactionCommand.MESSAGE_INVALID_CREDITOR_INDEX;
+import static seedu.address.logic.commands.AddTransactionCommand.MESSAGE_INVALID_DEBTOR_INDEX;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_AMOUNT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_COMPOUNDING_TYPE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_INTEREST_RATE;
+
+import java.util.stream.Stream;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.AddTransactionCommand;
@@ -12,12 +19,12 @@ import seedu.address.model.transaction.TransactionDescriptor;
  * Parses input arguments and creates a new AddTransactionCommand object.
  *
  * <p>Expected format:
- * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX t/[m|y ]amount, rate, description}
- * e.g. {@code addtxn 2 3 t/10, 5, lunch}
+ * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE d/DESCRIPTION [c/COMPOUNDING_TYPE]}
+ * e.g. {@code addtxn 2 3 a/10 i/5 d/lunch c/m}
  *
  * <p>The debtor and creditor indices refer to the one-based positions of persons
- * currently displayed in the person list. The transaction prefix optionally starts
- * with "m " (monthly) or "y " (yearly) to indicate the compounding type.
+ * currently displayed in the person list. The optional compounding type prefix
+ * accepts "m" (monthly) or "y" (yearly); defaults to none if omitted.
  */
 public class AddTransactionCommandParser implements Parser<AddTransactionCommand> {
 
@@ -28,7 +35,8 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
      * @throws ParseException if the user input does not conform the expected format
      */
     public AddTransactionCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TRANSACTION);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(
+                args, PREFIX_AMOUNT, PREFIX_INTEREST_RATE, PREFIX_DESCRIPTION, PREFIX_COMPOUNDING_TYPE);
 
         // Preamble must contain exactly "DEBTOR_INDEX CREDITOR_INDEX"
         String preamble = argMultimap.getPreamble().trim();
@@ -44,20 +52,37 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
 
         try {
             debtorIndex = ParserUtil.parseIndex(indices[0]);
+        } catch (ParseException pe) {
+            throw new ParseException(
+                    MESSAGE_INVALID_DEBTOR_INDEX + "\n" + AddTransactionCommand.MESSAGE_USAGE, pe);
+        }
+
+        try {
             creditorIndex = ParserUtil.parseIndex(indices[1]);
         } catch (ParseException pe) {
             throw new ParseException(
-                    String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTransactionCommand.MESSAGE_USAGE), pe);
+                    MESSAGE_INVALID_CREDITOR_INDEX + "\n" + AddTransactionCommand.MESSAGE_USAGE, pe);
         }
 
-        if (!argMultimap.getValue(PREFIX_TRANSACTION).isPresent()) {
+        if (!arePrefixesPresent(argMultimap, PREFIX_AMOUNT, PREFIX_INTEREST_RATE)) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTransactionCommand.MESSAGE_USAGE));
         }
 
-        TransactionDescriptor descriptor =
-                ParserUtil.parseTransactionDescriptor(argMultimap.getValue(PREFIX_TRANSACTION).get());
+        // c/ is optional — pass empty string if absent to signal NONE
+        String compoundingRaw = argMultimap.getValue(PREFIX_COMPOUNDING_TYPE).orElse("");
+
+        TransactionDescriptor descriptor = ParserUtil.parseTransactionDescriptor(
+                argMultimap.getValue(PREFIX_AMOUNT).get(),
+                argMultimap.getValue(PREFIX_INTEREST_RATE).get(),
+                argMultimap.getValue(PREFIX_DESCRIPTION).orElse(""),
+                compoundingRaw);
 
         return new AddTransactionCommand(debtorIndex, creditorIndex, descriptor);
+    }
+
+    /** Returns true only if all of the prefixes contain non-empty {@code Optional} values. */
+    private static boolean arePrefixesPresent(ArgumentMultimap argMultimap, Prefix... prefixes) {
+        return Stream.of(prefixes).allMatch(prefix -> argMultimap.getValue(prefix).isPresent());
     }
 }

@@ -1,7 +1,10 @@
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TRANSACTION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_AMOUNT;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_COMPOUNDING_TYPE;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_INTEREST_RATE;
 
 import java.util.List;
 
@@ -31,17 +34,23 @@ public class AddTransactionCommand extends Command {
             + ": Adds a transaction between two persons identified by their index numbers "
             + "in the displayed person list.\n"
             + "Parameters: DEBTOR_INDEX CREDITOR_INDEX (both must be positive integers) "
-            + PREFIX_TRANSACTION + "[m|y ]AMOUNT, RATE, DESCRIPTION\n"
+            + PREFIX_AMOUNT + "AMOUNT "
+            + PREFIX_INTEREST_RATE + "INTEREST_RATE "
+            + "[" + PREFIX_DESCRIPTION + "DESCRIPTION] "
+            + "[" + PREFIX_COMPOUNDING_TYPE + "COMPOUNDING_TYPE(m/y/n)]\n"
             + "Example: " + COMMAND_WORD + " 2 3 "
-            + PREFIX_TRANSACTION + "10, 5, lunch";
+            + PREFIX_AMOUNT + "10 "
+            + PREFIX_INTEREST_RATE + "5 "
+            + PREFIX_DESCRIPTION + "lunch "
+            + PREFIX_COMPOUNDING_TYPE + "m";
 
     public static final String MESSAGE_SUCCESS = "New transaction added: %1$s owes %2$s — %3$s";
     public static final String MESSAGE_SAME_PERSON =
             "Debtor and creditor cannot be the same person.";
     public static final String MESSAGE_INVALID_DEBTOR_INDEX =
-            "The debtor index provided is out of range.";
+            "The debtor index provided is invalid or out of range.";
     public static final String MESSAGE_INVALID_CREDITOR_INDEX =
-            "The creditor index provided is out of range.";
+            "The creditor index provided is invalid or out of range.";
 
     private final Index debtorIndex;
     private final Index creditorIndex;

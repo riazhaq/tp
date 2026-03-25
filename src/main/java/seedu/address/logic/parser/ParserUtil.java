@@ -25,10 +25,17 @@ public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
 
-    public static final String MESSAGE_INVALID_TRANSACTION =
-            "Transaction details should be in the form '[m|y ] amount, rate, description',"
-                    + " where amount is positive and rate is between 0 and 100 "
-                    + "e.g. '10, 5, lunch' or 'm 10, 5, lunch'";
+    public static final String MESSAGE_INVALID_AMOUNT =
+            "Amount must be a positive number.";
+
+    public static final String MESSAGE_INVALID_RATE =
+            "Interest rate must be a number between 0 and 100.";
+
+    public static final String MESSAGE_INVALID_DESCRIPTION =
+            "Description cannot be empty.";
+
+    public static final String MESSAGE_INVALID_COMPOUNDING_TYPE =
+            "Compounding type must be 'm' (monthly), 'y' (yearly), or 'n' (none).";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -131,52 +138,78 @@ public class ParserUtil {
     }
 
     /**
-     * Parses a {@code String transactionDetails} into a {@code TransactionDescriptor}.
+     * Parses {@code String amount}, {@code String rate}, {@code String description},
+     * and {@code String compoundingType} into a {@code TransactionDescriptor}.
      * Leading and trailing whitespaces will be trimmed.
      *
-     * <p>Expected format: {@code [m|y ]amount, rate, description}
-     * e.g. {@code 10, 5, lunch} or {@code m 10, 5, lunch}
+     * <p>The {@code compoundingType} field is optional — pass an empty string
+     * to default to {@code CompoundingType.NONE}.
+     * Accepted values: {@code "m"} (monthly), {@code "y"} (yearly), {@code ""} (none).
      *
-     * <p>The debtor and creditor are NOT part of the transaction prefix value —
-     * they are passed as separate index arguments to {@code AddTransactionCommandParser}.
-     *
-     * @throws ParseException if the given {@code transactionDetails} is invalid.
+     * @throws ParseException if any of the given fields are invalid.
      */
-    public static TransactionDescriptor parseTransactionDescriptor(String transactionDetails) throws ParseException {
-        requireNonNull(transactionDetails);
-        String trimmed = transactionDetails.trim();
-        String lowercased = trimmed.toLowerCase();
+    public static TransactionDescriptor parseTransactionDescriptor(
+            String amount, String rate, String description, String compoundingType) throws ParseException {
+        requireNonNull(amount);
+        requireNonNull(rate);
+        requireNonNull(description);
+        requireNonNull(compoundingType);
 
-        CompoundingType compoundingType = CompoundingType.NONE;
-        String withoutType = trimmed;
+        double parsedAmount;
+        double parsedRate;
 
-        if (lowercased.startsWith("m ")) {
-            compoundingType = CompoundingType.MONTHLY;
-            withoutType = trimmed.substring(2);
-        } else if (lowercased.startsWith("y ")) {
-            compoundingType = CompoundingType.YEARLY;
-            withoutType = trimmed.substring(2);
-        }
-
-        // Expected format after stripping type: amount, rate, description
-        String[] parts = withoutType.split("\\s*,\\s*", 3);
-
-        if (parts.length != 3) {
-            throw new ParseException(MESSAGE_INVALID_TRANSACTION);
+        try {
+            parsedAmount = Double.parseDouble(amount.trim());
+            if (parsedAmount <= 0) {
+                throw new ParseException(MESSAGE_INVALID_AMOUNT);
+            }
+        } catch (NumberFormatException e) {
+            throw new ParseException(MESSAGE_INVALID_AMOUNT);
         }
 
         try {
-            double amount = Double.parseDouble(parts[0].trim());
-            double rate = Double.parseDouble(parts[1].trim());
-            String description = parts[2].trim();
-
-            if (amount < 0 || rate < 0 || rate > 100 || description.isEmpty()) {
-                throw new ParseException(MESSAGE_INVALID_TRANSACTION);
+            parsedRate = Double.parseDouble(rate.trim());
+            if (parsedRate < 0 || parsedRate > 100) {
+                throw new ParseException(MESSAGE_INVALID_RATE);
             }
-
-            return new TransactionDescriptor(compoundingType, amount, rate, description);
         } catch (NumberFormatException e) {
-            throw new ParseException(MESSAGE_INVALID_TRANSACTION);
+            throw new ParseException(MESSAGE_INVALID_RATE);
+        }
+
+        String trimmedDescription = description.trim();
+
+        CompoundingType parsedCompoundingType = parseCompoundingType(compoundingType);
+
+        return new TransactionDescriptor(parsedCompoundingType, parsedAmount, parsedRate, trimmedDescription);
+    }
+
+    /**
+     * Parses a {@code String compoundingType} into a {@code CompoundingType}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * <p>Accepted values (case-insensitive):
+     * <ul>
+     *   <li>{@code "m"} — monthly compounding</li>
+     *   <li>{@code "y"} — yearly compounding</li>
+     *   <li>{@code "n"} or {@code ""} — no compounding (default)</li>
+     * </ul>
+     *
+     * @param compoundingType the string to parse
+     * @return the corresponding {@code CompoundingType}
+     * @throws ParseException if {@code compoundingType} is not one of the accepted values
+     */
+    public static CompoundingType parseCompoundingType(String compoundingType) throws ParseException {
+        requireNonNull(compoundingType);
+        switch (compoundingType.trim().toLowerCase()) {
+        case "m":
+            return CompoundingType.MONTHLY;
+        case "y":
+            return CompoundingType.YEARLY;
+        case "n":
+        case "":
+            return CompoundingType.NONE;
+        default:
+            throw new ParseException(MESSAGE_INVALID_COMPOUNDING_TYPE);
         }
     }
 

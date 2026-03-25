@@ -1,5 +1,7 @@
 package seedu.address.model.transaction;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -43,10 +45,10 @@ public class Transaction {
     protected LocalDate lastRecalculatedDate;
 
     /** The person who owes money in this transaction. */
-    protected final Person debtor;
+    protected Person debtor;
 
     /** The person who is owed money in this transaction. */
-    protected final Person creditor;
+    protected Person creditor;
 
     /**
      * Constructs a {@code Transaction} with the specified debtor, creditor, amount,
@@ -174,6 +176,24 @@ public class Transaction {
     }
 
     /**
+     * Updates the debtor reference to the given person.
+     * Used when a Person is edited to keep transaction references consistent.
+     */
+    public void setDebtor(Person debtor) {
+        requireNonNull(debtor);
+        this.debtor = debtor;
+    }
+
+    /**
+     * Updates the creditor reference to the given person.
+     * Used when a Person is edited to keep transaction references consistent.
+     */
+    public void setCreditor(Person creditor) {
+        requireNonNull(creditor);
+        this.creditor = creditor;
+    }
+
+    /**
      * Returns a string representation of this transaction, including the current amount,
      * interest rate, description, debtor name, and creditor name.
      *
@@ -181,7 +201,7 @@ public class Transaction {
      */
     @Override
     public String toString() {
-        return String.format("[Amount: %.2f, Rate: %.2f%%, Desc: %s, Debtor: %s, Creditor: %s]",
+        return String.format("[Amount: %.2f, Rate: %.2f%%, Desc: %s, Debtor: %s, Creditor: %s, Type: None]",
                 currAmount, getInterest(), description, debtor.getName(), creditor.getName());
     }
 
