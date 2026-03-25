@@ -15,6 +15,7 @@ import seedu.address.model.person.Person;
 
 /**
  * An Immutable AddressBook that is serializable to JSON format.
+ * Only stores persons — transactions are stored separately in transactions.json.
  */
 @JsonRootName(value = "addressbook")
 class JsonSerializableAddressBook {
@@ -33,15 +34,18 @@ class JsonSerializableAddressBook {
 
     /**
      * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use.
-     *
-     * @param source future changes to this will not affect the created {@code JsonSerializableAddressBook}.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
-        persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
+        persons.addAll(source.getPersonList().stream()
+                .map(JsonAdaptedPerson::new)
+                .collect(Collectors.toList()));
     }
 
     /**
      * Converts this address book into the model's {@code AddressBook} object.
+     * Persons are loaded without transactions — call
+     * {@link JsonSerializableTransactionBook#loadInto(ReadOnlyAddressBook)}
+     * afterwards to attach transactions.
      *
      * @throws IllegalValueException if there were any data constraints violated.
      */
@@ -56,5 +60,4 @@ class JsonSerializableAddressBook {
         }
         return addressBook;
     }
-
 }

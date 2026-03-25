@@ -30,15 +30,19 @@ public class Person {
     private final Set<Transaction> transactions = new HashSet<>();
 
     /**
-     * Constructs a {@code Person} with the specified details.
-     *
-     * @param name The person's name.
-     * @param phone The person's phone number.
-     * @param email The person's email address.
-     * @param address The person's address.
-     * @param tags The set of tags associated with the person.
-     * @param transactions The set of transactions associated with the person.
-     * @throws NullPointerException if any argument is null.
+     * Constructs a {@code Person} without any transactions.
+     */
+    public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags) {
+        requireAllNonNull(name, phone, email, address, tags);
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.tags.addAll(tags);
+    }
+
+    /**
+     * Constructs a {@code Person} with an initial set of transactions.
      */
     public Person(Name name, Phone phone, Email email, Address address, Set<Tag> tags, Set<Transaction> transactions) {
         requireAllNonNull(name, phone, email, address, tags, transactions);
@@ -48,6 +52,23 @@ public class Person {
         this.address = address;
         this.tags.addAll(tags);
         this.transactions.addAll(transactions);
+    }
+
+    /**
+     * Appends a transaction to this person's transaction set.
+     */
+    public void appendTransaction(Transaction transaction) {
+        requireAllNonNull(transaction);
+        transactions.add(transaction);
+    }
+
+    /**
+     * Removes a transaction from this person's transaction set.
+     * Does nothing if the transaction is not present.
+     */
+    public void deleteTransaction(Transaction transaction) {
+        requireAllNonNull(transaction);
+        transactions.remove(transaction);
     }
 
     public Name getName() {
@@ -66,86 +87,77 @@ public class Person {
         return address;
     }
 
-    /**
-     * Returns an immutable tag set, which throws {@code UnsupportedOperationException}
-     * if modification is attempted.
-     */
     public Set<Tag> getTags() {
         return Collections.unmodifiableSet(tags);
     }
 
-    /**
-     * Returns an immutable transaction set, which throws {@code UnsupportedOperationException}
-     * if modification is attempted.
-     */
     public Set<Transaction> getTransactions() {
         return Collections.unmodifiableSet(transactions);
     }
 
     /**
-     * Returns an unmodifiable view of the transactions set.
-     * Attempts to modify the returned set will result in an {@code UnsupportedOperationException}.
+     * Returns true if {@code otherPerson} is considered the same real-world individual
+     * as this person, based solely on a case-insensitive, whitespace-normalised name comparison.
      *
-     * @return An unmodifiable set of transactions.
+     * <p>This is a weaker notion of equality than {@link #equals(Object)}, which requires
+     * all identity fields (name, phone, email, address, tags) to match. Use this method
+     * to guard against duplicate entries in the address book; use {@link #equals(Object)}
+     * for structural equality checks in collections and tests.
+     *
+     * <p>Name normalisation trims leading/trailing whitespace and collapses any internal
+     * sequences of whitespace to a single space, so {@code "John  Doe"} and {@code "john doe"}
+     * are considered the same person.
+     *
+     * @param otherPerson the person to compare against; may be {@code null},
+     *                    in which case {@code false} is returned
+     * @return {@code true} if both persons share the same normalised, case-insensitive name;
+     *         {@code false} otherwise
      */
     public boolean isSamePerson(Person otherPerson) {
         if (otherPerson == this) {
             return true;
         }
-
         if (otherPerson == null) {
             return false;
         }
-
         String thisNameNormalised = normaliseName(getName().toString());
         String otherNameNormalised = normaliseName(otherPerson.getName().toString());
-
         return thisNameNormalised.equalsIgnoreCase(otherNameNormalised);
     }
 
-    /**
-     * Normalises a name for identity comparison by trimming leading and trailing whitespace
-     * and collapsing multiple internal whitespace characters into a single space.
-     *
-     * @param name The name string to normalise.
-     * @return The normalised name string.
-     */
     private String normaliseName(String name) {
         String trimmed = name.trim();
         return MULTIPLE_WHITESPACE.matcher(trimmed).replaceAll(" ");
     }
 
     /**
-     * Returns true if both persons have the same identity and data fields.
-     * This defines a stronger notion of equality between two persons.
-     *
-     * @param other The object to compare against.
-     * @return True if both persons are equal, false otherwise.
+     * Equality is based on identity fields only (name, phone, email, address, tags).
+     * Transactions are excluded to prevent circular hashCode/equals calls between
+     * Person and Transaction.
      */
     @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
         }
-
-        // instanceof handles nulls
         if (!(other instanceof Person)) {
             return false;
         }
-
         Person otherPerson = (Person) other;
         return name.equals(otherPerson.name)
                 && phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
                 && address.equals(otherPerson.address)
-                && tags.equals(otherPerson.tags)
-                && transactions.equals(otherPerson.transactions);
+                && tags.equals(otherPerson.tags);
     }
 
+    /**
+     * Transactions are excluded from hashCode to prevent infinite recursion with
+     * Transaction.hashCode(), which references Person.hashCode() via debtor/creditor.
+     */
     @Override
     public int hashCode() {
-        // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags, transactions);
+        return Objects.hash(name, phone, email, address, tags);
     }
 
     @Override
@@ -159,5 +171,4 @@ public class Person {
                 .add("transactions", transactions)
                 .toString();
     }
-
 }

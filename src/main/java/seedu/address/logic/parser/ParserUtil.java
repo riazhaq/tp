@@ -15,9 +15,8 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.transaction.Amount;
-import seedu.address.model.transaction.MonthlyTransaction;
-import seedu.address.model.transaction.Transaction;
-import seedu.address.model.transaction.YearlyTransaction;
+import seedu.address.model.transaction.TransactionDescriptor;
+import seedu.address.model.transaction.TransactionDescriptor.CompoundingType;
 
 /**
  * Contains utility methods used for parsing strings in the various *Parser classes.
@@ -25,6 +24,18 @@ import seedu.address.model.transaction.YearlyTransaction;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
+
+    public static final String MESSAGE_INVALID_AMOUNT =
+            "Amount must be a positive number.";
+
+    public static final String MESSAGE_INVALID_RATE =
+            "Interest rate must be a number between 0 and 100.";
+
+    public static final String MESSAGE_INVALID_DESCRIPTION =
+            "Description cannot be empty.";
+
+    public static final String MESSAGE_INVALID_COMPOUNDING_TYPE =
+            "Compounding type must be 'm' (monthly), 'y' (yearly), or 'n' (none).";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
@@ -127,37 +138,78 @@ public class ParserUtil {
     }
 
     /**
-     * Parses a {@code String transactionArguments} into a {@code Transaction}.
+     * Parses {@code String amount}, {@code String rate}, {@code String description},
+     * and {@code String compoundingType} into a {@code TransactionDescriptor}.
      * Leading and trailing whitespaces will be trimmed.
      *
-     * @throws ParseException if the given {@code transactionDetails} is invalid.
+     * <p>The {@code compoundingType} field is optional — pass an empty string
+     * to default to {@code CompoundingType.NONE}.
+     * Accepted values: {@code "m"} (monthly), {@code "y"} (yearly), {@code ""} (none).
+     *
+     * @throws ParseException if any of the given fields are invalid.
      */
-    public static Transaction parseTransaction(String transactionDetails) throws ParseException {
-        requireNonNull(transactionDetails);
-        String trimmedTransactionDetails = transactionDetails.trim();
-        if (!Transaction.isValidTransactionArguments(trimmedTransactionDetails)) {
-            throw new ParseException(Transaction.MESSAGE_CONSTRAINTS);
+    public static TransactionDescriptor parseTransactionDescriptor(
+            String amount, String rate, String description, String compoundingType) throws ParseException {
+        requireNonNull(amount);
+        requireNonNull(rate);
+        requireNonNull(description);
+        requireNonNull(compoundingType);
+
+        double parsedAmount;
+        double parsedRate;
+
+        try {
+            parsedAmount = Double.parseDouble(amount.trim());
+            if (parsedAmount <= 0) {
+                throw new ParseException(MESSAGE_INVALID_AMOUNT);
+            }
+        } catch (NumberFormatException e) {
+            throw new ParseException(MESSAGE_INVALID_AMOUNT);
         }
 
-        String lowercasedTransactionDetails = trimmedTransactionDetails.toLowerCase();
-        String transactionDetailsWithoutType = trimmedTransactionDetails;
-
-        if (lowercasedTransactionDetails.startsWith("m ") || lowercasedTransactionDetails.startsWith("y ")) {
-            transactionDetailsWithoutType = trimmedTransactionDetails.substring(2);
+        try {
+            parsedRate = Double.parseDouble(rate.trim());
+            if (parsedRate < 0 || parsedRate > 100) {
+                throw new ParseException(MESSAGE_INVALID_RATE);
+            }
+        } catch (NumberFormatException e) {
+            throw new ParseException(MESSAGE_INVALID_RATE);
         }
 
-        String[] parts = transactionDetailsWithoutType.split("\\s*,\\s*", 3);
+        String trimmedDescription = description.trim();
 
-        double amount = Double.parseDouble(parts[0]);
-        double rate = Double.parseDouble(parts[1]);
-        String description = parts[2];
+        CompoundingType parsedCompoundingType = parseCompoundingType(compoundingType);
 
-        if (lowercasedTransactionDetails.startsWith("m ")) {
-            return new MonthlyTransaction(amount, rate, description);
-        } else if (lowercasedTransactionDetails.startsWith("y ")) {
-            return new YearlyTransaction(amount, rate, description);
-        } else {
-            return new Transaction(amount, rate, description);
+        return new TransactionDescriptor(parsedCompoundingType, parsedAmount, parsedRate, trimmedDescription);
+    }
+
+    /**
+     * Parses a {@code String compoundingType} into a {@code CompoundingType}.
+     * Leading and trailing whitespaces will be trimmed.
+     *
+     * <p>Accepted values (case-insensitive):
+     * <ul>
+     *   <li>{@code "m"} — monthly compounding</li>
+     *   <li>{@code "y"} — yearly compounding</li>
+     *   <li>{@code "n"} or {@code ""} — no compounding (default)</li>
+     * </ul>
+     *
+     * @param compoundingType the string to parse
+     * @return the corresponding {@code CompoundingType}
+     * @throws ParseException if {@code compoundingType} is not one of the accepted values
+     */
+    public static CompoundingType parseCompoundingType(String compoundingType) throws ParseException {
+        requireNonNull(compoundingType);
+        switch (compoundingType.trim().toLowerCase()) {
+        case "m":
+            return CompoundingType.MONTHLY;
+        case "y":
+            return CompoundingType.YEARLY;
+        case "n":
+        case "":
+            return CompoundingType.NONE;
+        default:
+            throw new ParseException(MESSAGE_INVALID_COMPOUNDING_TYPE);
         }
     }
 
@@ -174,17 +226,5 @@ public class ParserUtil {
             throw new ParseException(Amount.MESSAGE_CONSTRAINTS);
         }
         return new Amount(trimmedAmount);
-    }
-
-    /**
-     * Parses {@code Collection<String> transactions} into a {@code Set<Transaction>}.
-     */
-    public static Set<Transaction> parseTransactions(Collection<String> transactions) throws ParseException {
-        requireNonNull(transactions);
-        final Set<Transaction> transactionSet = new HashSet<>();
-        for (String transactionDetails : transactions) {
-            transactionSet.add(parseTransaction(transactionDetails));
-        }
-        return transactionSet;
     }
 }

@@ -16,10 +16,11 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
-import seedu.address.model.transaction.Transaction;
 
 /**
  * Jackson-friendly version of {@link Person}.
+ * Transactions are intentionally excluded — they are stored separately in transactions.json
+ * and loaded after all persons are reconstructed, to avoid circular references.
  */
 class JsonAdaptedPerson {
 
@@ -30,7 +31,6 @@ class JsonAdaptedPerson {
     private final String email;
     private final String address;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
-    private final List<JsonAdaptedTransaction> transactions = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
@@ -40,8 +40,7 @@ class JsonAdaptedPerson {
                              @JsonProperty("phone") String phone,
                              @JsonProperty("email") String email,
                              @JsonProperty("address") String address,
-                             @JsonProperty("tags") List<JsonAdaptedTag> tags,
-                             @JsonProperty("transactions") List<JsonAdaptedTransaction> transactions) {
+                             @JsonProperty("tags") List<JsonAdaptedTag> tags) {
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -49,26 +48,19 @@ class JsonAdaptedPerson {
         if (tags != null) {
             this.tags.addAll(tags);
         }
-        if (transactions != null) {
-            this.transactions.addAll(transactions);
-        }
     }
 
     /**
      * Converts a given {@code Person} into this class for Jackson use.
+     * Transactions are not serialized here — see {@code JsonSerializableTransactionBook}.
      */
     public JsonAdaptedPerson(Person source) {
         name = source.getName().fullName;
         phone = source.getPhone().value;
         email = source.getEmail().value;
         address = source.getAddress().value;
-
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
-                .collect(Collectors.toList()));
-
-        transactions.addAll(source.getTransactions().stream()
-                .map(JsonAdaptedTransaction::new)
                 .collect(Collectors.toList()));
     }
 
@@ -81,11 +73,6 @@ class JsonAdaptedPerson {
         final List<Tag> personTags = new ArrayList<>();
         for (JsonAdaptedTag tag : tags) {
             personTags.add(tag.toModelType());
-        }
-
-        final List<Transaction> personTransactions = new ArrayList<>();
-        for (JsonAdaptedTransaction transaction : transactions) {
-            personTransactions.add(transaction.toModelType());
         }
 
         if (name == null) {
@@ -121,8 +108,7 @@ class JsonAdaptedPerson {
         final Address modelAddress = new Address(address);
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        final Set<Transaction> modelTransactions = new HashSet<>(personTransactions);
 
-        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelTags, modelTransactions);
+        return new Person(modelName, modelPhone, modelEmail, modelAddress, modelTags);
     }
 }
