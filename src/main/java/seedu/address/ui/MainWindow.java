@@ -249,6 +249,17 @@ public class MainWindow extends UiPart<Stage> {
                 handleExit();
             }
 
+            // Refresh the transaction panel when a delete-transaction command succeeds.
+            // The panel only updates via selection-change events; without this explicit
+            // refresh it would still show the stale (pre-delete) transaction list.
+            commandResult.getPersonIndexToRefresh().ifPresent(oneBased -> {
+                int zeroBased = oneBased - 1;
+                if (zeroBased >= 0 && zeroBased < logic.getFilteredPersonList().size()) {
+                    Person refreshed = logic.getFilteredPersonList().get(zeroBased);
+                    transactionListPanel.displayPerson(refreshed);
+                }
+            });
+
             return commandResult;
         } catch (CommandException | ParseException e) {
             logger.info("An error occurred while executing command: " + commandText);

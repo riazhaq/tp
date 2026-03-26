@@ -10,10 +10,11 @@ import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -89,34 +90,66 @@ public class DeleteCommandTest {
     @Test
     public void execute_validTransactionIndexUnfilteredList_success() {
         Index transactionIndex = Index.fromOneBased(1);
-        Person personToModify = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
 
-        // Ensure there is at least one transaction to delete.
+        Person personToModify = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person otherPerson = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+
+        // Add shared transaction to BOTH persons
         Transaction seedTransaction = new MonthlyTransaction(personToModify, otherPerson, 10.0, 0.0, "seed");
         personToModify.appendTransaction(seedTransaction);
         otherPerson.appendTransaction(seedTransaction);
 
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, transactionIndex);
 
+        // Match sorting logic
+        List<Transaction> transactions = personToModify.getTransactions().stream()
+                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
+                .collect(Collectors.toList());
 
-        List<Transaction> transactions = new ArrayList<>(personToModify.getTransactions());
         Transaction transactionToDelete = transactions.get(transactionIndex.getZeroBased());
-        Set<Transaction> updatedTransactions = new HashSet<>(personToModify.getTransactions());
-        updatedTransactions.remove(transactionToDelete);
-        Person updatedPerson = new Person(personToModify.getName(), personToModify.getPhone(),
-                personToModify.getEmail(), personToModify.getAddress(), personToModify.getTags(), updatedTransactions);
 
+        // --- Expected updated persons ---
+        Set<Transaction> updatedTransactionsPerson = new HashSet<>(personToModify.getTransactions());
+        updatedTransactionsPerson.remove(transactionToDelete);
+
+        Set<Transaction> updatedTransactionsOther = new HashSet<>(otherPerson.getTransactions());
+        updatedTransactionsOther.remove(transactionToDelete);
+
+        Person updatedPerson = new Person(
+                personToModify.getName(),
+                personToModify.getPhone(),
+                personToModify.getEmail(),
+                personToModify.getAddress(),
+                personToModify.getTags(),
+                updatedTransactionsPerson
+        );
+
+        Person updatedOtherPerson = new Person(
+                otherPerson.getName(),
+                otherPerson.getPhone(),
+                otherPerson.getEmail(),
+                otherPerson.getAddress(),
+                otherPerson.getTags(),
+                updatedTransactionsOther
+        );
 
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
         expectedModel.setPerson(personToModify, updatedPerson);
+        expectedModel.setPerson(otherPerson, updatedOtherPerson);
 
-
-        String expectedMessage = String.format(DeleteCommand.MESSAGE_DELETE_TRANSACTION_SUCCESS,
-                transactionIndex.getOneBased());
-
+        String expectedMessage = String.format(
+                DeleteCommand.MESSAGE_DELETE_TRANSACTION_SUCCESS,
+                transactionIndex.getOneBased()
+        );
 
         assertCommandSuccess(deleteCommand, model, expectedMessage, expectedModel);
+
+
+        Person resultPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+        Person resultOther = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+
+        assertFalse(resultPerson.getTransactions().contains(transactionToDelete));
+        assertFalse(resultOther.getTransactions().contains(transactionToDelete));
     }
 
 

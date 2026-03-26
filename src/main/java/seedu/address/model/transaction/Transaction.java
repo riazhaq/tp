@@ -207,14 +207,19 @@ public class Transaction {
 
     /**
      * Checks equality based on the outstanding amount, interest rate, description,
-     * debtor identity, and creditor identity.
+     * last recalculated date, debtor identity, and creditor identity.
+     *
+     * <p>Including {@code lastRecalculatedDate} ensures that two transactions which are
+     * otherwise identical but were recorded on different dates are treated as distinct
+     * entries, preventing incorrect removal from a {@code HashSet} when multiple
+     * same-amount transactions exist for the same pair of persons.
      *
      * <p>Debtor and creditor use their own {@code equals()} implementations, which
      * intentionally exclude transactions to prevent circular references.
      *
      * @param other the object to compare against
      * @return {@code true} if both transactions have the same amount, rate,
-     *         description, debtor, and creditor; {@code false} otherwise
+     *         description, last recalculated date, debtor, and creditor; {@code false} otherwise
      */
     @Override
     public boolean equals(Object other) {
@@ -228,13 +233,14 @@ public class Transaction {
         return Double.compare(o.currAmount, currAmount) == 0
                 && Double.compare(o.getInterest(), getInterest()) == 0
                 && description.equals(o.description)
+                && lastRecalculatedDate.equals(o.lastRecalculatedDate)
                 && debtor.equals(o.debtor)
                 && creditor.equals(o.creditor);
     }
 
     /**
      * Computes the hash code from the outstanding amount, interest rate, description,
-     * debtor, and creditor.
+     * last recalculated date, debtor, and creditor.
      *
      * <p>Debtor and creditor use their own {@code hashCode()} implementations, which
      * intentionally exclude transactions to prevent circular references.
@@ -243,6 +249,6 @@ public class Transaction {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(currAmount, interestRate, description, debtor, creditor);
+        return Objects.hash(currAmount, interestRate, description, lastRecalculatedDate, debtor, creditor);
     }
 }
