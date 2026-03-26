@@ -9,10 +9,17 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.person.Person;
 import seedu.address.model.transaction.Transaction;
 import seedu.address.testutil.PersonBuilder;
 
 public class TransactionListPanelTest {
+
+    private static Transaction transaction(double amount, String description) {
+        Person debtor = new PersonBuilder().withName("Debtor").build();
+        Person creditor = new PersonBuilder().withName("Creditor").build();
+        return new Transaction(debtor, creditor, amount, 0, description);
+    }
 
     @Test
     public void noSelectionTitle_matchesExpected() {
@@ -44,7 +51,7 @@ public class TransactionListPanelTest {
 
     @Test
     public void descriptionText_returnsTransactionDescription() {
-        Transaction transaction = new Transaction(1, 0, "Dinner");
+        Transaction transaction = transaction(1, "Dinner");
         assertEquals("Dinner", TransactionListPanel.descriptionText(transaction));
     }
 
@@ -74,9 +81,9 @@ public class TransactionListPanelTest {
 
     @Test
     public void sortedTransactions_sortsDescendingByAmount() {
-        Transaction transactionHigh = new Transaction(10, 0, "high");
-        Transaction transactionMid = new Transaction(7, 0, "mid");
-        Transaction transactionLow = new Transaction(-5, 0, "low");
+        Transaction transactionHigh = transaction(10, "high");
+        Transaction transactionMid = transaction(7, "mid");
+        Transaction transactionLow = transaction(-5, "low");
 
         List<Transaction> sorted = TransactionListPanel.sortedTransactions(
                 Set.of(transactionLow, transactionMid, transactionHigh));
@@ -92,8 +99,8 @@ public class TransactionListPanelTest {
 
     @Test
     public void displayModelFor_person_buildsTitleAndSortedTransactions() {
-        Transaction transactionHigh = new Transaction(10, 0, "high");
-        Transaction transactionLow = new Transaction(-5, 0, "low");
+        Transaction transactionHigh = transaction(10, "high");
+        Transaction transactionLow = transaction(-5, "low");
         var person = new PersonBuilder().withName("Alex Yeoh")
                 .withTransactions(transactionLow, transactionHigh).build();
 

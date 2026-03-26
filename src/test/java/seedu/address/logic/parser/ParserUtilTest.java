@@ -20,7 +20,8 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.transaction.Amount;
-import seedu.address.model.transaction.Transaction;
+import seedu.address.model.transaction.TransactionDescriptor;
+import seedu.address.model.transaction.TransactionDescriptor.CompoundingType;
 
 public class ParserUtilTest {
     private static final String INVALID_NAME = "R@chel";
@@ -28,7 +29,6 @@ public class ParserUtilTest {
     private static final String INVALID_ADDRESS = " ";
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
-    private static final String INVALID_TRANSACTION = "ten, 5, lunch"; // invalid amount
 
     private static final String VALID_NAME = "Rachel Walker";
     private static final String VALID_PHONE = "123456";
@@ -36,8 +36,6 @@ public class ParserUtilTest {
     private static final String VALID_EMAIL = "rachel@example.com";
     private static final String VALID_TAG_1 = "friend";
     private static final String VALID_TAG_2 = "neighbour";
-    private static final Transaction VALID_TRANSACTION_1 = new Transaction(10, 0, "lunch");
-    private static final Transaction VALID_TRANSACTION_2 = new Transaction(20, 1, "dinner");
 
     private static final String WHITESPACE = " \t\r\n";
 
@@ -200,15 +198,6 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseTransaction_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseTransaction(null));
-    }
-
-    @Test
-    public void parseTransaction_invalidValue_throwsParseException() {
-        assertThrows(ParseException.class, () -> ParserUtil.parseTransaction(INVALID_TRANSACTION));
-    }
-    @Test
     public void parseAmount_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> ParserUtil.parseAmount(null));
     }
@@ -228,41 +217,55 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseTransaction_validValueWithoutWhitespace_returnsTransaction() throws Exception {
-        Transaction expectedTransaction = VALID_TRANSACTION_1;
-        assertEquals(expectedTransaction, ParserUtil.parseTransaction("10,0,lunch"));
+    public void parseCompoundingType_validValues_success() throws Exception {
+        assertEquals(CompoundingType.MONTHLY, ParserUtil.parseCompoundingType("m"));
+        assertEquals(CompoundingType.YEARLY, ParserUtil.parseCompoundingType("y"));
+        assertEquals(CompoundingType.NONE, ParserUtil.parseCompoundingType("n"));
+        assertEquals(CompoundingType.NONE, ParserUtil.parseCompoundingType(""));
+        assertEquals(CompoundingType.NONE, ParserUtil.parseCompoundingType(WHITESPACE));
     }
 
     @Test
-    public void parseTransaction_validValueWithWhitespace_returnsTransaction() throws Exception {
-        Transaction expectedTransaction = VALID_TRANSACTION_1;
-        String transactionWithWhitespace = WHITESPACE + "10, 0, lunch" + WHITESPACE;
-        assertEquals(expectedTransaction, ParserUtil.parseTransaction(transactionWithWhitespace));
+    public void parseCompoundingType_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE, () ->
+                ParserUtil.parseCompoundingType("weekly"));
     }
 
     @Test
-    public void parseTransactions_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseTransactions(null));
+    public void parseTransactionDescriptor_validValues_success() throws Exception {
+        TransactionDescriptor expected = new TransactionDescriptor(CompoundingType.MONTHLY, 10.0, 5.0, "lunch");
+        assertEquals(expected, ParserUtil.parseTransactionDescriptor("10.0", "5", "lunch", "m"));
     }
 
     @Test
-    public void parseTransactions_emptyCollection_returnsEmptySet() throws Exception {
-        assertTrue(ParserUtil.parseTransactions(Collections.emptyList()).isEmpty());
+    public void parseTransactionDescriptor_descriptionOptional_success() throws Exception {
+        TransactionDescriptor expected = new TransactionDescriptor(CompoundingType.NONE, 10.0, 0.0, "");
+        assertEquals(expected, ParserUtil.parseTransactionDescriptor("10", "0", "", ""));
     }
 
     @Test
-    public void parseTransactions_collectionWithValidTransactions_returnsTransactionSet() throws Exception {
-        Set<Transaction> actualTransactionSet =
-                ParserUtil.parseTransactions(Arrays.asList("10, 0, lunch", "20, 1, dinner"));
-        Set<Transaction> expectedTransactionSet =
-                new HashSet<>(Arrays.asList(VALID_TRANSACTION_1, VALID_TRANSACTION_2));
-
-        assertEquals(expectedTransactionSet, actualTransactionSet);
+    public void parseTransactionDescriptor_invalidAmount_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("0", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("-1", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("ten", "5", "lunch", ""));
     }
 
     @Test
-    public void parseTransactions_collectionWithInvalidTransaction_throwsParseException() {
-        assertThrows(ParseException.class, () -> ParserUtil
-                .parseTransactions(Arrays.asList("10,0,lunch", INVALID_TRANSACTION)));
+    public void parseTransactionDescriptor_invalidRate_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "-1", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "101", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_RATE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "five", "lunch", ""));
+    }
+
+    @Test
+    public void parseTransactionDescriptor_invalidCompoundingType_throwsParseException() {
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_COMPOUNDING_TYPE, () ->
+                ParserUtil.parseTransactionDescriptor("10", "5", "lunch", "weekly"));
     }
 }

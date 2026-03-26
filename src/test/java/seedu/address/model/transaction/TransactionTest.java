@@ -1,20 +1,29 @@
 package seedu.address.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.person.Person;
+import seedu.address.testutil.PersonBuilder;
+
 public class TransactionTest {
+
+    private static Person debtor() {
+        return new PersonBuilder().withName("Debtor").build();
+    }
+
+    private static Person creditor() {
+        return new PersonBuilder().withName("Creditor").build();
+    }
 
     private static class TestTransaction extends Transaction {
 
         public TestTransaction(double amount, double rate, String description) {
-            super(amount, rate, description);
+            super(debtor(), creditor(), amount, rate, description);
         }
 
         @Override
@@ -126,7 +135,8 @@ public class TransactionTest {
     @Test
     public void toString_correctFormat() {
         Transaction transaction = new TestTransaction(100, 5, "test transaction");
-        assertEquals("[Amount: 100.00, Rate: 5.00%, Desc: test transaction]", transaction.toString());
+        assertEquals("[Amount: 100.00, Rate: 5.00%, Desc: test transaction, Debtor: Debtor, Creditor: Creditor,"
+                + " Type: None]", transaction.toString());
     }
 
     // ========== equals ==========
@@ -184,72 +194,5 @@ public class TransactionTest {
         Transaction a = new TestTransaction(100, 5, "desc");
         Transaction b = new TestTransaction(100, 5, "desc");
         assertEquals(a.hashCode(), b.hashCode());
-    }
-
-    // ========== isValidTransactionArguments ==========
-
-    @Test
-    public void isValidTransactionArguments_validGenericTransaction_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("100, 5, my transaction"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_validMonthlyTransaction_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("m 100, 5, my transaction"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_validYearlyTransaction_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("y 100, 5, my transaction"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_uppercaseType_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("M 100, 5, my transaction"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_zeroRate_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("100, 0, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_maxRate_returnsTrue() {
-        assertTrue(Transaction.isValidTransactionArguments("100, 100, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_rateAbove100_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("100, 101, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_negativeRate_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("100, -1, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_missingDescription_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("100, 5"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_emptyDescription_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("100, 5, "));
-    }
-
-    @Test
-    public void isValidTransactionArguments_nonNumericAmount_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("abc, 5, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_nonNumericRate_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments("100, xyz, desc"));
-    }
-
-    @Test
-    public void isValidTransactionArguments_emptyString_returnsFalse() {
-        assertFalse(Transaction.isValidTransactionArguments(""));
     }
 }

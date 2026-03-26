@@ -10,6 +10,12 @@ import seedu.address.testutil.PersonBuilder;
 
 public class PersonCardTest {
 
+    private static Transaction transaction(double amount, String description) {
+        Person debtor = new PersonBuilder().withName("Debtor").build();
+        Person creditor = new PersonBuilder().withName("Creditor").build();
+        return new Transaction(debtor, creditor, amount, 0, description);
+    }
+
     @Test
     public void formatBalance_noTransactions_showsZeroBalance() {
         Person person = new PersonBuilder().withTransactions().build();
@@ -19,7 +25,7 @@ public class PersonCardTest {
     @Test
     public void formatBalance_positiveTransaction_showsYouOwe() {
         Person person = new PersonBuilder()
-                .withTransactions(new Transaction(12.5, 0, "Dinner"))
+                .withTransactions(transaction(12.5, "Dinner"))
                 .build();
         assertEquals("You owe: $12.50", PersonCard.formatBalance(person));
     }
@@ -27,7 +33,7 @@ public class PersonCardTest {
     @Test
     public void formatBalance_negativeTransaction_showsTheyOweYou() {
         Person person = new PersonBuilder()
-                .withTransactions(new Transaction(-45.0, 0, "Project Lunch"))
+                .withTransactions(transaction(-45.0, "Project Lunch"))
                 .build();
         assertEquals("They owe you: $45.00", PersonCard.formatBalance(person));
     }
@@ -36,8 +42,8 @@ public class PersonCardTest {
     public void formatBalance_multipleTransactions_showsSummedBalance() {
         Person person = new PersonBuilder()
                 .withTransactions(
-                        new Transaction(20.0, 0, "Lunch"),
-                        new Transaction(-5.0, 0, "Coffee"))
+                        transaction(20.0, "Lunch"),
+                        transaction(-5.0, "Coffee"))
                 .build();
         assertEquals("You owe: $15.00", PersonCard.formatBalance(person));
     }
@@ -54,7 +60,7 @@ public class PersonCardTest {
     @Test
     public void activeDebtsModel_positiveTotal_showsOweRed() {
         Person person = new PersonBuilder()
-                .withTransactions(new Transaction(12.5, 0, "Dinner"))
+                .withTransactions(transaction(12.5, "Dinner"))
                 .build();
         PersonCard.ActiveDebtsModel model = PersonCard.activeDebtsModelFor(person);
         assertEquals("-$12.50", model.getAmountText());
@@ -65,7 +71,7 @@ public class PersonCardTest {
     @Test
     public void activeDebtsModel_negativeTotal_showsLentGreen() {
         Person person = new PersonBuilder()
-                .withTransactions(new Transaction(-45.0, 0, "Project Lunch"))
+                .withTransactions(transaction(-45.0, "Project Lunch"))
                 .build();
         PersonCard.ActiveDebtsModel model = PersonCard.activeDebtsModelFor(person);
         assertEquals("+$45.00", model.getAmountText());
@@ -76,7 +82,7 @@ public class PersonCardTest {
     @Test
     public void activeDebtsModel_nearZeroTotal_treatedAsZero() {
         Person person = new PersonBuilder()
-                .withTransactions(new Transaction(0.001, 0, "Tiny"))
+                .withTransactions(transaction(0.001, "Tiny"))
                 .build();
         PersonCard.ActiveDebtsModel model = PersonCard.activeDebtsModelFor(person);
         assertEquals("$0.00", model.getAmountText());

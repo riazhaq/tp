@@ -8,8 +8,6 @@ import static seedu.address.logic.commands.CommandTestUtil.DESC_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_PHONE_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
-import static seedu.address.logic.commands.CommandTestUtil.VALID_TRANSACTION_DINNER;
-import static seedu.address.logic.commands.CommandTestUtil.VALID_TRANSACTION_LUNCH;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
@@ -40,7 +38,7 @@ public class EditCommandTest {
     @Test
     public void execute_allFieldsSpecifiedUnfilteredList_success() {
         Person editedPerson = new PersonBuilder()
-                .withTransactions(VALID_TRANSACTION_LUNCH, VALID_TRANSACTION_DINNER).build();
+                .build();
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder(editedPerson).build();
         EditCommand editCommand = new EditCommand(INDEX_FIRST_PERSON, descriptor);
 
@@ -62,14 +60,12 @@ public class EditCommandTest {
                 .withName(VALID_NAME_BOB)
                 .withPhone(VALID_PHONE_BOB)
                 .withTags(VALID_TAG_HUSBAND)
-                .withTransactions(VALID_TRANSACTION_LUNCH)
                 .build();
 
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder()
                 .withName(VALID_NAME_BOB)
                 .withPhone(VALID_PHONE_BOB)
                 .withTags(VALID_TAG_HUSBAND)
-                .withTransactions(VALID_TRANSACTION_LUNCH)
                 .build();
 
         EditCommand editCommand = new EditCommand(indexLastPerson, descriptor);
@@ -101,13 +97,11 @@ public class EditCommandTest {
         Person personInFilteredList = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person editedPerson = new PersonBuilder(personInFilteredList)
                 .withName(VALID_NAME_BOB)
-                .withTransactions(VALID_TRANSACTION_LUNCH)
                 .build();
 
         EditCommand editCommand = new EditCommand(INDEX_FIRST_PERSON,
                 new EditPersonDescriptorBuilder()
                         .withName(VALID_NAME_BOB)
-                        .withTransactions(VALID_TRANSACTION_LUNCH)
                         .build());
 
         String expectedMessage = String.format(EditCommand.MESSAGE_EDIT_PERSON_SUCCESS, Messages.format(editedPerson));

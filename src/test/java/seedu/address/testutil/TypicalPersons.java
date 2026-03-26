@@ -17,8 +17,6 @@ import java.util.List;
 
 import seedu.address.model.AddressBook;
 import seedu.address.model.person.Person;
-import seedu.address.model.transaction.MonthlyTransaction;
-import seedu.address.model.transaction.YearlyTransaction;
 
 /**
  * A utility class containing a list of {@code Person} objects to be used in tests.
@@ -29,28 +27,20 @@ public class TypicalPersons {
             .withAddress("123, Jurong West Ave 6, #08-111").withEmail("alice@example.com")
             .withPhone("94351253")
             .withTags("friends")
-            .withTransactions(
-                    new MonthlyTransaction(2000.0, 5.0, "Rent"),
-                    new YearlyTransaction(-300.0, 0.0, "Insurance") // negative transaction allowed
-            ).build();
+            .build();
     public static final Person BENSON = new PersonBuilder()
             .withName("Benson Meier")
             .withAddress("311, Clementi Ave 2, #02-25")
             .withEmail("johnd@example.com")
             .withPhone("98765432")
             .withTags("owesMoney", "friends")
-            .withTransactions(
-                    new MonthlyTransaction(1000.0, 5.0, "Rent"),
-                    new YearlyTransaction(-200.0, 0.0, "Lunch") // negative transaction allowed
-            ).build();
+            .build();
     public static final Person CARL = new PersonBuilder().withName("Carl Kurz").withPhone("95352563")
             .withEmail("heinz@example.com").withAddress("wall street")
-            .withTransactions(new MonthlyTransaction(500.0, 3.0, "Car"))
             .build();
 
     public static final Person DANIEL = new PersonBuilder().withName("Daniel Meier").withPhone("87652533")
             .withEmail("cornelia@example.com").withAddress("10th street").withTags("friends")
-            .withTransactions(new YearlyTransaction(1200.0, 2.5, "Mortgage"))
             .build();
 
     // No transactions — tests that persons without transactions are handled correctly
@@ -66,12 +56,10 @@ public class TypicalPersons {
     // Manually added — used in storage roundtrip tests, so transactions are important here
     public static final Person HOON = new PersonBuilder().withName("Hoon Meier").withPhone("8482424")
             .withEmail("stefan@example.com").withAddress("little india")
-            .withTransactions(new MonthlyTransaction(750.0, 1.5, "Phone"))
             .build();
 
     public static final Person IDA = new PersonBuilder().withName("Ida Mueller").withPhone("8482131")
             .withEmail("hans@example.com").withAddress("chicago ave")
-            .withTransactions(new YearlyTransaction(600.0, 4.0, "Gym"))
             .build();
 
     // Manually added - Person's details found in {@code CommandTestUtil}
@@ -99,6 +87,28 @@ public class TypicalPersons {
     }
 
     public static List<Person> getTypicalPersons() {
-        return new ArrayList<>(Arrays.asList(ALICE, BENSON, CARL, DANIEL, ELLE, FIONA, GEORGE));
+        // IMPORTANT: Person holds a mutable transaction set. Some tests append/remove transactions.
+        // Returning shared static Person instances will leak state between tests.
+        return new ArrayList<>(Arrays.asList(
+                copyWithoutTransactions(ALICE),
+                copyWithoutTransactions(BENSON),
+                copyWithoutTransactions(CARL),
+                copyWithoutTransactions(DANIEL),
+                copyWithoutTransactions(ELLE),
+                copyWithoutTransactions(FIONA),
+                copyWithoutTransactions(GEORGE)
+        ));
+    }
+
+    /**
+     * Creates a fresh {@link Person} with the same identity fields but an empty transaction set.
+     */
+    private static Person copyWithoutTransactions(Person person) {
+        var name = person.getName();
+        var phone = person.getPhone();
+        var email = person.getEmail();
+        var address = person.getAddress();
+        var tags = person.getTags();
+        return new Person(name, phone, email, address, tags);
     }
 }

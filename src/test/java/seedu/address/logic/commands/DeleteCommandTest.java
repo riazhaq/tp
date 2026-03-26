@@ -23,6 +23,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
 
 /**
@@ -89,6 +90,13 @@ public class DeleteCommandTest {
     public void execute_validTransactionIndexUnfilteredList_success() {
         Index transactionIndex = Index.fromOneBased(1);
         Person personToModify = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+
+        // Ensure there is at least one transaction to delete.
+        Person otherPerson = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        Transaction seedTransaction = new MonthlyTransaction(personToModify, otherPerson, 10.0, 0.0, "seed");
+        personToModify.appendTransaction(seedTransaction);
+        otherPerson.appendTransaction(seedTransaction);
+
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, transactionIndex);
 
 
@@ -114,6 +122,15 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_invalidTransactionIndex_throwsCommandException() {
+        Person personToModify = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
+
+        // Ensure there is at least one transaction, so this test targets an out-of-range index
+        // rather than the "no transactions found" case.
+        Person otherPerson = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
+        Transaction seedTransaction = new MonthlyTransaction(personToModify, otherPerson, 10.0, 0.0, "seed");
+        personToModify.appendTransaction(seedTransaction);
+        otherPerson.appendTransaction(seedTransaction);
+
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, Index.fromOneBased(3));
         assertCommandFailure(deleteCommand, model, DeleteCommand.MESSAGE_INVALID_TRANSACTION_DISPLAYED_INDEX);
     }

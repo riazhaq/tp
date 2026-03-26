@@ -10,16 +10,10 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_EMAIL_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_NAME_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_PHONE_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
-import static seedu.address.logic.commands.CommandTestUtil.VALID_TRANSACTION_DINNER;
-import static seedu.address.logic.commands.CommandTestUtil.VALID_TRANSACTION_LUNCH;
-
-import java.util.Collections;
-import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
-import seedu.address.model.transaction.Transaction;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 
 public class EditPersonDescriptorTest {
@@ -61,28 +55,18 @@ public class EditPersonDescriptorTest {
         // different tags -> returns false
         editedAmy = new EditPersonDescriptorBuilder(DESC_AMY).withTags(VALID_TAG_HUSBAND).build();
         assertFalse(DESC_AMY.equals(editedAmy));
-
-        // different transactions -> returns false
-        editedAmy = new EditPersonDescriptorBuilder(DESC_AMY)
-                .withTransactions(VALID_TRANSACTION_LUNCH, VALID_TRANSACTION_DINNER).build();
-        assertFalse(DESC_AMY.equals(editedAmy));
     }
 
     @Test
     public void toStringMethod() {
         EditPersonDescriptor editPersonDescriptor = new EditPersonDescriptor();
 
-        // Add transactions for completeness
-        editPersonDescriptor.setTransactions(
-                new HashSet<Transaction>(Collections.singletonList(VALID_TRANSACTION_LUNCH)));
-
         String expected = EditPersonDescriptor.class.getCanonicalName() + "{name="
                 + editPersonDescriptor.getName().orElse(null) + ", phone="
                 + editPersonDescriptor.getPhone().orElse(null) + ", email="
                 + editPersonDescriptor.getEmail().orElse(null) + ", address="
                 + editPersonDescriptor.getAddress().orElse(null) + ", tags="
-                + editPersonDescriptor.getTags().orElse(null) + ", transactions="
-                + editPersonDescriptor.getTransactions().orElse(null) + "}";
+                + editPersonDescriptor.getTags().orElse(null) + "}";
 
         assertEquals(expected, editPersonDescriptor.toString());
     }

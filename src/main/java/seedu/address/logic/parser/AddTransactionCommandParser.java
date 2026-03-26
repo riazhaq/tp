@@ -19,8 +19,8 @@ import seedu.address.model.transaction.TransactionDescriptor;
  * Parses input arguments and creates a new AddTransactionCommand object.
  *
  * <p>Expected format:
- * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE d/DESCRIPTION [c/COMPOUNDING_TYPE]}
- * e.g. {@code addtxn 2 3 a/10 i/5 d/lunch c/m}
+ * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPTION] [t/COMPOUNDING_TYPE]}
+ * e.g. {@code addtxn 2 3 a/10 i/5 d/lunch t/m}
  *
  * <p>The debtor and creditor indices refer to the one-based positions of persons
  * currently displayed in the person list. The optional compounding type prefix
@@ -69,7 +69,7 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTransactionCommand.MESSAGE_USAGE));
         }
 
-        // c/ is optional — pass empty string if absent to signal NONE
+        // t/ is optional - pass empty string if absent to signal NONE
         String compoundingRaw = argMultimap.getValue(PREFIX_COMPOUNDING_TYPE).orElse("");
 
         TransactionDescriptor descriptor = ParserUtil.parseTransactionDescriptor(
