@@ -91,7 +91,8 @@ public class DeleteCommandTest {
         Person otherPerson = model.getFilteredPersonList().get(1);
 
         // Seed a transaction between them
-        Transaction seedTransaction = new MonthlyTransaction(personToModify, otherPerson, 10.0, 0.0, "Test Transaction");
+        Transaction seedTransaction = new MonthlyTransaction(
+                personToModify, otherPerson, 10.0, 0.0, "Test Transaction");
         personToModify.appendTransaction(seedTransaction);
         otherPerson.appendTransaction(seedTransaction);
 
