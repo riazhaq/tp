@@ -101,14 +101,13 @@ public class DeleteCommandTest {
 
         DeleteCommand deleteCommand = new DeleteCommand(INDEX_FIRST_PERSON, transactionIndex);
 
-        // Match sorting logic
-        List<Transaction> transactions = personToModify.getTransactions().stream()
+        // Match sorting logic in DeleteCommand
+        List<Transaction> sortedTransactions = personToModify.getTransactions().stream()
                 .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
                 .collect(Collectors.toList());
+        Transaction transactionToDelete = sortedTransactions.get(transactionIndex.getZeroBased());
 
-        Transaction transactionToDelete = transactions.get(transactionIndex.getZeroBased());
-
-        // --- Expected updated persons ---
+        // Remove transaction from both persons
         Set<Transaction> updatedTransactionsPerson = new HashSet<>(personToModify.getTransactions());
         updatedTransactionsPerson.remove(transactionToDelete);
 
@@ -137,24 +136,22 @@ public class DeleteCommandTest {
         expectedModel.setPerson(personToModify, updatedPerson);
         expectedModel.setPerson(otherPerson, updatedOtherPerson);
 
-        // Format transaction details to match DeleteCommand
-        String transactionDetails = String.format("$%.2f | %s | %s → %s",
-                transactionToDelete.getCurrAmount(),
-                transactionToDelete.getDescription(),
-                transactionToDelete.getDebtor().getName(),
-                transactionToDelete.getCreditor().getName());
-
+        // Generate expected message exactly like DeleteCommand
         String expectedMessage = String.format(
                 DeleteCommand.MESSAGE_DELETE_TRANSACTION_SUCCESS,
                 transactionIndex.getOneBased(),
-                transactionDetails
+                String.format("$%.2f | %s | %s → %s",
+                        transactionToDelete.getCurrAmount(),
+                        transactionToDelete.getDescription(),
+                        transactionToDelete.getDebtor().getName(),
+                        transactionToDelete.getCreditor().getName())
         );
 
         assertCommandSuccess(deleteCommand, model, expectedMessage, expectedModel);
 
+        // Verify both persons no longer contain the deleted transaction
         Person resultPerson = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Person resultOther = model.getFilteredPersonList().get(INDEX_SECOND_PERSON.getZeroBased());
-
         assertFalse(resultPerson.getTransactions().contains(transactionToDelete));
         assertFalse(resultOther.getTransactions().contains(transactionToDelete));
     }
