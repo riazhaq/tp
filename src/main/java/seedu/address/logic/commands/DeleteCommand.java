@@ -159,7 +159,7 @@ public class DeleteCommand extends Command {
      * @param transactionToRemove the transaction to remove
      * @return a new person object with the transaction removed
      */
-    private static Person createPersonWithoutTransaction(Person person, Transaction transactionToRemove) {
+    public static Person createPersonWithoutTransaction(Person person, Transaction transactionToRemove) {
         Set<Transaction> updatedTransactions = new HashSet<>(person.getTransactions());
         updatedTransactions.remove(transactionToRemove);
 
