@@ -13,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,12 +30,16 @@ public class TransactionListPanelTest {
 
     private static final String ALEX = "Alex Yeoh";
     private static final String BERNICE = "Bernice Yu";
+    private static boolean isFxToolkitAvailable = true;
 
     @BeforeAll
     public static void setUpFxToolkit() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         try {
             Platform.startup(latch::countDown);
+        } catch (UnsupportedOperationException unsupportedEnvironment) {
+            isFxToolkitAvailable = false;
+            return;
         } catch (IllegalStateException alreadyStarted) {
             latch.countDown();
         }
@@ -78,6 +83,9 @@ public class TransactionListPanelTest {
     }
 
     private static <T> T onFx(ThrowingSupplier<T> supplier) {
+        Assumptions.assumeTrue(isFxToolkitAvailable,
+            "Skipping JavaFX-dependent test because toolkit is unavailable in this environment");
+
         AtomicReference<T> result = new AtomicReference<>();
         AtomicReference<Throwable> error = new AtomicReference<>();
         CountDownLatch latch = new CountDownLatch(1);
