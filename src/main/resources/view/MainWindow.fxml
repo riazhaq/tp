@@ -50,16 +50,16 @@
         </StackPane>
 
         <Label fx:id="activeContactsLabel" text="Active Contacts (0)" styleClass="section-title" VBox.vgrow="NEVER" />
-        <SplitPane VBox.vgrow="ALWAYS" styleClass="pane-with-border background">
+        <SplitPane VBox.vgrow="ALWAYS" styleClass="pane-with-border background" dividerPositions="0.28">
           <items>
-            <VBox styleClass="pane-with-border" minWidth="340" prefWidth="340">
+            <VBox styleClass="pane-with-border" minWidth="280" prefWidth="280">
               <padding>
                 <Insets top="10" right="10" bottom="10" left="10" />
               </padding>
               <Label text="Person" styleClass="list-header" />
               <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
             </VBox>
-            <VBox styleClass="pane-with-border">
+            <VBox styleClass="pane-with-border" minWidth="620" prefWidth="650">
               <padding>
                 <Insets top="10" right="10" bottom="10" left="10" />
               </padding>

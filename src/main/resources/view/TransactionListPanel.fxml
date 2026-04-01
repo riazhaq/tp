@@ -7,14 +7,16 @@
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" spacing="6" styleClass="transaction-list-panel">
   <Label fx:id="title" text="Transactions - Select a person" styleClass="panel-title" />
-  <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS">
+  <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS" prefWidth="930">
     <columns>
       <TableColumn fx:id="indexColumn" text="#" prefWidth="40" />
-      <TableColumn fx:id="typeColumn" text="Type" prefWidth="80" />
-      <TableColumn fx:id="amountColumn" text="Amount" prefWidth="90" />
-      <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="220" />
-      <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
-      <TableColumn fx:id="dateColumn" text="Date" prefWidth="110" />
+      <TableColumn fx:id="compoundingColumn" text="Compounding" prefWidth="140" minWidth="120" />
+      <TableColumn fx:id="directionColumn" text="Direction" prefWidth="110" minWidth="90" />
+      <TableColumn fx:id="otherPartyColumn" text="Other Party" prefWidth="130" minWidth="110" />
+      <TableColumn fx:id="amountColumn" text="Amount" prefWidth="90" minWidth="80" />
+      <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="210" minWidth="130" />
+      <TableColumn fx:id="statusColumn" text="Status" prefWidth="90" minWidth="80" />
+      <TableColumn fx:id="dateColumn" text="Date" prefWidth="110" minWidth="90" />
     </columns>
   </TableView>
 </VBox>
