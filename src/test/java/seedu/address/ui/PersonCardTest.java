@@ -68,7 +68,7 @@ public class PersonCardTest {
         Transaction tx = transaction(person, 12.5, "Dinner", true); // person is debtor
         person = new PersonBuilder().withTransactions(tx).build();
         PersonCard.ActiveDebtsModel model = PersonCard.activeDebtsModelFor(person);
-        assertEquals("$12.50", model.getAmountText());
+        assertEquals("-$12.50", model.getAmountText());
         assertEquals("(Owe)", model.getSuffixText());
         assertEquals("debts-owe", model.getStyleClass());
     }
@@ -79,7 +79,7 @@ public class PersonCardTest {
         Transaction tx = transaction(person, 45.0, "Project Lunch", false); // person is creditor
         person = new PersonBuilder().withTransactions(tx).build();
         PersonCard.ActiveDebtsModel model = PersonCard.activeDebtsModelFor(person);
-        assertEquals("$45.00", model.getAmountText());
+        assertEquals("+$45.00", model.getAmountText());
         assertEquals("(Lent)", model.getSuffixText());
         assertEquals("debts-lent", model.getStyleClass());
     }
