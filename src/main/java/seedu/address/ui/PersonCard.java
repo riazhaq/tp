@@ -130,29 +130,18 @@ public class PersonCard extends UiPart<Region> {
     }
 
     static ActiveDebtsModel activeDebtsModelFor(Person person) {
-        double amountOwed = 0.0;
-        double amountOwedTo = 0.0;
+        double total = person.getTransactions().stream()
+                .mapToDouble(Transaction::getCurrAmount)
+                .sum();
 
-        for (Transaction transaction : person.getTransactions()) {
-            if (transaction.getDebtor().equals(person)) {
-                // Person is the debtor, so they owe this amount
-                amountOwed += transaction.getCurrAmount();
-            } else if (transaction.getCreditor().equals(person)) {
-                // Person is the creditor, so this amount is owed to them
-                amountOwedTo += transaction.getCurrAmount();
-            }
-        }
-
-        double netBalance = amountOwedTo - amountOwed;
-
-        if (person.getTransactions().isEmpty() || Math.abs(netBalance) < NEAR_ZERO_THRESHOLD) {
+        if (person.getTransactions().isEmpty() || Math.abs(total) < NEAR_ZERO_THRESHOLD) {
             return new ActiveDebtsModel("$0.00", "", null);
         }
 
-        if (netBalance < 0) {
-            return new ActiveDebtsModel(String.format("$%.2f", Math.abs(netBalance)), "(Owe)", STYLE_DEBTS_OWE);
+        if (total > 0) {
+            return new ActiveDebtsModel(String.format("-$%.2f", total), "(Owe)", STYLE_DEBTS_OWE);
         }
 
-        return new ActiveDebtsModel(String.format("$%.2f", netBalance), "(Lent)", STYLE_DEBTS_LENT);
+        return new ActiveDebtsModel(String.format("+$%.2f", Math.abs(total)), "(Lent)", STYLE_DEBTS_LENT);
     }
 }
