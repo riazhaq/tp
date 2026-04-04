@@ -158,6 +158,38 @@ Clears all entries from the address book.
 
 Format: `clear`
 
+### Settling a transaction : `settle`
+
+Marks a specific transaction as paid while keeping it in the history so the outstanding balance for the person is recalculated without losing the record.
+
+Format: `settle PERSON_INDEX t/TRANSACTION_INDEX`
+
+Example: `settle 1 t/2`
+
+### Recording a Debt (You Owe Someone) : `owe`
+
+Creates a new transaction where you owe money to a person in the current list.
+
+Format: `owe INDEX a/AMOUNT [d/DESCRIPTION]`
+
+Example: `owe 1 a/12.50 d/Dinner`
+
+### Recording a Loan (Someone Owes You) : `lent`
+
+Creates a new transaction where another person owes you money.
+
+Format: `lent INDEX a/AMOUNT [d/DESCRIPTION]`
+
+Example: `lent 2 a/50 d/Concert tickets`
+
+### Deleting a transaction : `delete`
+
+Removes a specific transaction from a person; specifying both the person index and transaction index lets you target the exact entry.
+
+Format: `delete INDEX t/TRANSACTION_INDEX`
+
+Example: `delete 1 t/2`
+
 ### Exiting the program : `exit`
 
 Exits the program.
