@@ -19,6 +19,8 @@ Class Email
 Class Name
 Class Phone
 Class Tag
+Class Transaction
+Class InterestRate
 
 Class I #FFFFFF
 }
@@ -42,6 +44,11 @@ Person *--> Phone
 Person *--> Email
 Person *--> Address
 Person *--> "*" Tag
+
+Person *-right-> "~* transactions" Transaction
+Transaction -up-> "1" InterestRate
+Transaction "*" -up-> "1" Person : debtor
+Transaction "*" -up-> "1" Person : creditor
 
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
