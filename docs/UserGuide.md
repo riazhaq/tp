@@ -87,6 +87,16 @@ Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
 * `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
 
+### Adding a transaction : `addtxn`
+
+Adds a transaction between two existing persons in the address book, where the **debtor** owes money to the **creditor**.
+
+Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPTION] [t/COMPOUNDING_TYPE]`
+
+Examples:
+* `addtxn 1 2 a/12.50 i/5 d/Dinner t/m`
+* `addtxn 2 1 a/100 i/0 d/Refund`
+
 ### Listing all persons : `list`
 
 Shows a list of all persons in the address book.
