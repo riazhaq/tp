@@ -177,6 +177,26 @@ Examples:
 * `list` followed by `delete 2` deletes the 2nd person in the address book.
 * `find Betsy` followed by `delete 1` deletes the 1st person in the results of the `find` command.
 
+### Adding a transaction : `addtxn`
+
+Adds a transaction between two persons in the address book.
+
+Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPTION] [t/COMPOUNDING_TYPE]`
+
+* Adds a transaction from the debtor to the creditor at the specified indexes.
+* The indexes refer to the index numbers shown in the displayed person list.
+* Both indexes **must be positive integers** 1, 2, 3, …
+* Both indexes **must be different** (a person cannot transact with themselves).
+* `AMOUNT` must be a positive number.
+* `INTEREST_RATE` must be a non-negative number.
+* `COMPOUNDING_TYPE` must be `m` (monthly), `y` (yearly), or `n` (none) if specified.
+* Items in square brackets are optional.
+
+Examples:
+* `addtxn 1 2 a/50 i/5 d/lunch t/m` adds a transaction where person 1 owes person 2 $50 at 5% monthly compounding interest for lunch.
+* `addtxn 2 3 a/10 i/5 d/lunch t/m` adds a transaction where person 2 owes person 3 $10 at 5% monthly compounding interest for lunch.
+* `addtxn 1 2 a/100 i/0` adds a transaction where person 1 owes person 2 $100 with no interest.
+
 ### Clearing all entries : `clear`
 
 Clears all entries from the address book.
