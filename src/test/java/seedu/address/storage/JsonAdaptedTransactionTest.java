@@ -1,6 +1,7 @@
 package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -90,6 +91,16 @@ public class JsonAdaptedTransactionTest {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("m", VALID_AMOUNT, VALID_RATE, null,
                 new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), false);
         assertThrows(IllegalValueException.class, adapted::toModelType);
+    }
+
+    @Test
+    public void jsonCreator_nullSettled_defaultsToFalse() throws IllegalValueException {
+        JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), null);
+
+        Transaction transaction = adapted.toModelType();
+
+        assertFalse(transaction.isSettled());
     }
 }
 
