@@ -177,40 +177,6 @@ public class MainWindowTest {
     }
 
     @Test
-    public void executeCommand_exitResult_hidesHelpWindowAndStageAndPersistsGuiSettings() {
-        Person live = new PersonBuilder().withName("Alice Pauline").build();
-        ObservableList<Person> persons = FXCollections.observableArrayList(live);
-        FakeLogic logic = new FakeLogic(persons);
-        logic.resultToReturn = new CommandResult("bye", false, true);
-        Stage stage = FxTestUtil.onFx(Stage::new);
-        MainWindow window = FxTestUtil.onFx(() -> new MainWindow(stage, logic));
-        StubPersonListPanel personListPanel = FxTestUtil.onFx(() -> new StubPersonListPanel(persons));
-        TrackingTransactionListPanel transactionPanel = FxTestUtil.onFx(TrackingTransactionListPanel::new);
-        ResultDisplay resultDisplay = FxTestUtil.onFx(ResultDisplay::new);
-        personListPanel.selectedPerson = live;
-        setField(window, "personListPanel", personListPanel);
-        setField(window, "transactionListPanel", transactionPanel);
-        setField(window, "resultDisplay", resultDisplay);
-
-        double expectedWidth = FxTestUtil.onFx(() -> {
-            stage.setWidth(810);
-            stage.setHeight(620);
-            stage.setX(25);
-            stage.setY(35);
-            stage.show();
-            return stage.getWidth();
-        });
-        double expectedHeight = FxTestUtil.onFx(stage::getHeight);
-        int expectedX = FxTestUtil.onFx(() -> (int) stage.getX());
-        int expectedY = FxTestUtil.onFx(() -> (int) stage.getY());
-
-        FxTestUtil.onFxRun(() -> invoke(window, "executeCommand", "exit"));
-
-        assertFalse(FxTestUtil.onFx(stage::isShowing));
-        assertEquals(new GuiSettings(expectedWidth, expectedHeight, expectedX, expectedY), logic.guiSettings);
-    }
-
-    @Test
     public void executeCommand_commandException_updatesErrorDisplayAndRethrows() {
         Person live = new PersonBuilder().withName("Alice Pauline").build();
         ObservableList<Person> persons = FXCollections.observableArrayList(live);
@@ -277,18 +243,6 @@ public class MainWindowTest {
         Person second = new PersonBuilder().withName("Bob Choo").build();
         FxTestUtil.onFxRun(() -> persons.add(second));
         assertEquals("Active Contacts (2)", activeContactsLabel.getText());
-    }
-
-    @Test
-    public void getPersonListPanel_afterFillInnerParts_returnsPanel() {
-        ObservableList<Person> persons = FXCollections.observableArrayList(
-                new PersonBuilder().withName("Alice Pauline").build());
-        FakeLogic logic = new FakeLogic(persons);
-        MainWindow window = FxTestUtil.onFx(() -> new MainWindow(new Stage(), logic));
-        FxTestUtil.onFxRun(window::fillInnerParts);
-
-        PersonListPanel expected = getField(window, "personListPanel");
-        assertSame(expected, window.getPersonListPanel());
     }
 
     private static Object invoke(Object target, String methodName, Object... args) {

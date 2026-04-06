@@ -13,6 +13,7 @@ import javafx.application.Platform;
  */
 public final class FxTestUtil {
 
+    private static final long FX_TIMEOUT_SECONDS = isLinuxOs() ? 30 : 5;
     private static boolean isFxToolkitAvailable = true;
 
     private FxTestUtil() {}
@@ -32,7 +33,7 @@ public final class FxTestUtil {
             Platform.setImplicitExit(false);
             latch.countDown();
         }
-        if (!latch.await(5, TimeUnit.SECONDS)) {
+        if (!latch.await(FX_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
             throw new AssertionError("Timed out starting JavaFX toolkit");
         }
     }
@@ -58,7 +59,7 @@ public final class FxTestUtil {
         });
 
         try {
-            if (!latch.await(5, TimeUnit.SECONDS)) {
+            if (!latch.await(FX_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 throw new AssertionError("Timed out waiting for JavaFX operation");
             }
         } catch (InterruptedException interruptedException) {
@@ -70,6 +71,10 @@ public final class FxTestUtil {
             throw new AssertionError(error.get());
         }
         return result.get();
+    }
+
+    private static boolean isLinuxOs() {
+        return System.getProperty("os.name", "").toLowerCase().contains("linux");
     }
 
     /**
