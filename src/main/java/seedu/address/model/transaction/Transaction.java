@@ -50,6 +50,9 @@ public class Transaction {
     /** The person who is owed money in this transaction. */
     protected Person creditor;
 
+    /** Whether this transaction has been fully settled. */
+    protected boolean settled;
+
     /**
      * Constructs a {@code Transaction} with the specified debtor, creditor, amount,
      * interest rate, and description. The last recalculated date is set to today.
@@ -67,6 +70,7 @@ public class Transaction {
         this.interestRate = new InterestRate(interestRate);
         this.description = description;
         this.lastRecalculatedDate = LocalDate.now();
+        this.settled = false;
     }
 
     /**
@@ -90,6 +94,21 @@ public class Transaction {
             this.updateTransactionAmount();
         }
         currAmount -= amount;
+        if (Math.abs(currAmount) < 1e-9) {
+            settled = true;
+        }
+        updateLastRecalculatedDate();
+    }
+
+    /**
+     * Marks this transaction as fully settled and sets the outstanding amount to zero.
+     */
+    public void settleTransaction() {
+        if (!this.lastRecalculatedDate.equals(LocalDate.now())) {
+            this.updateTransactionAmount();
+        }
+        currAmount = 0;
+        settled = true;
         updateLastRecalculatedDate();
     }
 
@@ -176,6 +195,20 @@ public class Transaction {
     }
 
     /**
+     * Returns whether this transaction has been fully settled.
+     */
+    public boolean isSettled() {
+        return settled;
+    }
+
+    /**
+     * Updates the settled state. Primarily used by storage during deserialisation.
+     */
+    public void setSettled(boolean settled) {
+        this.settled = settled;
+    }
+
+    /**
      * Updates the debtor reference to the given person.
      * Used when a Person is edited to keep transaction references consistent.
      */
@@ -234,6 +267,7 @@ public class Transaction {
                 && Double.compare(o.getInterest(), getInterest()) == 0
                 && description.equals(o.description)
                 && lastRecalculatedDate.equals(o.lastRecalculatedDate)
+            && settled == o.settled
                 && debtor.equals(o.debtor)
                 && creditor.equals(o.creditor);
     }
@@ -249,6 +283,6 @@ public class Transaction {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(currAmount, interestRate, description, lastRecalculatedDate, debtor, creditor);
+        return Objects.hash(currAmount, interestRate, description, lastRecalculatedDate, settled, debtor, creditor);
     }
 }

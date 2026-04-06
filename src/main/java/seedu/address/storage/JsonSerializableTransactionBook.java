@@ -78,6 +78,11 @@ class JsonSerializableTransactionBook {
                             "Creditor in transaction not found in address book: "
                                     + transaction.getCreditor().getName()));
 
+            // Rebind to live person instances to keep transaction perspective and
+            // downstream command updates consistent across the app lifecycle.
+            transaction.setDebtor(liveDebtor);
+            transaction.setCreditor(liveCreditor);
+
             liveDebtor.appendTransaction(transaction);
             liveCreditor.appendTransaction(transaction);
         }
