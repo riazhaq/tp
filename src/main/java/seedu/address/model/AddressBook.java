@@ -41,6 +41,14 @@ public class AddressBook implements ReadOnlyAddressBook {
     //// list overwrite operations
 
     /**
+     * Adds a person to the front of the address book.
+     * The person must not already exist in the address book.
+     */
+    public void addPersonAtFront(Person p) {
+        persons.addAtFront(p);
+    }
+
+    /**
      * Replaces the contents of the person list with {@code persons}.
      * {@code persons} must not contain duplicate persons.
      */

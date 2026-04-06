@@ -90,7 +90,18 @@ public class MainApp extends Application {
             initialData = new AddressBook();
         }
 
-        return new ModelManager(initialData, userPrefs);
+        // Ensure "me" contact is always first
+        AddressBook addressBook = new AddressBook(initialData);
+        boolean hasMeContact = addressBook.getPersonList()
+                .stream()
+                .anyMatch(p -> p.getName().fullName.equalsIgnoreCase("Me"));
+
+        if (!hasMeContact) {
+            addressBook.addPersonAtFront(SampleDataUtil.getMeContact());
+            logger.info("No 'Me' contact found. Adding default 'Me' contact at front of address book.");
+        }
+
+        return new ModelManager(addressBook, userPrefs);
     }
 
     private void initLogging(Config config) {

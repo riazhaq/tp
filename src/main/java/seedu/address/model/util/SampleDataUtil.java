@@ -63,6 +63,20 @@ public class SampleDataUtil {
         return new Person[] { alex, bernice, charlotte, david, irfan, roy };
     }
 
+    /**
+     * Returns a {@code Person} representing the user ("me") to always appear
+     * first in the address book.
+     */
+    public static Person getMeContact() {
+        return new Person(
+                new Name("Me"),
+                new Phone("00000000"),
+                new Email("me@example.com"),
+                new Address("My Address"),
+                new HashSet<>(),
+                new HashSet<>());
+    }
+
     public static ReadOnlyAddressBook getSampleAddressBook() {
         AddressBook sampleAb = new AddressBook();
         for (Person samplePerson : getSamplePersons()) {

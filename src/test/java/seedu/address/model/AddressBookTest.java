@@ -7,6 +7,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_ADDRESS_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
+import static seedu.address.testutil.TypicalPersons.BOB;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.util.Arrays;
@@ -52,6 +53,31 @@ public class AddressBookTest {
         AddressBookStub newData = new AddressBookStub(newPersons);
 
         assertThrows(DuplicatePersonException.class, () -> addressBook.resetData(newData));
+    }
+
+    @Test
+    public void addPersonAtFront_nullPerson_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> addressBook.addPersonAtFront(null));
+    }
+
+    @Test
+    public void addPersonAtFront_duplicatePerson_throwsDuplicatePersonException() {
+        addressBook.addPerson(ALICE);
+        assertThrows(DuplicatePersonException.class, () -> addressBook.addPersonAtFront(ALICE));
+    }
+
+    @Test
+    public void addPersonAtFront_emptyAddressBook_personIsFirst() {
+        addressBook.addPersonAtFront(ALICE);
+        assertEquals(ALICE, addressBook.getPersonList().get(0));
+    }
+
+    @Test
+    public void addPersonAtFront_nonEmptyAddressBook_personIsFirst() {
+        addressBook.addPerson(ALICE);
+        addressBook.addPersonAtFront(BOB);
+        assertEquals(BOB, addressBook.getPersonList().get(0));
+        assertEquals(ALICE, addressBook.getPersonList().get(1));
     }
 
     @Test

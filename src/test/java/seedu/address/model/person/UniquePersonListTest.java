@@ -48,6 +48,33 @@ public class UniquePersonListTest {
     }
 
     @Test
+    public void addAtFront_nullPerson_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> uniquePersonList.addAtFront(null));
+    }
+
+    @Test
+    public void addAtFront_duplicatePerson_throwsDuplicatePersonException() {
+        uniquePersonList.addAtFront(ALICE);
+        assertThrows(DuplicatePersonException.class, () -> uniquePersonList.addAtFront(ALICE));
+    }
+
+    @Test
+    public void addAtFront_emptyList_personIsFirst() {
+        uniquePersonList.addAtFront(ALICE);
+        UniquePersonList expectedUniquePersonList = new UniquePersonList();
+        expectedUniquePersonList.add(ALICE);
+        assertEquals(expectedUniquePersonList, uniquePersonList);
+    }
+
+    @Test
+    public void addAtFront_nonEmptyList_personIsFirst() {
+        uniquePersonList.add(ALICE);
+        uniquePersonList.addAtFront(BOB);
+        assertEquals(BOB, uniquePersonList.asUnmodifiableObservableList().get(0));
+        assertEquals(ALICE, uniquePersonList.asUnmodifiableObservableList().get(1));
+    }
+
+    @Test
     public void add_nullPerson_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> uniquePersonList.add(null));
     }
