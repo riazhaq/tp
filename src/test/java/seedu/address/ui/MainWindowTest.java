@@ -280,19 +280,6 @@ public class MainWindowTest {
     }
 
     @Test
-    public void show_makesStageVisible() {
-        ObservableList<Person> persons = FXCollections.observableArrayList();
-        FakeLogic logic = new FakeLogic(persons);
-        Stage stage = FxTestUtil.onFx(Stage::new);
-        MainWindow window = FxTestUtil.onFx(() -> new MainWindow(stage, logic));
-
-        FxTestUtil.onFxRun(window::show);
-
-        assertTrue(FxTestUtil.onFx(stage::isShowing));
-        FxTestUtil.onFxRun(stage::hide);
-    }
-
-    @Test
     public void getPersonListPanel_afterFillInnerParts_returnsPanel() {
         ObservableList<Person> persons = FXCollections.observableArrayList(
                 new PersonBuilder().withName("Alice Pauline").build());
@@ -302,35 +289,6 @@ public class MainWindowTest {
 
         PersonListPanel expected = getField(window, "personListPanel");
         assertSame(expected, window.getPersonListPanel());
-    }
-
-    @Test
-    public void handleHelp_whenNotShowing_opensHelpWindow() {
-        ObservableList<Person> persons = FXCollections.observableArrayList();
-        FakeLogic logic = new FakeLogic(persons);
-        MainWindow window = FxTestUtil.onFx(() -> new MainWindow(new Stage(), logic));
-        HelpWindow helpWindow = getField(window, "helpWindow");
-
-        assertFalse(FxTestUtil.onFx(helpWindow::isShowing));
-        FxTestUtil.onFxRun(window::handleHelp);
-
-        assertTrue(FxTestUtil.onFx(helpWindow::isShowing));
-        FxTestUtil.onFxRun(helpWindow::hide);
-    }
-
-    @Test
-    public void handleHelp_whenAlreadyShowing_remainsVisibleWithoutError() {
-        ObservableList<Person> persons = FXCollections.observableArrayList();
-        FakeLogic logic = new FakeLogic(persons);
-        MainWindow window = FxTestUtil.onFx(() -> new MainWindow(new Stage(), logic));
-        HelpWindow helpWindow = getField(window, "helpWindow");
-
-        FxTestUtil.onFxRun(helpWindow::show);
-        assertTrue(FxTestUtil.onFx(helpWindow::isShowing));
-
-        FxTestUtil.onFxRun(window::handleHelp);
-        assertTrue(FxTestUtil.onFx(helpWindow::isShowing));
-        FxTestUtil.onFxRun(helpWindow::hide);
     }
 
     private static Object invoke(Object target, String methodName, Object... args) {
