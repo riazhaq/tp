@@ -46,6 +46,7 @@ With IOU, users can:
 
 1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar addressbook.jar` command to run the application.<br>
    A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
+  If no contact named `Me` exists yet, IOU inserts a default `Me` contact at the top of the list on startup.<br>
    ![Ui](images/Ui.png)
 
 1. Type the command in the command box and press Enter to execute it. e.g. typing **`help`** and pressing Enter will open the help window.<br>
@@ -86,6 +87,10 @@ With IOU, users can:
 * Extraneous parameters for commands that do not take in parameters (such as `help`, `list`, `exit` and `clear`) will be ignored.<br>
   e.g. if the command specifies `help 123`, it will be interpreted as `help`.
 
+* Select a person in the person list to view that person's transactions in the transaction panel.
+
+* For commands that target a transaction using `t/TRANSACTION_INDEX`, the transaction index refers to the order shown in the transaction panel, sorted from the largest current amount to the smallest.
+
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </div>
 
@@ -111,16 +116,6 @@ A person can have any number of tags (including 0)
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
 * `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
-
-### Adding a transaction : `addtxn`
-
-Adds a transaction between two existing persons in the address book, where the **debtor** owes money to the **creditor**.
-
-Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPTION] [t/COMPOUNDING_TYPE]`
-
-Examples:
-* `addtxn 1 2 a/12.50 i/5 d/Dinner t/m`
-* `addtxn 2 1 a/100 i/0 d/Refund`
 
 ### Listing all persons : `list`
 
@@ -189,7 +184,9 @@ Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPT
 * Both indexes **must be different** (a person cannot transact with themselves).
 * `AMOUNT` must be a positive number.
 * `INTEREST_RATE` must be a non-negative number.
+* If `t/COMPOUNDING_TYPE` is omitted, the transaction is created with no compounding.
 * `COMPOUNDING_TYPE` must be `m` (monthly), `y` (yearly), or `n` (none) if specified.
+* The transaction appears in the transaction panel for both people involved.
 * Items in square brackets are optional.
 
 Examples:
@@ -209,29 +206,21 @@ Marks a specific transaction as paid while keeping it in the history so the outs
 
 Format: `settle PERSON_INDEX t/TRANSACTION_INDEX`
 
+* The person index refers to the displayed person list.
+* The transaction index refers to the displayed transaction panel for that selected person.
+* Settling sets the transaction amount to `$0.00` and marks it as `Settled`, but keeps the record visible in the transaction history.
+
 Example: `settle 1 t/2`
-
-### Recording a Debt (You Owe Someone) : `owe`
-
-Creates a new transaction where you owe money to a person in the current list.
-
-Format: `owe INDEX a/AMOUNT [d/DESCRIPTION]`
-
-Example: `owe 1 a/12.50 d/Dinner`
-
-### Recording a Loan (Someone Owes You) : `lent`
-
-Creates a new transaction where another person owes you money.
-
-Format: `lent INDEX a/AMOUNT [d/DESCRIPTION]`
-
-Example: `lent 2 a/50 d/Concert tickets`
 
 ### Deleting a transaction : `delete`
 
 Removes a specific transaction from a person; specifying both the person index and transaction index lets you target the exact entry.
 
 Format: `delete INDEX t/TRANSACTION_INDEX`
+
+* The person index refers to the displayed person list.
+* The transaction index refers to the displayed transaction panel for that selected person.
+* Deleting a transaction removes the same shared record from both the debtor and the creditor.
 
 Example: `delete 1 t/2`
 
@@ -243,15 +232,22 @@ Format: `exit`
 
 ### Saving the data
 
-AddressBook data are saved in the hard disk automatically after any command that changes the data. There is no need to save manually.
+IOU saves data to disk automatically after any command that changes the data. There is no need to save manually.
+
+Person data is stored in `[JAR file location]/data/addressbook.json`.
+Transaction data is stored in `[JAR file location]/data/addressbook_transactions.json`.
 
 ### Editing the data file
 
-AddressBook data are saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+Advanced users can edit the JSON files directly.
+
+* `[JAR file location]/data/addressbook.json` stores persons.
+* `[JAR file location]/data/addressbook_transactions.json` stores transactions.
+* If you edit transactions manually, debtor and creditor entries must still match valid persons in the address book.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
-If your changes to the data file makes its format invalid, AddressBook will discard all data and start with an empty data file at the next run. Hence, it is recommended to take a backup of the file before editing it.<br>
-Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+If your changes make either file invalid, IOU may fail to load your saved data correctly at the next run. Hence, it is recommended to take a backup of both files before editing them.<br>
+Furthermore, certain edits can cause IOU to behave in unexpected ways if person and transaction records no longer match. Therefore, edit the data files only if you are confident that you can update them correctly.
 </div>
 
 ### Archiving data files `[coming in v2.0]`
