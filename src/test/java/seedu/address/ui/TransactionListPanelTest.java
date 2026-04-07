@@ -1,12 +1,15 @@
 package seedu.address.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import javafx.application.Platform;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import seedu.address.model.person.Person;
 import seedu.address.model.transaction.MonthlyTransaction;
@@ -145,6 +149,19 @@ public class TransactionListPanelTest {
     }
 
     @Test
+    public void statusText_transactionPending_returnsPending() {
+        Transaction transaction = transaction(10, "Dinner");
+        assertEquals("Pending", TransactionListPanel.statusText(transaction));
+    }
+
+    @Test
+    public void statusText_transactionSettled_returnsSettled() {
+        Transaction transaction = transaction(10, "Dinner");
+        transaction.setSettled(true);
+        assertEquals("Settled", TransactionListPanel.statusText(transaction));
+    }
+
+    @Test
     public void typeText_amountPositive_isOwe() {
         assertEquals("Owe", TransactionListPanel.typeText(12.34));
         assertEquals("Owe", TransactionListPanel.typeText(0));
@@ -183,6 +200,13 @@ public class TransactionListPanelTest {
     @Test
     public void dateText_null_throws() {
         assertThrows(NullPointerException.class, () -> TransactionListPanel.dateText(null));
+    }
+
+    @Test
+    public void dateText_returnsLastRecalculatedDate() {
+        Transaction transaction = transaction(10, "Dinner");
+        assertEquals(transaction.getLastRecalculatedDate().toString(),
+                TransactionListPanel.dateText(transaction));
     }
 
     @Test
@@ -284,6 +308,45 @@ public class TransactionListPanelTest {
         assertEquals("Bernice Yu", panel.otherPartyName(lentTransaction));
     }
 
+    @Test
+    public void directionTextAndOtherPartyName_sameIdentityDifferentInstance_consistent() {
+        Person selectedAlice = new PersonBuilder()
+                .withName(ALEX)
+                .withPhone("99998888")
+                .withEmail("alex.other@example.com")
+                .withAddress("Other Address")
+                .build();
+        Person debtorAlice = person(ALEX);
+        Person creditorBernice = person(BERNICE);
+
+        Transaction owesTransaction = transaction(debtorAlice, creditorBernice, 12.5, "Dinner");
+        Person displayedPerson = personWithTransactions(ALEX, owesTransaction);
+
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        onFxRun(() -> panel.displayPerson(selectedAlice));
+
+        assertEquals("Owe", panel.directionText(owesTransaction));
+        assertEquals("Bernice Yu", panel.otherPartyName(owesTransaction));
+
+        onFxRun(() -> panel.displayPerson(displayedPerson));
+        assertEquals("Owe", panel.directionText(owesTransaction));
+        assertEquals("Bernice Yu", panel.otherPartyName(owesTransaction));
+    }
+
+    @Test
+    public void directionTextAndOtherPartyName_personNotInTransaction_emptyString() {
+        Person notInTransaction = person("Charlotte Oliveiro");
+        Person debtor = person(ALEX);
+        Person creditor = person(BERNICE);
+        Transaction transaction = transaction(debtor, creditor, 10.0, "Snack");
+
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        onFxRun(() -> panel.displayPerson(notInTransaction));
+
+        assertEquals("", panel.directionText(transaction));
+        assertEquals("", panel.otherPartyName(transaction));
+    }
+
     // FXML initialize coverage
 
     @Test
@@ -331,6 +394,17 @@ public class TransactionListPanelTest {
     }
 
     @Test
+    public void directionCellModel_setsStyleClassForRecognisedDirections() {
+        TransactionListPanel.TypeCellModel owe = TransactionListPanel.directionCellModel("Owe", false);
+        assertEquals("Owe", owe.getText());
+        assertEquals("tx-type-owe", owe.getStyleClass());
+
+        TransactionListPanel.TypeCellModel lent = TransactionListPanel.directionCellModel("Lent", false);
+        assertEquals("Lent", lent.getText());
+        assertEquals("tx-type-lent", lent.getStyleClass());
+    }
+
+    @Test
     public void oneBasedIndexOf_followsIndexOfSemantics() {
         List<String> items = List.of("a", "b", "c");
         assertEquals(1, TransactionListPanel.oneBasedIndexOf(items, "a"));
@@ -341,6 +415,108 @@ public class TransactionListPanelTest {
     @Test
     public void oneBasedIndexOf_nullItems_throws() {
         assertThrows(NullPointerException.class, () -> TransactionListPanel.oneBasedIndexOf(null, "x"));
+    }
+
+    @Test
+    public void indexCellValue_wrapsOneBasedIndex() {
+        Transaction t1 = transaction(5, "a");
+        Transaction t2 = transaction(3, "b");
+        List<Transaction> items = List.of(t1, t2);
+        assertEquals(1, TransactionListPanel.indexCellValue(items, t1).getValue().intValue());
+        assertEquals(2, TransactionListPanel.indexCellValue(items, t2).getValue().intValue());
+        assertEquals(0,
+                TransactionListPanel.indexCellValue(items, transaction(1, "missing")).getValue().intValue());
+    }
+
+    @Test
+    public void statusCell_updateItem_settledAppliesStyle() {
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        TableColumn<Transaction, String> statusColumn = getField(panel, "statusColumn");
+
+        javafx.scene.control.TableCell<Transaction, String> cell =
+            onFx(() -> statusColumn.getCellFactory().call(statusColumn));
+        onFxRun(() -> invokeUpdateItem(cell, String.class, "Settled", false));
+
+        assertEquals("Settled", onFx(cell::getText));
+        assertTrue(onFx(() -> cell.getStyleClass().contains("tx-status-settled")));
+
+        onFxRun(() -> invokeUpdateItem(cell, String.class, null, true));
+        assertNull(onFx(cell::getText));
+    }
+
+    @Test
+    public void transactionRow_updateItem_settledAppliesStyle() {
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        TableView<Transaction> transactionTable = getField(panel, "transactionTable");
+        Transaction transaction = transaction(10, "Dinner");
+        transaction.setSettled(true);
+
+        TableRow<Transaction> row = onFx(() -> transactionTable.getRowFactory().call(transactionTable));
+        onFxRun(() -> invokeUpdateItem(row, Transaction.class, transaction, false));
+
+        assertTrue(onFx(() -> row.getStyleClass().contains("tx-row-settled")));
+
+        onFxRun(() -> invokeUpdateItem(row, Transaction.class, null, true));
+        assertFalse(onFx(() -> row.getStyleClass().contains("tx-row-settled")));
+    }
+
+    @Test
+    public void directionCell_updateItem_appliesStyleAndClearsOnEmpty() {
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        TableColumn<Transaction, String> directionColumn = getField(panel, "directionColumn");
+        javafx.scene.control.TableCell<Transaction, String> cell =
+                onFx(() -> directionColumn.getCellFactory().call(directionColumn));
+
+        onFxRun(() -> invokeUpdateItem(cell, String.class, "Owe", false));
+        assertEquals("Owe", onFx(cell::getText));
+        assertTrue(onFx(() -> cell.getStyleClass().contains("tx-type-owe")));
+        assertFalse(onFx(() -> cell.getStyleClass().contains("tx-type-lent")));
+
+        onFxRun(() -> invokeUpdateItem(cell, String.class, "Lent", false));
+        assertEquals("Lent", onFx(cell::getText));
+        assertTrue(onFx(() -> cell.getStyleClass().contains("tx-type-lent")));
+        assertFalse(onFx(() -> cell.getStyleClass().contains("tx-type-owe")));
+
+        onFxRun(() -> invokeUpdateItem(cell, String.class, null, true));
+        assertNull(onFx(cell::getText));
+    }
+
+    @Test
+    public void cellValueFactories_invokedForFirstTableItem() {
+        Person debtor = person(ALEX);
+        Person creditor = person(BERNICE);
+        Transaction oweTransaction = transaction(debtor, creditor, 12.5, "Dinner");
+        Person displayedPerson = personWithTransactions(ALEX, oweTransaction);
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        onFxRun(() -> panel.displayPerson(displayedPerson));
+
+        TableColumn<Transaction, Number> indexColumn = getField(panel, "indexColumn");
+        TableColumn<Transaction, String> compoundingColumn = getField(panel, "compoundingColumn");
+        TableColumn<Transaction, String> directionColumn2 = getField(panel, "directionColumn");
+        TableColumn<Transaction, String> otherPartyColumn = getField(panel, "otherPartyColumn");
+        TableColumn<Transaction, String> amountColumn = getField(panel, "amountColumn");
+        TableColumn<Transaction, String> descriptionColumn = getField(panel, "descriptionColumn");
+        TableColumn<Transaction, String> statusColumn2 = getField(panel, "statusColumn");
+        TableColumn<Transaction, String> dateColumn = getField(panel, "dateColumn");
+
+        assertEquals(1, onFx(() -> indexColumn.getCellObservableValue(0)).getValue().intValue());
+        assertEquals("None", onFx(() -> compoundingColumn.getCellObservableValue(0)).getValue());
+        assertEquals("Owe", onFx(() -> directionColumn2.getCellObservableValue(0)).getValue());
+        assertEquals(BERNICE, onFx(() -> otherPartyColumn.getCellObservableValue(0)).getValue());
+        assertEquals("$12.50", onFx(() -> amountColumn.getCellObservableValue(0)).getValue());
+        assertEquals("Dinner", onFx(() -> descriptionColumn.getCellObservableValue(0)).getValue());
+        assertEquals("Pending", onFx(() -> statusColumn2.getCellObservableValue(0)).getValue());
+        assertNotNull(onFx(() -> dateColumn.getCellObservableValue(0)).getValue());
+    }
+
+    private static void invokeUpdateItem(Object target, Class<?> parameterType, Object item, boolean empty) {
+        try {
+            Method method = target.getClass().getDeclaredMethod("updateItem", parameterType, boolean.class);
+            method.setAccessible(true);
+            method.invoke(target, item, empty);
+        } catch (ReflectiveOperationException exception) {
+            throw new AssertionError(exception);
+        }
     }
 
     @FunctionalInterface
