@@ -21,16 +21,29 @@ public class DeleteCommandParser implements Parser<DeleteCommand> {
     public DeleteCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TRANSACTION_INDEX);
 
+        // Reject duplicate t/ prefixes — e.g. "1 t/1delete 1 t/1"
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_TRANSACTION_INDEX);
+
         try {
             Index targetIndex = ParserUtil.parseIndex(argMultimap.getPreamble());
             Index transactionIndex = null;
 
             if (argMultimap.getValue(PREFIX_TRANSACTION_INDEX).isPresent()) {
-                transactionIndex = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_TRANSACTION_INDEX).get());
+                String rawTransactionIndex = argMultimap.getValue(PREFIX_TRANSACTION_INDEX).get();
+
+                // Reject values with extra text after the index, e.g. "1delete 1"
+                if (!rawTransactionIndex.trim().matches("\\d+")) {
+                    throw new ParseException(
+                            String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
+                }
+
+                transactionIndex = ParserUtil.parseIndex(rawTransactionIndex);
             }
 
-            return (transactionIndex == null) ? new DeleteCommand(targetIndex)
+            return (transactionIndex == null)
+                    ? new DeleteCommand(targetIndex)
                     : new DeleteCommand(targetIndex, transactionIndex);
+
         } catch (ParseException pe) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE), pe);
