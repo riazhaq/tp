@@ -13,7 +13,6 @@ import seedu.address.model.person.Name;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.Phone;
 import seedu.address.model.tag.Tag;
-import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
 
 /**
@@ -48,15 +47,15 @@ public class SampleDataUtil {
                 getTagSet("colleagues"));
 
         // Now construct transactions with both persons available
-        Transaction alexOwesbernice = new MonthlyTransaction(alex, bernice, 500.0, 5.0, "Rent");
+        Transaction alexOwesbernice = new Transaction(alex, bernice, 500.0, "Rent");
         alex.appendTransaction(alexOwesbernice);
         bernice.appendTransaction(alexOwesbernice);
 
-        Transaction davidOwesCharlotte = new MonthlyTransaction(david, charlotte, 1000.0, 4.0, "Car");
+        Transaction davidOwesCharlotte = new Transaction(david, charlotte, 1000.0, "Car");
         david.appendTransaction(davidOwesCharlotte);
         charlotte.appendTransaction(davidOwesCharlotte);
 
-        Transaction royOwesIrfan = new MonthlyTransaction(roy, irfan, 150.0, 1.5, "Gym");
+        Transaction royOwesIrfan = new Transaction(roy, irfan, 150.0, "Gym");
         roy.appendTransaction(royOwesIrfan);
         irfan.appendTransaction(royOwesIrfan);
 

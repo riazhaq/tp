@@ -27,8 +27,8 @@ public class SimplifyCommandTest {
         Person b = model.getFilteredPersonList().get(1);
         Person c = model.getFilteredPersonList().get(2);
 
-        Transaction t1 = new Transaction(a, b, 10.0, 0.0, "a->b");
-        Transaction t2 = new Transaction(b, c, 6.0, 0.0, "b->c");
+        Transaction t1 = new Transaction(a, b, 10.0, "a->b");
+        Transaction t2 = new Transaction(b, c, 6.0, "b->c");
 
         a.appendTransaction(t1);
         b.appendTransaction(t1);
@@ -51,9 +51,9 @@ public class SimplifyCommandTest {
         Person b = model.getFilteredPersonList().get(1);
         Person c = model.getFilteredPersonList().get(2);
 
-        Transaction t1 = new Transaction(a, b, 10.0, 0.0, "a->b");
-        Transaction t2 = new Transaction(b, c, 10.0, 0.0, "b->c");
-        Transaction t3 = new Transaction(c, a, 10.0, 0.0, "c->a");
+        Transaction t1 = new Transaction(a, b, 10.0, "a->b");
+        Transaction t2 = new Transaction(b, c, 10.0, "b->c");
+        Transaction t3 = new Transaction(c, a, 10.0, "c->a");
 
         a.appendTransaction(t1);
         b.appendTransaction(t1);

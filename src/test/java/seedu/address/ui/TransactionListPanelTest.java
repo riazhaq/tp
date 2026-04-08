@@ -25,9 +25,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import seedu.address.model.person.Person;
-import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
-import seedu.address.model.transaction.YearlyTransaction;
 import seedu.address.testutil.PersonBuilder;
 
 public class TransactionListPanelTest {
@@ -57,7 +55,7 @@ public class TransactionListPanelTest {
     }
 
     private static Transaction transaction(Person debtor, Person creditor, double amount, String description) {
-        return new Transaction(debtor, creditor, amount, 0, description);
+        return new Transaction(debtor, creditor, amount, description);
     }
 
     private static Person person(String name) {
@@ -68,27 +66,9 @@ public class TransactionListPanelTest {
         return new PersonBuilder().withName(name).withTransactions(transactions).build();
     }
 
-    private static MonthlyTransaction monthlyTransaction(double amount, String description) {
-        return new MonthlyTransaction(
-                new PersonBuilder().withName("Debtor").build(),
-                new PersonBuilder().withName("Creditor").build(),
-                amount,
-                1.0,
-                description);
-    }
-
-    private static YearlyTransaction yearlyTransaction(double amount, String description) {
-        return new YearlyTransaction(
-                new PersonBuilder().withName("Debtor").build(),
-                new PersonBuilder().withName("Creditor").build(),
-                amount,
-                1.0,
-                description);
-    }
-
     private static <T> T onFx(ThrowingSupplier<T> supplier) {
         Assumptions.assumeTrue(isFxToolkitAvailable,
-            "Skipping JavaFX-dependent test because toolkit is unavailable in this environment");
+                "Skipping JavaFX-dependent test because toolkit is unavailable in this environment");
 
         AtomicReference<T> result = new AtomicReference<>();
         AtomicReference<Throwable> error = new AtomicReference<>();
@@ -162,28 +142,10 @@ public class TransactionListPanelTest {
     }
 
     @Test
-    public void typeText_amountPositive_isOwe() {
-        assertEquals("Owe", TransactionListPanel.typeText(12.34));
-        assertEquals("Owe", TransactionListPanel.typeText(0));
-    }
-
-    @Test
-    public void typeText_amountNegative_isLent() {
-        assertEquals("Lent", TransactionListPanel.typeText(-0.01));
-    }
-
-    @Test
     public void amountText_formatsAbsoluteCurrency() {
         assertEquals("$12.50", TransactionListPanel.amountText(12.5));
         assertEquals("$12.50", TransactionListPanel.amountText(-12.5));
         assertEquals("$0.00", TransactionListPanel.amountText(0));
-    }
-
-    @Test
-    public void compoundingType_recognisesTransactionSubtypes() {
-        assertEquals("None", TransactionListPanel.compoundingType(transaction(10, "Dinner")));
-        assertEquals("Monthly", TransactionListPanel.compoundingType(monthlyTransaction(10, "Rent")));
-        assertEquals("Yearly", TransactionListPanel.compoundingType(yearlyTransaction(10, "Loan")));
     }
 
     @Test
@@ -203,24 +165,9 @@ public class TransactionListPanelTest {
     }
 
     @Test
-    public void dateText_returnsLastRecalculatedDate() {
+    public void dateText_returnsDate() {
         Transaction transaction = transaction(10, "Dinner");
-        assertEquals(transaction.getLastRecalculatedDate().toString(),
-                TransactionListPanel.dateText(transaction));
-    }
-
-    @Test
-    public void styleClassForType_null_returnsNull() {
-        assertNull(TransactionListPanel.styleClassForType(null));
-    }
-
-    @Test
-    public void styleClassForType_recognisesOweAndLent() {
-        assertEquals("tx-type-owe", TransactionListPanel.styleClassForType("Owe"));
-        assertEquals("tx-type-owe", TransactionListPanel.styleClassForType("owe"));
-        assertEquals("tx-type-lent", TransactionListPanel.styleClassForType("Lent"));
-        assertEquals("tx-type-lent", TransactionListPanel.styleClassForType("lent"));
-        assertNull(TransactionListPanel.styleClassForType("Other"));
+        assertEquals(transaction.getDate().toString(), TransactionListPanel.dateText(transaction));
     }
 
     @Test
@@ -313,7 +260,6 @@ public class TransactionListPanelTest {
         Person debtorAlice = person(ALEX);
         Person creditorBernice = person(BERNICE);
 
-        // selectedAlice has same identity fields as debtorAlice, just a different instance
         Person selectedAlice = new PersonBuilder()
                 .withName(debtorAlice.getName().toString())
                 .withPhone(debtorAlice.getPhone().toString())
@@ -361,12 +307,10 @@ public class TransactionListPanelTest {
         TransactionListPanel panel = onFx(TransactionListPanel::new);
 
         TableView<Transaction> transactionTable = getField(panel, "transactionTable");
-        TableColumn<Transaction, String> compoundingColumn = getField(panel, "compoundingColumn");
         TableColumn<Transaction, String> directionColumn = getField(panel, "directionColumn");
         TableColumn<Transaction, String> otherPartyColumn = getField(panel, "otherPartyColumn");
 
         assertSame(TableView.UNCONSTRAINED_RESIZE_POLICY, transactionTable.getColumnResizePolicy());
-        assertNotNull(compoundingColumn.getCellValueFactory());
         assertNotNull(directionColumn.getCellValueFactory());
         assertNotNull(directionColumn.getCellFactory());
         assertNotNull(otherPartyColumn.getCellValueFactory());
@@ -375,24 +319,6 @@ public class TransactionListPanelTest {
 
         assertSame(displayedPerson, getField(panel, "currentPerson"));
         assertEquals(1, transactionTable.getItems().size());
-    }
-
-    @Test
-    public void typeCellModel_emptyOrNull_returnsNulls() {
-        TransactionListPanel.TypeCellModel model = TransactionListPanel.typeCellModel(null, true);
-        assertNull(model.getText());
-        assertNull(model.getStyleClass());
-    }
-
-    @Test
-    public void typeCellModel_setsStyleClassForRecognisedTypes() {
-        TransactionListPanel.TypeCellModel owe = TransactionListPanel.typeCellModel("Owe", false);
-        assertEquals("Owe", owe.getText());
-        assertEquals("tx-type-owe", owe.getStyleClass());
-
-        TransactionListPanel.TypeCellModel lent = TransactionListPanel.typeCellModel("Lent", false);
-        assertEquals("Lent", lent.getText());
-        assertEquals("tx-type-lent", lent.getStyleClass());
     }
 
     @Test
@@ -436,7 +362,7 @@ public class TransactionListPanelTest {
         TableColumn<Transaction, String> statusColumn = getField(panel, "statusColumn");
 
         javafx.scene.control.TableCell<Transaction, String> cell =
-            onFx(() -> statusColumn.getCellFactory().call(statusColumn));
+                onFx(() -> statusColumn.getCellFactory().call(statusColumn));
         onFxRun(() -> invokeUpdateItem(cell, String.class, "Settled", false));
 
         assertEquals("Settled", onFx(cell::getText));
@@ -493,21 +419,19 @@ public class TransactionListPanelTest {
         onFxRun(() -> panel.displayPerson(displayedPerson));
 
         TableColumn<Transaction, Number> indexColumn = getField(panel, "indexColumn");
-        TableColumn<Transaction, String> compoundingColumn = getField(panel, "compoundingColumn");
-        TableColumn<Transaction, String> directionColumn2 = getField(panel, "directionColumn");
+        TableColumn<Transaction, String> directionColumn = getField(panel, "directionColumn");
         TableColumn<Transaction, String> otherPartyColumn = getField(panel, "otherPartyColumn");
         TableColumn<Transaction, String> amountColumn = getField(panel, "amountColumn");
         TableColumn<Transaction, String> descriptionColumn = getField(panel, "descriptionColumn");
-        TableColumn<Transaction, String> statusColumn2 = getField(panel, "statusColumn");
+        TableColumn<Transaction, String> statusColumn = getField(panel, "statusColumn");
         TableColumn<Transaction, String> dateColumn = getField(panel, "dateColumn");
 
         assertEquals(1, onFx(() -> indexColumn.getCellObservableValue(0)).getValue().intValue());
-        assertEquals("None", onFx(() -> compoundingColumn.getCellObservableValue(0)).getValue());
-        assertEquals("Owe", onFx(() -> directionColumn2.getCellObservableValue(0)).getValue());
+        assertEquals("Owe", onFx(() -> directionColumn.getCellObservableValue(0)).getValue());
         assertEquals(BERNICE, onFx(() -> otherPartyColumn.getCellObservableValue(0)).getValue());
         assertEquals("$12.50", onFx(() -> amountColumn.getCellObservableValue(0)).getValue());
         assertEquals("Dinner", onFx(() -> descriptionColumn.getCellObservableValue(0)).getValue());
-        assertEquals("Pending", onFx(() -> statusColumn2.getCellObservableValue(0)).getValue());
+        assertEquals("Pending", onFx(() -> statusColumn.getCellObservableValue(0)).getValue());
         assertNotNull(onFx(() -> dateColumn.getCellObservableValue(0)).getValue());
     }
 

@@ -16,12 +16,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Region;
 import seedu.address.model.person.Person;
-import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
-import seedu.address.model.transaction.YearlyTransaction;
 
 /**
- * Panel that displays transactions (transactions) for the currently selected person.
+ * Panel that displays transactions for the currently selected person.
  */
 public class TransactionListPanel extends UiPart<Region> {
 
@@ -30,9 +28,6 @@ public class TransactionListPanel extends UiPart<Region> {
     private static final String NO_SELECTION_TITLE = "Transactions - Select a person";
     private static final String STATUS_PENDING = "Pending";
     private static final String STATUS_SETTLED = "Settled";
-    private static final String COMPOUNDING_NONE = "None";
-    private static final String COMPOUNDING_MONTHLY = "Monthly";
-    private static final String COMPOUNDING_YEARLY = "Yearly";
     private static final String DIRECTION_OWE = "Owe";
     private static final String DIRECTION_LENT = "Lent";
     private static final String TYPE_OWE = "Owe";
@@ -88,9 +83,6 @@ public class TransactionListPanel extends UiPart<Region> {
     private TableColumn<Transaction, Number> indexColumn;
 
     @FXML
-    private TableColumn<Transaction, String> compoundingColumn;
-
-    @FXML
     private TableColumn<Transaction, String> directionColumn;
 
     @FXML
@@ -126,28 +118,21 @@ public class TransactionListPanel extends UiPart<Region> {
         indexColumn.setCellValueFactory(cellData ->
                 indexCellValue(transactionTable.getItems(), cellData.getValue()));
 
-        compoundingColumn.setCellValueFactory(cellData -> {
-            return new ReadOnlyStringWrapper(compoundingType(cellData.getValue()));
-        });
-
-        directionColumn.setCellValueFactory(cellData -> {
-            return new ReadOnlyStringWrapper(directionText(cellData.getValue()));
-        });
+        directionColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(directionText(cellData.getValue())));
         directionColumn.setCellFactory(col -> new DirectionCell());
 
-        otherPartyColumn.setCellValueFactory(cellData -> {
-            return new ReadOnlyStringWrapper(otherPartyName(cellData.getValue()));
-        });
+        otherPartyColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(otherPartyName(cellData.getValue())));
 
-        amountColumn.setCellValueFactory(cellData -> {
-            return new ReadOnlyStringWrapper(amountText(cellData.getValue().getCurrAmount()));
-        });
+        amountColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(amountText(cellData.getValue().getCurrAmount())));
 
         descriptionColumn.setCellValueFactory(cellData ->
                 new ReadOnlyStringWrapper(descriptionText(cellData.getValue())));
 
         statusColumn.setCellValueFactory(cellData ->
-            new ReadOnlyStringWrapper(statusText(cellData.getValue())));
+                new ReadOnlyStringWrapper(statusText(cellData.getValue())));
         statusColumn.setCellFactory(col -> new StatusCell());
 
         dateColumn.setCellValueFactory(cellData ->
@@ -155,7 +140,7 @@ public class TransactionListPanel extends UiPart<Region> {
     }
 
     /**
-     * Displays the transactions (transactions) belonging to the given person.
+     * Displays the transactions belonging to the given person.
      *
      * @param person The selected person. If null, the panel resets to the no-selection state.
      */
@@ -197,15 +182,6 @@ public class TransactionListPanel extends UiPart<Region> {
     }
 
     /**
-     * Returns the display text for a transaction type based on the current amount.
-     * @deprecated Use directionText() instead for role-based direction display.
-     */
-    @Deprecated
-    static String typeText(double amount) {
-        return amount >= 0 ? TYPE_OWE : TYPE_LENT;
-    }
-
-    /**
      * Formats the amount as an absolute currency string (e.g. "$12.50").
      */
     static String amountText(double amount) {
@@ -225,7 +201,7 @@ public class TransactionListPanel extends UiPart<Region> {
      */
     static String dateText(Transaction transaction) {
         Objects.requireNonNull(transaction);
-        return transaction.getLastRecalculatedDate().toString();
+        return transaction.getDate().toString();
     }
 
     /**
@@ -253,7 +229,7 @@ public class TransactionListPanel extends UiPart<Region> {
     }
 
     /**
-     * Computes the 1-based index of {@code value} within {@code items}, using {@code List#indexOf}.
+     * Computes the 1-based index of {@code value} within {@code items}.
      * Returns 0 if not found.
      */
     static int oneBasedIndexOf(List<?> items, Object value) {
@@ -263,19 +239,6 @@ public class TransactionListPanel extends UiPart<Region> {
 
     static ReadOnlyObjectWrapper<Number> indexCellValue(List<Transaction> items, Transaction value) {
         return new ReadOnlyObjectWrapper<>(oneBasedIndexOf(items, value));
-    }
-
-    /**
-     * Returns the display text for compounding type based on transaction type.
-     */
-    static String compoundingType(Transaction transaction) {
-        if (transaction instanceof MonthlyTransaction) {
-            return COMPOUNDING_MONTHLY;
-        } else if (transaction instanceof YearlyTransaction) {
-            return COMPOUNDING_YEARLY;
-        } else {
-            return COMPOUNDING_NONE;
-        }
     }
 
     /**
@@ -323,25 +286,6 @@ public class TransactionListPanel extends UiPart<Region> {
             return STYLE_TX_OWE;
         }
         if (DIRECTION_LENT.equalsIgnoreCase(directionLabel)) {
-            return STYLE_TX_LENT;
-        }
-        return null;
-    }
-
-    /**
-     * Maps a type label to the corresponding style class.
-     * @return style class name, or null if the label is not recognised.
-     * @deprecated Use styleClassForDirection() instead.
-     */
-    @Deprecated
-    static String styleClassForType(String typeLabel) {
-        if (typeLabel == null) {
-            return null;
-        }
-        if (TYPE_OWE.equalsIgnoreCase(typeLabel)) {
-            return STYLE_TX_OWE;
-        }
-        if (TYPE_LENT.equalsIgnoreCase(typeLabel)) {
             return STYLE_TX_LENT;
         }
         return null;
@@ -396,36 +340,6 @@ public class TransactionListPanel extends UiPart<Region> {
             getStyleClass().remove(STYLE_ROW_SETTLED);
             if (!empty && item != null && item.isSettled()) {
                 getStyleClass().add(STYLE_ROW_SETTLED);
-            }
-        }
-    }
-
-    /**
-     * @deprecated Use directionCellModel() instead.
-     */
-    @Deprecated
-    static TypeCellModel typeCellModel(String item, boolean empty) {
-        if (empty || item == null) {
-            return new TypeCellModel(null, null);
-        }
-        return new TypeCellModel(item, styleClassForType(item));
-    }
-
-    /**
-     * @deprecated Use DirectionCell instead.
-     */
-    @Deprecated
-    private static class TransactionTypeCell extends TableCell<Transaction, String> {
-        @Override
-        protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-
-            getStyleClass().removeAll(STYLE_TX_OWE, STYLE_TX_LENT);
-
-            TypeCellModel model = typeCellModel(item, empty);
-            setText(model.getText());
-            if (model.getStyleClass() != null) {
-                getStyleClass().add(model.getStyleClass());
             }
         }
     }

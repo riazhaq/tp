@@ -2,9 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_AMOUNT;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_COMPOUNDING_TYPE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_INTEREST_RATE;
 
 import java.util.List;
 
@@ -14,11 +12,8 @@ import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Person;
-import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
 import seedu.address.model.transaction.TransactionDescriptor;
-import seedu.address.model.transaction.TransactionDescriptor.CompoundingType;
-import seedu.address.model.transaction.YearlyTransaction;
 
 /**
  * Adds a transaction between two existing persons in the address book.
@@ -35,14 +30,10 @@ public class AddTransactionCommand extends Command {
             + "in the displayed person list.\n"
             + "Parameters: DEBTOR_INDEX CREDITOR_INDEX (both must be positive integers) "
             + PREFIX_AMOUNT + "AMOUNT "
-            + PREFIX_INTEREST_RATE + "INTEREST_RATE "
-            + "[" + PREFIX_DESCRIPTION + "DESCRIPTION] "
-            + "[" + PREFIX_COMPOUNDING_TYPE + "COMPOUNDING_TYPE(m/y/n)]\n"
+            + "[" + PREFIX_DESCRIPTION + "DESCRIPTION]\n"
             + "Example: " + COMMAND_WORD + " 2 3 "
             + PREFIX_AMOUNT + "10 "
-            + PREFIX_INTEREST_RATE + "5 "
-            + PREFIX_DESCRIPTION + "lunch "
-            + PREFIX_COMPOUNDING_TYPE + "m";
+            + PREFIX_DESCRIPTION + "lunch";
 
     public static final String MESSAGE_SUCCESS = "New transaction added: %1$s owes %2$s — %3$s";
     public static final String MESSAGE_SUCCESS_WITH_TRANSACTION_NUMBER =
@@ -93,7 +84,8 @@ public class AddTransactionCommand extends Command {
         Person debtor = lastShownList.get(debtorIndex.getZeroBased());
         Person creditor = lastShownList.get(creditorIndex.getZeroBased());
 
-        Transaction transaction = buildTransaction(debtor, creditor, descriptor);
+        Transaction transaction = new Transaction(debtor, creditor,
+                descriptor.getAmount(), descriptor.getDescription());
 
         debtor.appendTransaction(transaction);
         creditor.appendTransaction(transaction);
@@ -112,24 +104,6 @@ public class AddTransactionCommand extends Command {
         return debtor.getTransactions().stream()
                 .filter(t -> t.getDebtor().isSamePerson(debtor) && t.getCreditor().isSamePerson(creditor))
                 .count();
-    }
-
-    /**
-     * Builds the correct {@code Transaction} subtype from a {@code TransactionDescriptor}.
-     */
-    private static Transaction buildTransaction(Person debtor, Person creditor, TransactionDescriptor descriptor) {
-        CompoundingType type = descriptor.getCompoundingType();
-        double amount = descriptor.getAmount();
-        double rate = descriptor.getRate();
-        String description = descriptor.getDescription();
-
-        if (type == CompoundingType.MONTHLY) {
-            return new MonthlyTransaction(debtor, creditor, amount, rate, description);
-        } else if (type == CompoundingType.YEARLY) {
-            return new YearlyTransaction(debtor, creditor, amount, rate, description);
-        } else {
-            return new Transaction(debtor, creditor, amount, rate, description);
-        }
     }
 
     @Override

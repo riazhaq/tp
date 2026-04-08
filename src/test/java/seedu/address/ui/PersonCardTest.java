@@ -13,13 +13,13 @@ public class PersonCardTest {
     private static Transaction transaction(Person person, double amount, String description, boolean isDebtor) {
         Person debtor = isDebtor ? person : new PersonBuilder().withName("Other").build();
         Person creditor = isDebtor ? new PersonBuilder().withName("Other").build() : person;
-        return new Transaction(debtor, creditor, Math.abs(amount), 0, description);
+        return new Transaction(debtor, creditor, Math.abs(amount), description);
     }
 
     private static Transaction transaction(double amount, String description) {
         Person debtor = new PersonBuilder().withName("Debtor").build();
         Person creditor = new PersonBuilder().withName("Creditor").build();
-        return new Transaction(debtor, creditor, amount, 0, description);
+        return new Transaction(debtor, creditor, amount, description);
     }
 
     @Test

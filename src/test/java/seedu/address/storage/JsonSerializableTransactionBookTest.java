@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.model.AddressBook;
 import seedu.address.model.person.Person;
-import seedu.address.model.transaction.MonthlyTransaction;
 import seedu.address.model.transaction.Transaction;
 import seedu.address.testutil.PersonBuilder;
 
@@ -20,7 +19,7 @@ public class JsonSerializableTransactionBookTest {
     public void loadInto_transactionsAreReboundToLivePersons() throws Exception {
         Person sourceDebtor = new PersonBuilder().withName("Alice Pauline").build();
         Person sourceCreditor = new PersonBuilder().withName("Bob Choo").build();
-        Transaction transaction = new MonthlyTransaction(sourceDebtor, sourceCreditor, 42.0, 1.5, "Lunch");
+        Transaction transaction = new Transaction(sourceDebtor, sourceCreditor, 42.0, "Lunch");
         transaction.setSettled(true);
         sourceDebtor.appendTransaction(transaction);
         sourceCreditor.appendTransaction(transaction);
@@ -54,7 +53,7 @@ public class JsonSerializableTransactionBookTest {
         Person debtor = new PersonBuilder().withName("Alice Pauline").build();
         Person creditor = new PersonBuilder().withName("Bob Choo").build();
         JsonAdaptedTransaction adaptedTransaction = new JsonAdaptedTransaction(
-                "m", 10.0, 0.0, "Lunch", new JsonAdaptedPerson(debtor), new JsonAdaptedPerson(creditor), false);
+                10.0, "Lunch", new JsonAdaptedPerson(debtor), new JsonAdaptedPerson(creditor), false);
         JsonSerializableTransactionBook serializableBook =
             new JsonSerializableTransactionBook(List.of(adaptedTransaction));
 

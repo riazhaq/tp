@@ -10,7 +10,6 @@
   <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS" prefWidth="930">
     <columns>
       <TableColumn fx:id="indexColumn" text="#" prefWidth="40" />
-      <TableColumn fx:id="compoundingColumn" text="Compounding" prefWidth="140" minWidth="120" />
       <TableColumn fx:id="directionColumn" text="Direction" prefWidth="110" minWidth="90" />
       <TableColumn fx:id="otherPartyColumn" text="Other Party" prefWidth="130" minWidth="110" />
       <TableColumn fx:id="amountColumn" text="Amount" prefWidth="90" minWidth="80" />

@@ -4,9 +4,7 @@ import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.commands.AddTransactionCommand.MESSAGE_INVALID_CREDITOR_INDEX;
 import static seedu.address.logic.commands.AddTransactionCommand.MESSAGE_INVALID_DEBTOR_INDEX;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_AMOUNT;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_COMPOUNDING_TYPE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_INTEREST_RATE;
 
 import java.util.stream.Stream;
 
@@ -19,12 +17,11 @@ import seedu.address.model.transaction.TransactionDescriptor;
  * Parses input arguments and creates a new AddTransactionCommand object.
  *
  * <p>Expected format:
- * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT i/INTEREST_RATE [d/DESCRIPTION] [t/COMPOUNDING_TYPE]}
- * e.g. {@code addtxn 2 3 a/10 i/5 d/lunch t/m}
+ * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT [d/DESCRIPTION]}
+ * e.g. {@code addtxn 2 3 a/10 d/lunch}
  *
  * <p>The debtor and creditor indices refer to the one-based positions of persons
- * currently displayed in the person list. The optional compounding type prefix
- * accepts "m" (monthly) or "y" (yearly); defaults to none if omitted.
+ * currently displayed in the person list.
  */
 public class AddTransactionCommandParser implements Parser<AddTransactionCommand> {
 
@@ -36,9 +33,8 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
      */
     public AddTransactionCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(
-                args, PREFIX_AMOUNT, PREFIX_INTEREST_RATE, PREFIX_DESCRIPTION, PREFIX_COMPOUNDING_TYPE);
+                args, PREFIX_AMOUNT, PREFIX_DESCRIPTION);
 
-        // Preamble must contain exactly "DEBTOR_INDEX CREDITOR_INDEX"
         String preamble = argMultimap.getPreamble().trim();
         String[] indices = preamble.split("\\s+", 2);
 
@@ -64,19 +60,14 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
                     MESSAGE_INVALID_CREDITOR_INDEX + "\n" + AddTransactionCommand.MESSAGE_USAGE, pe);
         }
 
-        if (!arePrefixesPresent(argMultimap, PREFIX_AMOUNT, PREFIX_INTEREST_RATE)) {
+        if (!arePrefixesPresent(argMultimap, PREFIX_AMOUNT)) {
             throw new ParseException(
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddTransactionCommand.MESSAGE_USAGE));
         }
 
-        // t/ is optional - pass empty string if absent to signal NONE
-        String compoundingRaw = argMultimap.getValue(PREFIX_COMPOUNDING_TYPE).orElse("");
-
         TransactionDescriptor descriptor = ParserUtil.parseTransactionDescriptor(
                 argMultimap.getValue(PREFIX_AMOUNT).get(),
-                argMultimap.getValue(PREFIX_INTEREST_RATE).get(),
-                argMultimap.getValue(PREFIX_DESCRIPTION).orElse(""),
-                compoundingRaw);
+                argMultimap.getValue(PREFIX_DESCRIPTION).orElse(""));
 
         return new AddTransactionCommand(debtorIndex, creditorIndex, descriptor);
     }
