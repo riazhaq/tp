@@ -96,22 +96,12 @@ public class Person {
     }
 
     /**
-     * Returns true if {@code otherPerson} is considered the same real-world individual
-     * as this person, based solely on a case-insensitive, whitespace-normalised name comparison.
+     * Returns true if {@code otherPerson} represents the same real-world individual,
+     * defined as having the same name (case-insensitive, whitespace-normalised),
+     * phone, email, and address.
      *
-     * <p>This is a weaker notion of equality than {@link #equals(Object)}, which requires
-     * all identity fields (name, phone, email, address, tags) to match. Use this method
-     * to guard against duplicate entries in the address book; use {@link #equals(Object)}
-     * for structural equality checks in collections and tests.
-     *
-     * <p>Name normalisation trims leading/trailing whitespace and collapses any internal
-     * sequences of whitespace to a single space, so {@code "John  Doe"} and {@code "john doe"}
-     * are considered the same person.
-     *
-     * @param otherPerson the person to compare against; may be {@code null},
-     *                    in which case {@code false} is returned
-     * @return {@code true} if both persons share the same normalised, case-insensitive name;
-     *         {@code false} otherwise
+     * <p>This is a weaker notion of equality than {@link #equals(Object)}, which also
+     * requires tags to match.
      */
     public boolean isSamePerson(Person otherPerson) {
         if (otherPerson == this) {
@@ -122,7 +112,10 @@ public class Person {
         }
         String thisNameNormalised = normaliseName(getName().toString());
         String otherNameNormalised = normaliseName(otherPerson.getName().toString());
-        return thisNameNormalised.equalsIgnoreCase(otherNameNormalised);
+        return thisNameNormalised.equalsIgnoreCase(otherNameNormalised)
+                && phone.equals(otherPerson.phone)
+                && email.equals(otherPerson.email)
+                && address.equals(otherPerson.address);
     }
 
     private String normaliseName(String name) {

@@ -310,14 +310,16 @@ public class TransactionListPanelTest {
 
     @Test
     public void directionTextAndOtherPartyName_sameIdentityDifferentInstance_consistent() {
-        Person selectedAlice = new PersonBuilder()
-                .withName(ALEX)
-                .withPhone("99998888")
-                .withEmail("alex.other@example.com")
-                .withAddress("Other Address")
-                .build();
         Person debtorAlice = person(ALEX);
         Person creditorBernice = person(BERNICE);
+
+        // selectedAlice has same identity fields as debtorAlice, just a different instance
+        Person selectedAlice = new PersonBuilder()
+                .withName(debtorAlice.getName().toString())
+                .withPhone(debtorAlice.getPhone().toString())
+                .withEmail(debtorAlice.getEmail().toString())
+                .withAddress(debtorAlice.getAddress().toString())
+                .build();
 
         Transaction owesTransaction = transaction(debtorAlice, creditorBernice, 12.5, "Dinner");
         Person displayedPerson = personWithTransactions(ALEX, owesTransaction);
