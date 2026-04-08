@@ -262,6 +262,11 @@ public class MainWindow extends UiPart<Stage> {
             // even when the ListView selection has not changed.
             refreshTransactionPanelFromSelection();
 
+            // Force person list cards to re-render so balance labels reflect any
+            // in-place transaction mutations (e.g. settleup) without requiring a
+            // list-level change event.
+            personListPanel.refresh();
+
             if (commandResult.isShowHelp()) {
                 handleHelp();
             }
