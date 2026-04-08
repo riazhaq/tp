@@ -60,7 +60,8 @@ public class SettleCommandTest {
         assertTrue(result.getPersonIndexToRefresh().isPresent());
         assertEquals(personIndex.getOneBased(), result.getPersonIndexToRefresh().getAsInt());
         assertEquals("Settled Transaction #1: $25.00 | Lunch | "
-                        + settledTransaction.getDebtor().getName() + " -> " + settledTransaction.getCreditor().getName(),
+                        + settledTransaction.getDebtor().getName() + " -> "
+                        + settledTransaction.getCreditor().getName(),
                 result.getFeedbackToUser());
     }
 
