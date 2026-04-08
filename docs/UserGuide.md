@@ -212,6 +212,22 @@ Format: `settle PERSON_INDEX t/TRANSACTION_INDEX`
 
 Example: `settle 1 t/2`
 
+### Simplifying debts among a group : `simplify`
+
+Computes a minimal settlement plan for 3 or more selected people and shows who should pay whom, without modifying any transactions yet.
+
+Format: `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`
+
+* You must provide at least 3 distinct person indexes.
+* All indexes refer to the currently displayed person list.
+* Only unsettled transactions between selected people are included in the calculation.
+* The command is preview-only: it does not mark any transaction as settled.
+* The resulting plan is shown in the UI result display.
+
+Examples:
+* `simplify 1 2 3`
+* `simplify 1 2 3 4`
+
 ### Deleting a transaction : `delete`
 
 Removes a specific transaction from a person; specifying both the person index and transaction index lets you target the exact entry.
@@ -280,4 +296,5 @@ Action | Format, Examples
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
+**Simplify** | `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `simplify 1 2 3 4`
 **Help** | `help`
