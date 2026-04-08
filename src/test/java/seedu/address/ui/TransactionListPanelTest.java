@@ -88,7 +88,7 @@ public class TransactionListPanelTest {
 
     private static <T> T onFx(ThrowingSupplier<T> supplier) {
         Assumptions.assumeTrue(isFxToolkitAvailable,
-            "Skipping JavaFX-dependent test because toolkit is unavailable in this environment");
+                "Skipping JavaFX-dependent test because toolkit is unavailable in this environment");
 
         AtomicReference<T> result = new AtomicReference<>();
         AtomicReference<Throwable> error = new AtomicReference<>();
@@ -436,7 +436,7 @@ public class TransactionListPanelTest {
         TableColumn<Transaction, String> statusColumn = getField(panel, "statusColumn");
 
         javafx.scene.control.TableCell<Transaction, String> cell =
-            onFx(() -> statusColumn.getCellFactory().call(statusColumn));
+                onFx(() -> statusColumn.getCellFactory().call(statusColumn));
         onFxRun(() -> invokeUpdateItem(cell, String.class, "Settled", false));
 
         assertEquals("Settled", onFx(cell::getText));
@@ -509,6 +509,21 @@ public class TransactionListPanelTest {
         assertEquals("Dinner", onFx(() -> descriptionColumn.getCellObservableValue(0)).getValue());
         assertEquals("Pending", onFx(() -> statusColumn2.getCellObservableValue(0)).getValue());
         assertNotNull(onFx(() -> dateColumn.getCellObservableValue(0)).getValue());
+    }
+
+    @Test
+    public void amountColumn_settledTransaction_showsOriginalAmount() {
+        Person debtor = person(ALEX);
+        Person creditor = person(BERNICE);
+        Transaction settledTransaction = transaction(debtor, creditor, 75.0, "Settled debt");
+        settledTransaction.settleTransaction(); // currAmount → 0, originalAmount stays 75.0
+        Person displayedPerson = personWithTransactions(ALEX, settledTransaction);
+
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        onFxRun(() -> panel.displayPerson(displayedPerson));
+
+        TableColumn<Transaction, String> amountColumn = getField(panel, "amountColumn");
+        assertEquals("$75.00", onFx(() -> amountColumn.getCellObservableValue(0)).getValue());
     }
 
     private static void invokeUpdateItem(Object target, Class<?> parameterType, Object item, boolean empty) {
