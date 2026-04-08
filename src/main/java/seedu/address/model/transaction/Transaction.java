@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.UUID;
 
 import seedu.address.model.person.Person;
 
@@ -53,6 +54,9 @@ public class Transaction {
     /** Whether this transaction has been fully settled. */
     protected boolean settled;
 
+    /** Unique transactionId for each transaction */
+    protected final String transactionId;
+
     /**
      * Constructs a {@code Transaction} with the specified debtor, creditor, amount,
      * interest rate, and description. The last recalculated date is set to today.
@@ -64,6 +68,7 @@ public class Transaction {
      * @param description  a non-empty description of the transaction
      */
     public Transaction(Person debtor, Person creditor, double currAmount, double interestRate, String description) {
+        this.transactionId = UUID.randomUUID().toString();
         this.debtor = debtor;
         this.creditor = creditor;
         this.currAmount = currAmount;
@@ -263,13 +268,7 @@ public class Transaction {
             return false;
         }
         Transaction o = (Transaction) other;
-        return Double.compare(o.currAmount, currAmount) == 0
-                && Double.compare(o.getInterest(), getInterest()) == 0
-                && description.equals(o.description)
-                && lastRecalculatedDate.equals(o.lastRecalculatedDate)
-            && settled == o.settled
-                && debtor.equals(o.debtor)
-                && creditor.equals(o.creditor);
+        return transactionId.equals(o.transactionId);
     }
 
     /**
@@ -283,6 +282,6 @@ public class Transaction {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(currAmount, interestRate, description, lastRecalculatedDate, settled, debtor, creditor);
+        return Objects.hash(transactionId);
     }
 }

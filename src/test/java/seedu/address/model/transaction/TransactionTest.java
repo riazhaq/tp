@@ -205,13 +205,6 @@ public class TransactionTest {
     // ========== equals ==========
 
     @Test
-    public void equals_sameValues_returnsTrue() {
-        Transaction a = new TestTransaction(100, 5, "desc");
-        Transaction b = new TestTransaction(100, 5, "desc");
-        assertEquals(a, b);
-    }
-
-    @Test
     public void equals_sameObject_returnsTrue() {
         Transaction a = new TestTransaction(100, 5, "desc");
         assertEquals(a, a);
@@ -258,12 +251,4 @@ public class TransactionTest {
         assertNotEquals(a, "not a transaction");
     }
 
-    // ========== hashCode ==========
-
-    @Test
-    public void hashCode_equalTransactions_samehashCode() {
-        Transaction a = new TestTransaction(100, 5, "desc");
-        Transaction b = new TestTransaction(100, 5, "desc");
-        assertEquals(a.hashCode(), b.hashCode());
-    }
 }
