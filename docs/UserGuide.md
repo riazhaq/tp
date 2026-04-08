@@ -209,6 +209,8 @@ Format: `settle PERSON_INDEX t/TRANSACTION_INDEX`
 * The person index refers to the displayed person list.
 * The transaction index refers to the displayed transaction panel for that selected person.
 * Settling sets the transaction amount to `$0.00` and marks it as `Settled`, but keeps the record visible in the transaction history.
+* The success message displays the original amount that was settled (e.g. Settled Transaction #1: $50.00 | lunch | Alice → Bob), 
+so you always have a clear record of what was paid.
 
 Example: `settle 1 t/2`
 
