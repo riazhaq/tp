@@ -5,27 +5,58 @@ import static java.util.Objects.requireNonNull;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.person.PersonMatchesFilterPredicate;
 
 /**
- * Finds and lists all persons in address book whose name contains any of the argument keywords.
- * Keyword matching is case insensitive.
+ * Finds and lists all persons in the address book whose details match all provided filters.
+ *
+ * <p>The following optional filters can be combined freely:
+ * <ul>
+ *   <li>{@code n/} – person's name contains the keyword (partial, case-insensitive)</li>
+ *   <li>{@code d/} – any transaction description contains the keyword (partial, case-insensitive)</li>
+ *   <li>{@code min/} – at least one transaction amount is ≥ the specified minimum</li>
+ *   <li>{@code max/} – at least one transaction amount is ≤ the specified maximum</li>
+ *   <li>{@code t/} – person has a tag matching the keyword (case-insensitive)</li>
+ * </ul>
+ *
+ * <p>Only persons satisfying <em>all</em> supplied filters are shown.
  */
 public class FindCommand extends Command {
 
+    /** The command keyword used to invoke this command from the CLI. */
     public static final String COMMAND_WORD = "find";
 
-    public static final String MESSAGE_USAGE = COMMAND_WORD + ": Finds all persons whose names contain any of "
-            + "the specified keywords (case-insensitive) and displays them as a list with index numbers.\n"
-            + "Parameters: KEYWORD [MORE_KEYWORDS]...\n"
-            + "Example: " + COMMAND_WORD + " alice bob charlie";
+    /** Usage message displayed when the command is used incorrectly. */
+    public static final String MESSAGE_USAGE = COMMAND_WORD
+            + ": Finds all persons who match ALL of the provided filters.\n"
+            + "All filters are optional, but at least one must be provided.\n"
+            + "Parameters: [n/NAME] [d/DESCRIPTION] [min/MIN_AMOUNT] [max/MAX_AMOUNT] [t/TAG]\n"
+            + "  n/   - Person's name (partial match, case-insensitive)\n"
+            + "  d/   - Transaction description (partial match, case-insensitive)\n"
+            + "  min/ - Minimum transaction amount (inclusive)\n"
+            + "  max/ - Maximum transaction amount (inclusive)\n"
+            + "  t/   - Tag name (partial match, case-insensitive)\n"
+            + "Example: " + COMMAND_WORD + " n/alice min/10 t/friends";
 
-    private final NameContainsKeywordsPredicate predicate;
+    /** The composite predicate that encapsulates all active search filters. */
+    private final PersonMatchesFilterPredicate predicate;
 
-    public FindCommand(NameContainsKeywordsPredicate predicate) {
+    /**
+     * Creates a {@code FindCommand} that will filter the person list using the given predicate.
+     *
+     * @param predicate the composite filter predicate; must not be {@code null}
+     */
+    public FindCommand(PersonMatchesFilterPredicate predicate) {
+        requireNonNull(predicate);
         this.predicate = predicate;
     }
 
+    /**
+     * Executes the find command by updating the filtered person list in the model.
+     *
+     * @param model the application model; must not be {@code null}
+     * @return a {@link CommandResult} reporting how many persons matched the filters
+     */
     @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
@@ -40,13 +71,17 @@ public class FindCommand extends Command {
             return true;
         }
 
-        // instanceof handles nulls
         if (!(other instanceof FindCommand)) {
             return false;
         }
 
         FindCommand otherFindCommand = (FindCommand) other;
         return predicate.equals(otherFindCommand.predicate);
+    }
+
+    @Override
+    public int hashCode() {
+        return predicate.hashCode();
     }
 
     @Override
