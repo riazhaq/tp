@@ -167,7 +167,7 @@ This section describes some noteworthy details on how certain features are imple
 
 IOU extends AB3 with a transaction subsystem built around three ideas.
 
-1. `AddTransactionCommandParser` parses two person indexes plus a `TransactionDescriptor`, then `AddTransactionCommand` resolves the live debtor and creditor from the filtered person list and creates the correct transaction subtype: `Transaction`, `MonthlyTransaction`, or `YearlyTransaction`.
+1. `AddTransactionCommandParser` parses two person indexes plus a `TransactionDescriptor`, then `AddTransactionCommand` resolves the live debtor and creditor from the filtered person list.
 1. The same `Transaction` object is appended to both involved persons. This keeps the debtor and creditor views consistent and allows commands such as `settle` and transaction-scoped `delete` to update one shared record.
 1. The transaction panel and transaction-targeting commands use the same displayed order: transactions are sorted by current amount in descending order before being assigned a one-based transaction index.
 
@@ -497,27 +497,21 @@ testers are expected to do more *exploratory* testing.
 
     1. Prerequisites: List all persons using the `list` command. Multiple persons (at least 2) in the list.
 
-    1. Test case: `addtxn 1 2 a/50 i/5 d/lunch t/m`<br>
-       Expected: A transaction is added from person 1 (debtor) to person 2 (creditor) for an amount of 50 with 5% monthly compounding interest. Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
-
-    1. Test case: `addtxn 1 2 a/50 i/0 d/dinner`<br>
+    1. Test case: `addtxn 1 2 a/50 d/dinner`<br>
        Expected: A transaction is added from person 1 to person 2 for an amount of 50 with no interest and no compounding type. Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `addtxn 1 2 a/50 i/5`<br>
+    1. Test case: `addtxn 1 2 a/50`<br>
        Expected: A transaction is added with no description and no compounding type (optional fields omitted). Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `addtxn 0 2 a/50 i/5`<br>
+    1. Test case: `addtxn 0 2 a/50`<br>
        Expected: No transaction is added. Error details shown in the status message indicating invalid index. Status bar remains the same.
 
-    1. Test case: `addtxn 1 1 a/50 i/5`<br>
+    1. Test case: `addtxn 1 1 a/50`<br>
        Expected: No transaction is added. Error details shown in the status message indicating debtor and creditor cannot be the same person. Status bar remains the same.
 
-    1. Test case: `addtxn 1 2 a/-50 i/5`<br>
+    1. Test case: `addtxn 1 2 a/-50`<br>
        Expected: No transaction is added. Error details shown in the status message indicating amount must be a positive value. Status bar remains the same.
-
-    1. Test case: `addtxn 1 2 a/50 i/5 t/z`<br>
-       Expected: No transaction is added. Error details shown in the status message indicating compounding type must be `m`, `y`, or `n`. Status bar remains the same.
-
+   
     1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn 1 2 a/50`, `addtxn x 2 a/50 i/5` (where x is larger than the list size)<br>
        Expected: Similar to previous. Error details shown in the status message. Status bar remains the same.
 
