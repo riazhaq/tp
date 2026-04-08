@@ -270,14 +270,14 @@ public class MainWindow extends UiPart<Stage> {
                 handleExit();
             }
 
-            // Refresh the transaction panel when a delete-transaction command succeeds.
-            // The panel only updates via selection-change events; without this explicit
-            // refresh it would still show the stale (pre-delete) transaction list.
+            // Some commands (e.g. settle, delete transaction) request that the UI refresh
+            // a specific person's transactions after execution.
             commandResult.getPersonIndexToRefresh().ifPresent(oneBased -> {
                 int zeroBased = oneBased - 1;
                 if (zeroBased >= 0 && zeroBased < logic.getFilteredPersonList().size()) {
                     Person refreshed = logic.getFilteredPersonList().get(zeroBased);
-                    transactionListPanel.displayPerson(refreshed);
+                    // Keep selection highlight and transactions panel in sync.
+                    personListPanel.selectPerson(refreshed);
                 }
             });
 
