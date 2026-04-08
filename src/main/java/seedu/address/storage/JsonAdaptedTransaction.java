@@ -92,14 +92,14 @@ class JsonAdaptedTransaction {
 
         Transaction transaction;
         switch (transactionType) {
-            case "m":
-                transaction = new MonthlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
+        case "m":
+            transaction = new MonthlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
                 break;
-            case "y":
-                transaction = new YearlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
+        case "y":
+            transaction = new YearlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
                 break;
-            default:
-                transaction = new Transaction(modelDebtor, modelCreditor, amount, rate, description);
+        default:
+            transaction = new Transaction(modelDebtor, modelCreditor, amount, rate, description);
                 break;
         }
 
