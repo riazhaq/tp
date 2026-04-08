@@ -167,6 +167,38 @@ public class TransactionTest {
         assertEquals(0, transaction.getNumberOfYearsSinceLastPaid());
     }
 
+    // ========== originalAmount ==========
+
+    @Test
+    public void getOriginalAmount_matchesInitialAmount() {
+        Transaction transaction = new TestTransaction(250.5, 3, "desc");
+        assertEquals(250.5, transaction.getOriginalAmount(), 0.001);
+    }
+
+    @Test
+    public void getOriginalAmount_unchangedAfterPayment() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        transaction.payTransaction(60);
+        assertEquals(100, transaction.getOriginalAmount(), 0.001);
+        assertEquals(40, transaction.getCurrAmount(), 0.001);
+    }
+
+    @Test
+    public void getOriginalAmount_unchangedAfterFullSettlement() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        transaction.settleTransaction();
+        assertEquals(100, transaction.getOriginalAmount(), 0.001);
+        assertEquals(0, transaction.getCurrAmount(), 0.001);
+        assertTrue(transaction.isSettled());
+    }
+
+    @Test
+    public void setOriginalAmount_updatesStoredValue() {
+        Transaction transaction = new TestTransaction(100, 5, "desc");
+        transaction.setOriginalAmount(999.9);
+        assertEquals(999.9, transaction.getOriginalAmount(), 0.001);
+    }
+
     // ========== Getters ==========
 
     @Test

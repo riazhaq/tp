@@ -33,6 +33,9 @@ public class Transaction {
     /** The current outstanding amount owed by the debtor to the creditor. */
     protected double currAmount;
 
+    /** The original amount when the transaction was first created. Never changes after construction. */
+    protected double originalAmount;
+
     /** The interest rate applied to this transaction. */
     protected final InterestRate interestRate;
 
@@ -72,6 +75,7 @@ public class Transaction {
         this.debtor = debtor;
         this.creditor = creditor;
         this.currAmount = currAmount;
+        this.originalAmount = currAmount;
         this.interestRate = new InterestRate(interestRate);
         this.description = description;
         this.lastRecalculatedDate = LocalDate.now();
@@ -143,6 +147,23 @@ public class Transaction {
      */
     protected void updateLastRecalculatedDate() {
         this.lastRecalculatedDate = LocalDate.now();
+    }
+
+    /**
+     * Returns the original amount when the transaction was first created.
+     * This value never changes, even after partial payments or settlement.
+     *
+     * @return the original amount
+     */
+    public double getOriginalAmount() {
+        return originalAmount;
+    }
+
+    /**
+     * Sets the original amount. Used by storage during deserialisation.
+     */
+    public void setOriginalAmount(double originalAmount) {
+        this.originalAmount = originalAmount;
     }
 
     /**

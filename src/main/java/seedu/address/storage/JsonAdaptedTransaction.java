@@ -21,6 +21,7 @@ class JsonAdaptedTransaction {
 
     private final String transactionType;
     private final double amount;
+    private final double originalAmount;
     private final double rate;
     private final String description;
     private final JsonAdaptedPerson debtor;
@@ -33,6 +34,7 @@ class JsonAdaptedTransaction {
     @JsonCreator
     public JsonAdaptedTransaction(@JsonProperty("transactionType") String transactionType,
                                   @JsonProperty("amount") double amount,
+                                  @JsonProperty("originalAmount") Double originalAmount,
                                   @JsonProperty("rate") double rate,
                                   @JsonProperty("description") String description,
                                   @JsonProperty("debtor") JsonAdaptedPerson debtor,
@@ -40,6 +42,7 @@ class JsonAdaptedTransaction {
                                   @JsonProperty("settled") Boolean settled) {
         this.transactionType = transactionType == null ? "" : transactionType;
         this.amount = amount;
+        this.originalAmount = (originalAmount != null) ? originalAmount : amount;
         this.rate = rate;
         this.description = description;
         this.debtor = debtor;
@@ -59,6 +62,7 @@ class JsonAdaptedTransaction {
             transactionType = "";
         }
         amount = source.getCurrAmount();
+        originalAmount = source.getOriginalAmount();
         rate = source.getInterest();
         description = source.getDescription();
         debtor = new JsonAdaptedPerson(source.getDebtor());
@@ -88,18 +92,19 @@ class JsonAdaptedTransaction {
 
         Transaction transaction;
         switch (transactionType) {
-        case "m":
-            transaction = new MonthlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
-            break;
-        case "y":
-            transaction = new YearlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
-            break;
-        default:
-            transaction = new Transaction(modelDebtor, modelCreditor, amount, rate, description);
-            break;
+            case "m":
+                transaction = new MonthlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
+                break;
+            case "y":
+                transaction = new YearlyTransaction(modelDebtor, modelCreditor, amount, rate, description);
+                break;
+            default:
+                transaction = new Transaction(modelDebtor, modelCreditor, amount, rate, description);
+                break;
         }
 
         transaction.setSettled(settled);
+        transaction.setOriginalAmount(originalAmount);
         return transaction;
     }
 }

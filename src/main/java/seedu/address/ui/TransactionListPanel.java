@@ -140,14 +140,14 @@ public class TransactionListPanel extends UiPart<Region> {
         });
 
         amountColumn.setCellValueFactory(cellData -> {
-            return new ReadOnlyStringWrapper(amountText(cellData.getValue().getCurrAmount()));
+            return new ReadOnlyStringWrapper(amountText(cellData.getValue().getOriginalAmount()));
         });
 
         descriptionColumn.setCellValueFactory(cellData ->
                 new ReadOnlyStringWrapper(descriptionText(cellData.getValue())));
 
         statusColumn.setCellValueFactory(cellData ->
-            new ReadOnlyStringWrapper(statusText(cellData.getValue())));
+                new ReadOnlyStringWrapper(statusText(cellData.getValue())));
         statusColumn.setCellFactory(col -> new StatusCell());
 
         dateColumn.setCellValueFactory(cellData ->
