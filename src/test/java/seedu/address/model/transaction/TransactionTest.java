@@ -1,7 +1,11 @@
 package seedu.address.model.transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 
@@ -65,6 +69,7 @@ public class TransactionTest {
         Transaction transaction = new TestTransaction(100, 5, "test transaction");
         transaction.payTransaction(100);
         assertEquals(0, transaction.getCurrAmount(), 0.001);
+        assertTrue(transaction.isSettled());
     }
 
     @Test
@@ -72,6 +77,64 @@ public class TransactionTest {
         Transaction transaction = new TestTransaction(100, 5, "test transaction");
         transaction.payTransaction(150);
         assertEquals(-50, transaction.getCurrAmount(), 0.001);
+        assertFalse(transaction.isSettled());
+    }
+
+    @Test
+    public void settleTransaction_setsAmountToZeroAndMarksSettled() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+
+        transaction.settleTransaction();
+
+        assertEquals(0, transaction.getCurrAmount(), 0.001);
+        assertTrue(transaction.isSettled());
+    }
+
+    @Test
+    public void settleTransaction_updatesTransactionBeforeSettlement() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        transaction.lastRecalculatedDate = transaction.lastRecalculatedDate.minusDays(1);
+
+        transaction.settleTransaction();
+
+        assertEquals(0, transaction.getCurrAmount(), 0.001);
+        assertTrue(transaction.isSettled());
+    }
+
+    @Test
+    public void setSettled_updatesState() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+
+        transaction.setSettled(true);
+        assertTrue(transaction.isSettled());
+
+        transaction.setSettled(false);
+        assertFalse(transaction.isSettled());
+    }
+
+    @Test
+    public void setDebtorAndCreditor_updatesReferences() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        Person replacementDebtor = new PersonBuilder().withName("Replacement Debtor").build();
+        Person replacementCreditor = new PersonBuilder().withName("Replacement Creditor").build();
+
+        transaction.setDebtor(replacementDebtor);
+        transaction.setCreditor(replacementCreditor);
+
+        assertSame(replacementDebtor, transaction.getDebtor());
+        assertSame(replacementCreditor, transaction.getCreditor());
+    }
+
+    @Test
+    public void setDebtor_null_throwsNullPointerException() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        assertThrows(NullPointerException.class, () -> transaction.setDebtor(null));
+    }
+
+    @Test
+    public void setCreditor_null_throwsNullPointerException() {
+        Transaction transaction = new TestTransaction(100, 5, "test transaction");
+        assertThrows(NullPointerException.class, () -> transaction.setCreditor(null));
     }
 
     // ========== getNumberOfMonthsSinceLastPaid ==========
@@ -142,13 +205,6 @@ public class TransactionTest {
     // ========== equals ==========
 
     @Test
-    public void equals_sameValues_returnsTrue() {
-        Transaction a = new TestTransaction(100, 5, "desc");
-        Transaction b = new TestTransaction(100, 5, "desc");
-        assertEquals(a, b);
-    }
-
-    @Test
     public void equals_sameObject_returnsTrue() {
         Transaction a = new TestTransaction(100, 5, "desc");
         assertEquals(a, a);
@@ -176,6 +232,14 @@ public class TransactionTest {
     }
 
     @Test
+    public void equals_differentSettledState_returnsFalse() {
+        Transaction a = new TestTransaction(100, 5, "desc");
+        Transaction b = new TestTransaction(100, 5, "desc");
+        b.setSettled(true);
+        assertNotEquals(a, b);
+    }
+
+    @Test
     public void equals_nullObject_returnsFalse() {
         Transaction a = new TestTransaction(100, 5, "desc");
         assertNotEquals(a, null);
@@ -187,12 +251,4 @@ public class TransactionTest {
         assertNotEquals(a, "not a transaction");
     }
 
-    // ========== hashCode ==========
-
-    @Test
-    public void hashCode_equalTransactions_samehashCode() {
-        Transaction a = new TestTransaction(100, 5, "desc");
-        Transaction b = new TestTransaction(100, 5, "desc");
-        assertEquals(a.hashCode(), b.hashCode());
-    }
 }

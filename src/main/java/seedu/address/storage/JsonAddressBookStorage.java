@@ -89,12 +89,7 @@ public class JsonAddressBookStorage implements AddressBookStorage {
                 JsonUtil.readJsonFile(transactionFilePath, JsonSerializableTransactionBook.class);
 
         if (jsonTransactionBook.isPresent()) {
-            try {
-                jsonTransactionBook.get().loadInto(addressBook);
-            } catch (IllegalValueException ive) {
-                logger.info("Illegal values found in " + transactionFilePath + ": " + ive.getMessage());
-                throw new DataLoadingException(ive);
-            }
+            jsonTransactionBook.get().loadInto(addressBook);
         }
 
         return Optional.of(addressBook);

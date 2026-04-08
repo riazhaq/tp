@@ -1,6 +1,7 @@
 package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,7 +31,7 @@ public class JsonAdaptedTransactionTest {
     @Test
     public void jsonCreator_monthlyType_createsMonthlyTransaction() throws IllegalValueException {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("m", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
-                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()));
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), false);
         Transaction transaction = adapted.toModelType();
         assertTrue(transaction instanceof MonthlyTransaction);
     }
@@ -38,7 +39,7 @@ public class JsonAdaptedTransactionTest {
     @Test
     public void jsonCreator_yearlyType_createsYearlyTransaction() throws IllegalValueException {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("y", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
-                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()));
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), false);
         Transaction transaction = adapted.toModelType();
         assertTrue(transaction instanceof YearlyTransaction);
     }
@@ -46,7 +47,7 @@ public class JsonAdaptedTransactionTest {
     @Test
     public void jsonCreator_unknownType_createsGenericTransaction() throws IllegalValueException {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("z", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
-                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()));
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), false);
         Transaction transaction = adapted.toModelType();
         assertEquals(Transaction.class, transaction.getClass());
     }
@@ -57,6 +58,7 @@ public class JsonAdaptedTransactionTest {
         Person creditor = creditor();
         MonthlyTransaction original = new MonthlyTransaction(debtor, creditor, VALID_AMOUNT, VALID_RATE,
                 VALID_DESCRIPTION);
+        original.setSettled(true);
 
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction(original);
         Transaction restored = adapted.toModelType();
@@ -67,27 +69,38 @@ public class JsonAdaptedTransactionTest {
         assertEquals(original.getDescription(), restored.getDescription());
         assertEquals(original.getDebtor(), restored.getDebtor());
         assertEquals(original.getCreditor(), restored.getCreditor());
+        assertTrue(restored.isSettled());
     }
 
     @Test
     public void toModelType_missingDebtor_throwsIllegalValueException() {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("m", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
-                null, new JsonAdaptedPerson(creditor()));
+                null, new JsonAdaptedPerson(creditor()), false);
         assertThrows(IllegalValueException.class, adapted::toModelType);
     }
 
     @Test
     public void toModelType_missingCreditor_throwsIllegalValueException() {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("m", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
-                new JsonAdaptedPerson(debtor()), null);
+                new JsonAdaptedPerson(debtor()), null, false);
         assertThrows(IllegalValueException.class, adapted::toModelType);
     }
 
     @Test
     public void toModelType_missingDescription_throwsIllegalValueException() {
         JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("m", VALID_AMOUNT, VALID_RATE, null,
-                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()));
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), false);
         assertThrows(IllegalValueException.class, adapted::toModelType);
+    }
+
+    @Test
+    public void jsonCreator_nullSettled_defaultsToFalse() throws IllegalValueException {
+        JsonAdaptedTransaction adapted = new JsonAdaptedTransaction("", VALID_AMOUNT, VALID_RATE, VALID_DESCRIPTION,
+                new JsonAdaptedPerson(debtor()), new JsonAdaptedPerson(creditor()), null);
+
+        Transaction transaction = adapted.toModelType();
+
+        assertFalse(transaction.isSettled());
     }
 }
 

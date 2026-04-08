@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
@@ -22,6 +23,8 @@ import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.SettleCommand;
+import seedu.address.logic.commands.SimplifyCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
@@ -87,6 +90,23 @@ public class AddressBookParserTest {
     public void parseCommand_list() throws Exception {
         assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD) instanceof ListCommand);
         assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD + " 3") instanceof ListCommand);
+    }
+
+    @Test
+    public void parseCommand_settle() throws Exception {
+        SettleCommand command = (SettleCommand) parser.parseCommand(
+                SettleCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " t/1");
+        assertEquals(new SettleCommand(INDEX_FIRST_PERSON, Index.fromOneBased(1)), command);
+    }
+
+    @Test
+    public void parseCommand_simplify() throws Exception {
+        SimplifyCommand command = (SimplifyCommand) parser.parseCommand(
+                SimplifyCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " 2 3");
+        assertEquals(new SimplifyCommand(List.of(
+                INDEX_FIRST_PERSON,
+                Index.fromOneBased(2),
+                Index.fromOneBased(3))), command);
     }
 
     @Test

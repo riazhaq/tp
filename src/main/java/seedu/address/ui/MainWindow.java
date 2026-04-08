@@ -186,6 +186,23 @@ public class MainWindow extends UiPart<Stage> {
     }
 
     /**
+     * Re-renders the transaction panel based on the current list selection.
+     */
+    private void refreshTransactionPanelFromSelection() {
+        Person selectedPerson = personListPanel.getSelectedPerson();
+        if (selectedPerson == null) {
+            transactionListPanel.displayPerson(null);
+            return;
+        }
+
+        Person canonicalSelectedPerson = logic.getFilteredPersonList().stream()
+                .filter(person -> person.isSamePerson(selectedPerson))
+                .findFirst()
+                .orElse(selectedPerson);
+        transactionListPanel.displayPerson(canonicalSelectedPerson);
+    }
+
+    /**
      * Sets the default size based on {@code guiSettings}.
      */
     private void setWindowDefaultSize(GuiSettings guiSettings) {
@@ -240,6 +257,10 @@ public class MainWindow extends UiPart<Stage> {
             logger.info("Result: " + commandResult.getFeedbackToUser());
             applyResultUpdate(new ResultDisplayAdapter(resultDisplay),
                     successUpdate(commandResult.getFeedbackToUser()));
+
+            // Ensure table rows reflect in-place transaction updates (e.g. addtxn)
+            // even when the ListView selection has not changed.
+            refreshTransactionPanelFromSelection();
 
             if (commandResult.isShowHelp()) {
                 handleHelp();

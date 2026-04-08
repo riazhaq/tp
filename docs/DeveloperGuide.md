@@ -76,12 +76,14 @@ The UI consists of a `MainWindow` that is made up of parts e.g.`CommandBox`, `Re
 
 The `UI` component uses the JavaFx UI framework. The layout of these UI parts are defined in matching `.fxml` files that are in the `src/main/resources/view` folder. For example, the layout of the [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java) is specified in [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml)
 
+Compared with the base AB3 layout, IOU's `MainWindow` uses a split view: the left side shows the person list and the right side shows a dedicated `TransactionListPanel` for the currently selected person. Selecting a person in `PersonListPanel` triggers `TransactionListPanel` to re-render that person's transactions. Commands that mutate only transactions can also request an explicit panel refresh through `CommandResult` so the transaction table stays in sync even when the selection itself does not change.
+
 The `UI` component,
 
 * executes user commands using the `Logic` component.
 * listens for changes to `Model` data so that the UI can be updated with the modified data.
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands.
-* depends on some classes in the `Model` component, as it displays `Person` object residing in the `Model`.
+* depends on some classes in the `Model` component, as it displays `Person` objects and their associated `Transaction` objects.
 
 ### Logic component
 
@@ -123,9 +125,13 @@ How the parsing works:
 The `Model` component,
 
 * stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
+* stores each person's transactions inside the `Person` object as a `Set<Transaction>`.
+* treats a transaction as a shared domain object referenced by both the debtor and the creditor, so UI and commands view the same record from either person's perspective.
 * stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
 * stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
+
+To avoid recursive equality and hash-code issues between `Person` and `Transaction`, `Person.equals()` and `Person.hashCode()` intentionally exclude transactions. This allows transactions to safely keep references to `Person` objects while still being stored in sets and rebound after edits or deserialisation.
 
 <div markdown="span" class="alert alert-info">:information_source: **Note:** An alternative (arguably, a more OOP) model is given below. It has a `Tag` list in the `AddressBook`, which `Person` references. This allows `AddressBook` to only require one `Tag` object per unique tag, instead of each `Person` needing their own `Tag` objects.<br>
 
@@ -142,6 +148,8 @@ The `Model` component,
 
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
+* persists persons and transactions into separate files: the main address book file stores persons, while a sibling file with `_transactions` appended before the extension stores transactions.
+* loads persons first, then loads transactions and rebinds each transaction's debtor and creditor to the live `Person` instances already present in the in-memory model.
 * inherits from both `AddressBookStorage` and `UserPrefStorage`, which means it can be treated as either one (if only the functionality of only one is needed).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
@@ -154,6 +162,18 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 ## **Implementation**
 
 This section describes some noteworthy details on how certain features are implemented.
+
+### Transaction management
+
+IOU extends AB3 with a transaction subsystem built around three ideas.
+
+1. `AddTransactionCommandParser` parses two person indexes plus a `TransactionDescriptor`, then `AddTransactionCommand` resolves the live debtor and creditor from the filtered person list and creates the correct transaction subtype: `Transaction`, `MonthlyTransaction`, or `YearlyTransaction`.
+1. The same `Transaction` object is appended to both involved persons. This keeps the debtor and creditor views consistent and allows commands such as `settle` and transaction-scoped `delete` to update one shared record.
+1. The transaction panel and transaction-targeting commands use the same displayed order: transactions are sorted by current amount in descending order before being assigned a one-based transaction index.
+
+When a person is edited, `EditCommand` creates a replacement `Person` object and rewires every transaction that previously referenced the old person to reference the new one instead. This preserves transaction history while still allowing person details such as name, phone, or tags to change.
+
+At startup, IOU also ensures there is always a `Me` contact at the front of the address book if one does not already exist.
 
 ### \[Proposed\] Undo/redo feature
 
@@ -475,28 +495,28 @@ testers are expected to do more *exploratory* testing.
 
     1. Prerequisites: List all persons using the `list` command. Multiple persons (at least 2) in the list.
 
-    1. Test case: `addtxn 1 2 a/50 r/5 d/lunch c/m`<br>
+    1. Test case: `addtxn 1 2 a/50 i/5 d/lunch t/m`<br>
        Expected: A transaction is added from person 1 (debtor) to person 2 (creditor) for an amount of 50 with 5% monthly compounding interest. Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `addtxn 1 2 a/50 r/0 d/dinner`<br>
+    1. Test case: `addtxn 1 2 a/50 i/0 d/dinner`<br>
        Expected: A transaction is added from person 1 to person 2 for an amount of 50 with no interest and no compounding type. Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `addtxn 1 2 a/50 r/5`<br>
+    1. Test case: `addtxn 1 2 a/50 i/5`<br>
        Expected: A transaction is added with no description and no compounding type (optional fields omitted). Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `addtxn 0 2 a/50 r/5`<br>
+    1. Test case: `addtxn 0 2 a/50 i/5`<br>
        Expected: No transaction is added. Error details shown in the status message indicating invalid index. Status bar remains the same.
 
-    1. Test case: `addtxn 1 1 a/50 r/5`<br>
+    1. Test case: `addtxn 1 1 a/50 i/5`<br>
        Expected: No transaction is added. Error details shown in the status message indicating debtor and creditor cannot be the same person. Status bar remains the same.
 
-    1. Test case: `addtxn 1 2 a/-50 r/5`<br>
+    1. Test case: `addtxn 1 2 a/-50 i/5`<br>
        Expected: No transaction is added. Error details shown in the status message indicating amount must be a positive value. Status bar remains the same.
 
-    1. Test case: `addtxn 1 2 a/50 r/5 c/z`<br>
+    1. Test case: `addtxn 1 2 a/50 i/5 t/z`<br>
        Expected: No transaction is added. Error details shown in the status message indicating compounding type must be `m`, `y`, or `n`. Status bar remains the same.
 
-    1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn 1 2 a/50`, `addtxn x 2 a/50 r/5` (where x is larger than the list size)<br>
+    1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn 1 2 a/50`, `addtxn x 2 a/50 i/5` (where x is larger than the list size)<br>
        Expected: Similar to previous. Error details shown in the status message. Status bar remains the same.
 
     1. _{ more test cases … }_
@@ -505,6 +525,10 @@ testers are expected to do more *exploratory* testing.
 
 1. Dealing with missing/corrupted data files
 
-   1. _{explain how to simulate a missing/corrupted file, and the expected behavior}_
+   1. Delete `data/addressbook.json` and `data/addressbook_transactions.json`, then start the app.<br>
+      Expected: The app recreates the data files from sample data and inserts the default `Me` contact if needed.
+
+   1. Corrupt either JSON file by introducing invalid JSON syntax, then start the app.<br>
+      Expected: The app logs a data loading warning and starts with an empty address book instead of partially loading corrupted data.
 
 1. _{ more test cases …​ }_

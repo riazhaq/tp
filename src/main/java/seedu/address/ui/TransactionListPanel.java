@@ -29,6 +29,7 @@ public class TransactionListPanel extends UiPart<Region> {
 
     private static final String NO_SELECTION_TITLE = "Transactions - Select a person";
     private static final String STATUS_PENDING = "Pending";
+    private static final String STATUS_SETTLED = "Settled";
     private static final String COMPOUNDING_NONE = "None";
     private static final String COMPOUNDING_MONTHLY = "Monthly";
     private static final String COMPOUNDING_YEARLY = "Yearly";
@@ -38,6 +39,8 @@ public class TransactionListPanel extends UiPart<Region> {
     private static final String TYPE_LENT = "Lent";
     private static final String STYLE_TX_OWE = "tx-type-owe";
     private static final String STYLE_TX_LENT = "tx-type-lent";
+    private static final String STYLE_ROW_SETTLED = "tx-row-settled";
+    private static final String STYLE_STATUS_SETTLED = "tx-status-settled";
 
     static final class DisplayModel {
         private final String title;
@@ -118,6 +121,7 @@ public class TransactionListPanel extends UiPart<Region> {
     @FXML
     private void initialize() {
         transactionTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        transactionTable.setRowFactory(table -> new TransactionRow());
 
         indexColumn.setCellValueFactory(cellData ->
                 indexCellValue(transactionTable.getItems(), cellData.getValue()));
@@ -143,7 +147,8 @@ public class TransactionListPanel extends UiPart<Region> {
                 new ReadOnlyStringWrapper(descriptionText(cellData.getValue())));
 
         statusColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(statusText()));
+            new ReadOnlyStringWrapper(statusText(cellData.getValue())));
+        statusColumn.setCellFactory(col -> new StatusCell());
 
         dateColumn.setCellValueFactory(cellData ->
                 new ReadOnlyStringWrapper(dateText(cellData.getValue())));
@@ -159,12 +164,14 @@ public class TransactionListPanel extends UiPart<Region> {
         DisplayModel model = displayModelFor(person);
         title.setText(model.getTitle());
         transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
+        transactionTable.refresh();
     }
 
     private void showNoSelection() {
         DisplayModel model = displayModelFor(null);
         title.setText(model.getTitle());
         transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
+        transactionTable.refresh();
     }
 
     /**
@@ -179,6 +186,14 @@ public class TransactionListPanel extends UiPart<Region> {
      */
     static String statusText() {
         return STATUS_PENDING;
+    }
+
+    /**
+     * Returns the status label for the given transaction.
+     */
+    static String statusText(Transaction transaction) {
+        Objects.requireNonNull(transaction);
+        return transaction.isSettled() ? STATUS_SETTLED : STATUS_PENDING;
     }
 
     /**
@@ -270,11 +285,13 @@ public class TransactionListPanel extends UiPart<Region> {
         if (currentPerson == null) {
             return "";
         }
-        if (transaction.getDebtor().equals(currentPerson)) {
+        if (transaction.getDebtor().isSamePerson(currentPerson)) {
             return DIRECTION_OWE;
-        } else {
+        }
+        if (transaction.getCreditor().isSamePerson(currentPerson)) {
             return DIRECTION_LENT;
         }
+        return "";
     }
 
     /**
@@ -284,11 +301,13 @@ public class TransactionListPanel extends UiPart<Region> {
         if (currentPerson == null) {
             return "";
         }
-        if (transaction.getDebtor().equals(currentPerson)) {
+        if (transaction.getDebtor().isSamePerson(currentPerson)) {
             return transaction.getCreditor().getName().fullName;
-        } else {
+        }
+        if (transaction.getCreditor().isSamePerson(currentPerson)) {
             return transaction.getDebtor().getName().fullName;
         }
+        return "";
     }
 
     /**
@@ -346,6 +365,37 @@ public class TransactionListPanel extends UiPart<Region> {
             setText(model.getText());
             if (model.getStyleClass() != null) {
                 getStyleClass().add(model.getStyleClass());
+            }
+        }
+    }
+
+    private class StatusCell extends TableCell<Transaction, String> {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            getStyleClass().remove(STYLE_STATUS_SETTLED);
+
+            if (empty || item == null) {
+                setText(null);
+                return;
+            }
+
+            setText(item);
+            if (STATUS_SETTLED.equals(item)) {
+                getStyleClass().add(STYLE_STATUS_SETTLED);
+            }
+        }
+    }
+
+    private class TransactionRow extends javafx.scene.control.TableRow<Transaction> {
+        @Override
+        protected void updateItem(Transaction item, boolean empty) {
+            super.updateItem(item, empty);
+
+            getStyleClass().remove(STYLE_ROW_SETTLED);
+            if (!empty && item != null && item.isSettled()) {
+                getStyleClass().add(STYLE_ROW_SETTLED);
             }
         }
     }

@@ -14,7 +14,7 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
 
 /**
- * Panel containing the list of persons.
+ * Panel containing list of persons.
  */
 public class PersonListPanel extends UiPart<Region> {
     private static final String FXML = "PersonListPanel.fxml";
@@ -41,6 +41,13 @@ public class PersonListPanel extends UiPart<Region> {
         requireNonNull(listener);
         personListView.getSelectionModel().selectedItemProperty().addListener(
                 selectionChangeListener(listener));
+    }
+
+    /**
+     * Returns the currently selected person in the list, or {@code null} if no selection exists.
+     */
+    public Person getSelectedPerson() {
+        return personListView.getSelectionModel().getSelectedItem();
     }
 
     /**

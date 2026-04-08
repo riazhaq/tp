@@ -73,6 +73,26 @@ public class DeleteCommandTest {
     }
 
     @Test
+    public void execute_deletePersonWithTransactions_removesDanglingReferences() throws Exception {
+        Person personToDelete = model.getFilteredPersonList().get(0);
+        Person otherPerson = model.getFilteredPersonList().get(1);
+
+        Transaction transaction = new MonthlyTransaction(personToDelete, otherPerson, 10.0, 0.0, "seed");
+        personToDelete.appendTransaction(transaction);
+        otherPerson.appendTransaction(transaction);
+
+        DeleteCommand deleteCommand = new DeleteCommand(Index.fromOneBased(1));
+        deleteCommand.execute(model);
+
+        Person survivingPerson = model.getFilteredPersonList().stream()
+                .filter(p -> p.isSamePerson(otherPerson))
+                .findFirst()
+                .orElseThrow();
+
+        assertFalse(survivingPerson.getTransactions().contains(transaction));
+    }
+
+    @Test
     public void execute_invalidIndexFilteredList_throwsCommandException() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
 

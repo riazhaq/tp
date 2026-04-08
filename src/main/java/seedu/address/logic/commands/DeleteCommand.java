@@ -80,12 +80,46 @@ public class DeleteCommand extends Command {
         Person personToModify = lastShownList.get(targetIndex.getZeroBased());
 
         if (targetTransactionIndex == null) {
-            model.deletePerson(personToModify);
-            return new CommandResult(String.format(MESSAGE_DELETE_PERSON_SUCCESS,
-                    Messages.format(personToModify)));
+            return deletePersonAndRelatedTransactions(model, personToModify);
         }
 
         return deleteTransaction(model, personToModify);
+    }
+
+    /**
+     * Deletes a person and removes any shared transactions from counterparties
+     * to avoid dangling references to the deleted person.
+     */
+    private CommandResult deletePersonAndRelatedTransactions(Model model, Person personToDelete) {
+        Set<Transaction> transactionsToRemove = new HashSet<>(personToDelete.getTransactions());
+
+        for (Transaction transaction : transactionsToRemove) {
+            Person otherParty = transaction.getDebtor().equals(personToDelete)
+                    ? transaction.getCreditor()
+                    : transaction.getDebtor();
+
+            Person liveOtherParty = findLivePerson(model, otherParty);
+            if (liveOtherParty == null || liveOtherParty.equals(personToDelete)) {
+                continue;
+            }
+
+            Person updatedOtherParty = createPersonWithoutTransaction(liveOtherParty, transaction);
+            model.setPerson(liveOtherParty, updatedOtherParty);
+        }
+
+        model.deletePerson(personToDelete);
+        return new CommandResult(String.format(MESSAGE_DELETE_PERSON_SUCCESS,
+                Messages.format(personToDelete)));
+    }
+
+    /**
+     * Finds the canonical in-model person matching the given person identity.
+     */
+    private Person findLivePerson(Model model, Person person) {
+        return model.getAddressBook().getPersonList().stream()
+                .filter(candidate -> candidate.isSamePerson(person))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

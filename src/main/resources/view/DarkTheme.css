@@ -183,6 +183,23 @@
     -fx-font-weight: bold;
 }
 
+.table-row-cell:filled.tx-row-settled {
+    -fx-background-color: #2f3d31;
+}
+
+.table-row-cell:filled.tx-row-settled .table-cell {
+    -fx-text-fill: #d9e6d6;
+}
+
+.table-row-cell:filled:selected.tx-row-settled {
+    -fx-background-color: #47604b;
+}
+
+.table-cell.tx-status-settled {
+    -fx-text-fill: #8bc34a;
+    -fx-font-weight: bold;
+}
+
 .stack-pane {
      -fx-background-color: derive(#1d1d1d, 20%);
 }

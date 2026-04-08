@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.UUID;
 
 import seedu.address.model.person.Person;
 
@@ -50,6 +51,12 @@ public class Transaction {
     /** The person who is owed money in this transaction. */
     protected Person creditor;
 
+    /** Whether this transaction has been fully settled. */
+    protected boolean settled;
+
+    /** Unique transactionId for each transaction */
+    protected final String transactionId;
+
     /**
      * Constructs a {@code Transaction} with the specified debtor, creditor, amount,
      * interest rate, and description. The last recalculated date is set to today.
@@ -61,12 +68,14 @@ public class Transaction {
      * @param description  a non-empty description of the transaction
      */
     public Transaction(Person debtor, Person creditor, double currAmount, double interestRate, String description) {
+        this.transactionId = UUID.randomUUID().toString();
         this.debtor = debtor;
         this.creditor = creditor;
         this.currAmount = currAmount;
         this.interestRate = new InterestRate(interestRate);
         this.description = description;
         this.lastRecalculatedDate = LocalDate.now();
+        this.settled = false;
     }
 
     /**
@@ -90,6 +99,21 @@ public class Transaction {
             this.updateTransactionAmount();
         }
         currAmount -= amount;
+        if (Math.abs(currAmount) < 1e-9) {
+            settled = true;
+        }
+        updateLastRecalculatedDate();
+    }
+
+    /**
+     * Marks this transaction as fully settled and sets the outstanding amount to zero.
+     */
+    public void settleTransaction() {
+        if (!this.lastRecalculatedDate.equals(LocalDate.now())) {
+            this.updateTransactionAmount();
+        }
+        currAmount = 0;
+        settled = true;
         updateLastRecalculatedDate();
     }
 
@@ -176,6 +200,20 @@ public class Transaction {
     }
 
     /**
+     * Returns whether this transaction has been fully settled.
+     */
+    public boolean isSettled() {
+        return settled;
+    }
+
+    /**
+     * Updates the settled state. Primarily used by storage during deserialisation.
+     */
+    public void setSettled(boolean settled) {
+        this.settled = settled;
+    }
+
+    /**
      * Updates the debtor reference to the given person.
      * Used when a Person is edited to keep transaction references consistent.
      */
@@ -230,12 +268,7 @@ public class Transaction {
             return false;
         }
         Transaction o = (Transaction) other;
-        return Double.compare(o.currAmount, currAmount) == 0
-                && Double.compare(o.getInterest(), getInterest()) == 0
-                && description.equals(o.description)
-                && lastRecalculatedDate.equals(o.lastRecalculatedDate)
-                && debtor.equals(o.debtor)
-                && creditor.equals(o.creditor);
+        return transactionId.equals(o.transactionId);
     }
 
     /**
@@ -249,6 +282,6 @@ public class Transaction {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(currAmount, interestRate, description, lastRecalculatedDate, debtor, creditor);
+        return Objects.hash(transactionId);
     }
 }
