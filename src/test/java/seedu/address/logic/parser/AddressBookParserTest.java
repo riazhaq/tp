@@ -24,6 +24,7 @@ import seedu.address.logic.commands.FindCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.SettleCommand;
+import seedu.address.logic.commands.SettleUpCommand;
 import seedu.address.logic.commands.SimplifyCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
@@ -104,6 +105,16 @@ public class AddressBookParserTest {
         SimplifyCommand command = (SimplifyCommand) parser.parseCommand(
                 SimplifyCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " 2 3");
         assertEquals(new SimplifyCommand(List.of(
+                INDEX_FIRST_PERSON,
+                Index.fromOneBased(2),
+                Index.fromOneBased(3))), command);
+    }
+
+    @Test
+    public void parseCommand_settleup() throws Exception {
+        SettleUpCommand command = (SettleUpCommand) parser.parseCommand(
+                SettleUpCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased() + " 2 3");
+        assertEquals(new SettleUpCommand(List.of(
                 INDEX_FIRST_PERSON,
                 Index.fromOneBased(2),
                 Index.fromOneBased(3))), command);

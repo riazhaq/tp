@@ -51,6 +51,13 @@ public class PersonListPanel extends UiPart<Region> {
     }
 
     /**
+     * Forces all visible person list cells to re-render, refreshing displayed data such as balance labels.
+     */
+    public void refresh() {
+        personListView.refresh();
+    }
+
+    /**
      * Creates the ChangeListener used to notify a consumer about selection changes.
      *
      * @param listener consumer to invoke with the new selection

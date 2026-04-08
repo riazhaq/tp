@@ -228,6 +228,22 @@ Examples:
 * `simplify 1 2 3`
 * `simplify 1 2 3 4`
 
+### Settling up a group : `settleup`
+
+Marks all unsettled in-group transactions as settled in one action for 3 or more selected people.
+
+Format: `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`
+
+* You must provide at least 3 distinct person indexes.
+* All indexes refer to the currently displayed person list.
+* Only transactions where **both** the debtor and the creditor are in the selected group are settled.
+* Transactions involving anyone outside the group are left unchanged.
+* The result display shows how many transactions were settled and the total amount.
+
+Examples:
+* `settleup 1 2 3`
+* `settleup 1 2 3 4 5`
+
 ### Deleting a transaction : `delete`
 
 Removes a specific transaction from a person; specifying both the person index and transaction index lets you target the exact entry.
@@ -297,4 +313,5 @@ Action | Format, Examples
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
 **Simplify** | `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `simplify 1 2 3 4`
+**Settle Up** | `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `settleup 1 2 3 4`
 **Help** | `help`
