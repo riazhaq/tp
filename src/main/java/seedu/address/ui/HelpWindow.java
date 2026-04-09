@@ -65,6 +65,7 @@ public class HelpWindow extends UiPart<Stage> {
     public void show() {
         logger.fine("Showing help page about the application.");
         getRoot().show();
+        getRoot().toFront();
         getRoot().centerOnScreen();
     }
 
@@ -87,6 +88,27 @@ public class HelpWindow extends UiPart<Stage> {
      */
     public void focus() {
         getRoot().requestFocus();
+        getRoot().toFront();
+    }
+
+    /**
+     * Returns true if the help window is currently iconified/minimised.
+     */
+    public boolean isIconified() {
+        return getRoot().isIconified();
+    }
+
+    /**
+     * Restores the help window from a minimized state.
+     */
+    public void restore() {
+        Stage root = getRoot();
+        if (root.isIconified()) {
+            root.setIconified(false);
+        }
+        root.show();
+        root.toFront();
+        root.requestFocus();
     }
 
     /**
