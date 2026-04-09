@@ -16,6 +16,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.person.Person;
 import seedu.address.model.transaction.Transaction;
+import seedu.address.model.util.SampleDataUtil;
 
 /**
  * Deletes a person or a specific transaction using the displayed indexes.
@@ -36,6 +37,8 @@ public class DeleteCommand extends Command {
     public static final String MESSAGE_NO_TRANSACTIONS = "No transactions found for %1$s.";
     public static final String MESSAGE_INVALID_TRANSACTION_DISPLAYED_INDEX =
             "The transaction index provided is invalid";
+    public static final String MESSAGE_CANNOT_DELETE_ME =
+            "The '" + SampleDataUtil.ME_NAME + "' contact cannot be deleted.";
 
     private final Index targetIndex;
     private final Index targetTransactionIndex;
@@ -78,6 +81,9 @@ public class DeleteCommand extends Command {
         }
 
         Person personToModify = lastShownList.get(targetIndex.getZeroBased());
+        if (isMeContact(personToModify) && targetTransactionIndex == null) {
+            throw new CommandException(MESSAGE_CANNOT_DELETE_ME);
+        }
 
         if (targetTransactionIndex == null) {
             return deletePersonAndRelatedTransactions(model, personToModify);
@@ -184,6 +190,10 @@ public class DeleteCommand extends Command {
                 t.getDescription(),
                 t.getDebtor().getName(),
                 t.getCreditor().getName());
+    }
+
+    private boolean isMeContact(Person person) {
+        return person.getName().fullName.equalsIgnoreCase(SampleDataUtil.ME_NAME);
     }
 
     /**

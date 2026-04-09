@@ -167,6 +167,7 @@ Format: `delete INDEX`
 * Deletes the person at the specified `INDEX`.
 * The index refers to the index number shown in the displayed person list.
 * The index **must be a positive integer** 1, 2, 3, …​
+* The special **Me** contact (always added at the front) cannot be deleted.
 
 Examples:
 * `list` followed by `delete 2` deletes the 2nd person in the address book.
