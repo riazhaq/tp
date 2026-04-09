@@ -166,6 +166,7 @@ public class MainWindow extends UiPart<Stage> {
 
         transactionListPanel = new TransactionListPanel();
         transactionListPanelPlaceholder.getChildren().add(transactionListPanel.getRoot());
+        transactionListPanel.setTransactionSortListener(logic::setTransactionComparator);
         personListPanel.setSelectionListener(transactionListPanel::displayPerson);
 
         updateActiveContactsCount();

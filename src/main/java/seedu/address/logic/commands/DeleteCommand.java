@@ -2,7 +2,6 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -139,7 +138,7 @@ public class DeleteCommand extends Command {
     private CommandResult deleteTransaction(Model model, Person person) throws CommandException {
 
         List<Transaction> transactions = person.getTransactions().stream()
-                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
+                .sorted(model.getTransactionComparator())
                 .collect(Collectors.toList());
 
         if (transactions.isEmpty()) {

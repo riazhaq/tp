@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -307,10 +308,15 @@ public class TransactionListPanelTest {
         TransactionListPanel panel = onFx(TransactionListPanel::new);
 
         TableView<Transaction> transactionTable = getField(panel, "transactionTable");
+        TableColumn<Transaction, Number> indexColumn = getField(panel, "indexColumn");
         TableColumn<Transaction, String> directionColumn = getField(panel, "directionColumn");
         TableColumn<Transaction, String> otherPartyColumn = getField(panel, "otherPartyColumn");
+        TableColumn<Transaction, String> amountColumn = getField(panel, "amountColumn");
 
         assertSame(TableView.UNCONSTRAINED_RESIZE_POLICY, transactionTable.getColumnResizePolicy());
+        assertFalse(indexColumn.isSortable());
+        assertEquals(TableColumn.SortType.DESCENDING, amountColumn.getSortType());
+        assertTrue(amountColumn.getComparator().compare("$2.00", "$10.00") < 0);
         assertNotNull(directionColumn.getCellValueFactory());
         assertNotNull(directionColumn.getCellFactory());
         assertNotNull(otherPartyColumn.getCellValueFactory());
@@ -350,10 +356,21 @@ public class TransactionListPanelTest {
         Transaction t1 = transaction(5, "a");
         Transaction t2 = transaction(3, "b");
         List<Transaction> items = List.of(t1, t2);
-        assertEquals(1, TransactionListPanel.indexCellValue(items, t1).getValue().intValue());
-        assertEquals(2, TransactionListPanel.indexCellValue(items, t2).getValue().intValue());
+        assertEquals(1, TransactionListPanel.indexCellValue(items, null, t1).getValue().intValue());
+        assertEquals(2, TransactionListPanel.indexCellValue(items, null, t2).getValue().intValue());
         assertEquals(0,
-                TransactionListPanel.indexCellValue(items, transaction(1, "missing")).getValue().intValue());
+                TransactionListPanel.indexCellValue(items, null, transaction(1, "missing")).getValue().intValue());
+    }
+
+    @Test
+    public void indexCellValue_usesComparatorOrdering() {
+        Transaction first = transaction(5, "bravo");
+        Transaction second = transaction(3, "alpha");
+        List<Transaction> items = List.of(first, second);
+        Comparator<Transaction> byDescription = Comparator.comparing(Transaction::getDescription);
+
+        assertEquals(2, TransactionListPanel.indexCellValue(items, byDescription, first).getValue().intValue());
+        assertEquals(1, TransactionListPanel.indexCellValue(items, byDescription, second).getValue().intValue());
     }
 
     @Test

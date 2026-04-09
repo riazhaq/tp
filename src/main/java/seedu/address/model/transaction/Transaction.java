@@ -3,6 +3,7 @@ package seedu.address.model.transaction;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,6 +18,12 @@ import seedu.address.model.person.Person;
  * pair of persons.
  */
 public class Transaction {
+
+    /**
+     * Default transaction ordering used when no other sort has been selected.
+     */
+    public static final Comparator<Transaction> DESCENDING_BY_CURRENT_AMOUNT =
+            Comparator.comparingDouble(Transaction::getCurrAmount).reversed();
 
     public static final String MESSAGE_CONSTRAINTS =
             "Transaction value must be more than zero.";
@@ -63,6 +70,13 @@ public class Transaction {
         this.originalAmount = currAmount;
         this.description = description;
         this.settled = false;
+    }
+
+    /**
+     * Returns the default transaction ordering used by the UI and transaction commands.
+     */
+    public static Comparator<Transaction> descendingByCurrentAmount() {
+        return DESCENDING_BY_CURRENT_AMOUNT;
     }
 
     /**

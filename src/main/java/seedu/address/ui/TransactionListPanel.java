@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -101,6 +102,7 @@ public class TransactionListPanel extends UiPart<Region> {
     private TableColumn<Transaction, String> dateColumn;
 
     private Person currentPerson;
+    private Consumer<Comparator<Transaction>> transactionSortListener;
 
     /**
      * Creates a transaction list panel showing no selection initially.
@@ -114,9 +116,15 @@ public class TransactionListPanel extends UiPart<Region> {
     private void initialize() {
         transactionTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         transactionTable.setRowFactory(table -> new TransactionRow());
+        transactionTable.comparatorProperty().addListener((observable, oldComparator, newComparator) ->
+                notifyTransactionSortListener());
+
+        indexColumn.setSortable(false);
+        amountColumn.setComparator(TransactionListPanel::compareAmountText);
+        amountColumn.setSortType(TableColumn.SortType.DESCENDING);
 
         indexColumn.setCellValueFactory(cellData ->
-                indexCellValue(transactionTable.getItems(), cellData.getValue()));
+                indexCellValue(transactionTable.getItems(), transactionTable.getComparator(), cellData.getValue()));
 
         directionColumn.setCellValueFactory(cellData ->
                 new ReadOnlyStringWrapper(directionText(cellData.getValue())));
@@ -149,6 +157,7 @@ public class TransactionListPanel extends UiPart<Region> {
         DisplayModel model = displayModelFor(person);
         title.setText(model.getTitle());
         transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
+        transactionTable.sort();
         transactionTable.refresh();
     }
 
@@ -156,7 +165,16 @@ public class TransactionListPanel extends UiPart<Region> {
         DisplayModel model = displayModelFor(null);
         title.setText(model.getTitle());
         transactionTable.setItems(FXCollections.observableArrayList(model.getTransactions()));
+        transactionTable.sort();
         transactionTable.refresh();
+    }
+
+    /**
+     * Registers a listener that receives the currently active transaction comparator.
+     */
+    public void setTransactionSortListener(Consumer<Comparator<Transaction>> transactionSortListener) {
+        this.transactionSortListener = Objects.requireNonNull(transactionSortListener);
+        notifyTransactionSortListener();
     }
 
     /**
@@ -210,7 +228,7 @@ public class TransactionListPanel extends UiPart<Region> {
     static List<Transaction> sortedTransactions(Iterable<Transaction> transactions) {
         Objects.requireNonNull(transactions);
         return StreamSupport.stream(transactions.spliterator(), false)
-                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
+                .sorted(Transaction.descendingByCurrentAmount())
                 .collect(Collectors.toList());
     }
 
@@ -237,8 +255,23 @@ public class TransactionListPanel extends UiPart<Region> {
         return items.indexOf(value) + 1;
     }
 
-    static ReadOnlyObjectWrapper<Number> indexCellValue(List<Transaction> items, Transaction value) {
-        return new ReadOnlyObjectWrapper<>(oneBasedIndexOf(items, value));
+    static int oneBasedIndexOf(List<Transaction> items, Comparator<Transaction> comparator, Transaction value) {
+        Objects.requireNonNull(items);
+        Objects.requireNonNull(value);
+
+        if (comparator == null) {
+            return oneBasedIndexOf(items, value);
+        }
+
+        List<Transaction> orderedItems = items.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+        return oneBasedIndexOf(orderedItems, value);
+    }
+
+    static ReadOnlyObjectWrapper<Number> indexCellValue(List<Transaction> items, Comparator<Transaction> comparator,
+                                                        Transaction value) {
+        return new ReadOnlyObjectWrapper<>(oneBasedIndexOf(items, comparator, value));
     }
 
     /**
@@ -296,6 +329,28 @@ public class TransactionListPanel extends UiPart<Region> {
             return new TypeCellModel(null, null);
         }
         return new TypeCellModel(item, styleClassForDirection(item));
+    }
+
+    private static int compareAmountText(String left, String right) {
+        return Double.compare(parseAmountText(left), parseAmountText(right));
+    }
+
+    private static double parseAmountText(String amountText) {
+        if (amountText == null || amountText.isBlank()) {
+            return 0.0;
+        }
+        return Double.parseDouble(amountText.replace("$", ""));
+    }
+
+    private void notifyTransactionSortListener() {
+        if (transactionSortListener != null) {
+            transactionSortListener.accept(currentTransactionComparator());
+        }
+    }
+
+    private Comparator<Transaction> currentTransactionComparator() {
+        Comparator<Transaction> comparator = transactionTable.getComparator();
+        return comparator == null ? Transaction.descendingByCurrentAmount() : comparator;
     }
 
     private class DirectionCell extends TableCell<Transaction, String> {

@@ -49,7 +49,7 @@ public class SettleCommandTest {
         CommandResult result = settleCommand.execute(model);
 
         List<Transaction> transactions = model.getFilteredPersonList().get(0).getTransactions().stream()
-                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
+                .sorted(model.getTransactionComparator())
                 .collect(Collectors.toList());
 
         Transaction settledTransaction = transactions.get(0);
@@ -62,6 +62,31 @@ public class SettleCommandTest {
                         + settledTransaction.getDebtor().getName() + " -> "
                         + settledTransaction.getCreditor().getName(),
                 result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_respectsCustomTransactionSortComparator_success() throws Exception {
+        Person personToModify = model.getFilteredPersonList().get(0);
+        Person otherPerson = model.getFilteredPersonList().get(1);
+
+        Transaction higherAmountLaterInDescription = new Transaction(
+                personToModify, otherPerson, 20.0, "Zulu");
+        Transaction lowerAmountEarlierInDescription = new Transaction(
+                personToModify, otherPerson, 10.0, "Alpha");
+        personToModify.appendTransaction(higherAmountLaterInDescription);
+        personToModify.appendTransaction(lowerAmountEarlierInDescription);
+        otherPerson.appendTransaction(higherAmountLaterInDescription);
+        otherPerson.appendTransaction(lowerAmountEarlierInDescription);
+
+        model.setTransactionComparator(Comparator.comparing(Transaction::getDescription));
+
+        SettleCommand settleCommand = new SettleCommand(Index.fromOneBased(1), Index.fromOneBased(1));
+        CommandResult result = settleCommand.execute(model);
+
+        assertTrue(lowerAmountEarlierInDescription.isSettled());
+        assertFalse(higherAmountLaterInDescription.isSettled());
+        assertTrue(result.getFeedbackToUser().contains("Settled Transaction #1"));
+        assertTrue(result.getFeedbackToUser().contains("Alpha"));
     }
 
     @Test

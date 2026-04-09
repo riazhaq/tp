@@ -11,11 +11,13 @@ import static seedu.address.testutil.TypicalPersons.BENSON;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.transaction.Transaction;
 import seedu.address.testutil.AddressBookBuilder;
 
 public class ModelManagerTest {
@@ -91,6 +93,18 @@ public class ModelManagerTest {
     @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> modelManager.getFilteredPersonList().remove(0));
+    }
+
+    @Test
+    public void getTransactionComparator_defaultIsCurrentAmountDescending() {
+        assertEquals(Transaction.descendingByCurrentAmount(), modelManager.getTransactionComparator());
+    }
+
+    @Test
+    public void setTransactionComparator_validComparator_setsComparator() {
+        Comparator<Transaction> comparator = Comparator.comparing(Transaction::getDescription);
+        modelManager.setTransactionComparator(comparator);
+        assertEquals(comparator, modelManager.getTransactionComparator());
     }
 
     @Test

@@ -1,11 +1,13 @@
 package seedu.address.model;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.Person;
+import seedu.address.model.transaction.Transaction;
 
 /**
  * The API of the Model component.
@@ -78,6 +80,16 @@ public interface Model {
 
     /** Returns an unmodifiable view of the filtered person list */
     ObservableList<Person> getFilteredPersonList();
+
+    /**
+     * Returns the transaction ordering used for transaction indexes.
+     */
+    Comparator<Transaction> getTransactionComparator();
+
+    /**
+     * Updates the transaction ordering used for transaction indexes.
+     */
+    void setTransactionComparator(Comparator<Transaction> comparator);
 
     /**
      * Updates the filter of the filtered person list to filter by the given {@code predicate}.

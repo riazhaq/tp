@@ -134,7 +134,7 @@ public class DeleteCommandTest {
 
         // Sort transactions the same way DeleteCommand does
         List<Transaction> transactions = personToModify.getTransactions().stream()
-                .sorted(Comparator.comparingDouble(Transaction::getCurrAmount).reversed())
+                .sorted(model.getTransactionComparator())
                 .collect(Collectors.toList());
 
         Transaction transactionToDelete = transactions.get(transactionIndex.getZeroBased());
@@ -174,6 +174,30 @@ public class DeleteCommandTest {
 
         assertFalse(updatedPerson.getTransactions().contains(transactionToDelete));
         assertFalse(updatedOtherPerson.getTransactions().contains(transactionToDelete));
+    }
+
+    @Test
+    public void execute_respectsCustomTransactionSortComparator_success() throws Exception {
+        Person personToModify = model.getFilteredPersonList().get(0);
+        Person otherPerson = model.getFilteredPersonList().get(1);
+
+        Transaction laterAlphaTransaction = new Transaction(personToModify, otherPerson, 20.0, "Zulu");
+        Transaction earlierAlphaTransaction = new Transaction(personToModify, otherPerson, 10.0, "Alpha");
+        personToModify.appendTransaction(laterAlphaTransaction);
+        personToModify.appendTransaction(earlierAlphaTransaction);
+        otherPerson.appendTransaction(laterAlphaTransaction);
+        otherPerson.appendTransaction(earlierAlphaTransaction);
+
+        model.setTransactionComparator(Comparator.comparing(Transaction::getDescription));
+
+        DeleteCommand deleteCommand = new DeleteCommand(Index.fromOneBased(1), Index.fromOneBased(1));
+        CommandResult result = deleteCommand.execute(model);
+
+        assertTrue(result.getFeedbackToUser().contains("Deleted Transaction #1"));
+        assertTrue(result.getFeedbackToUser().contains("Alpha"));
+        Person updatedPerson = model.getFilteredPersonList().get(0);
+        assertFalse(updatedPerson.getTransactions().contains(earlierAlphaTransaction));
+        assertTrue(updatedPerson.getTransactions().contains(laterAlphaTransaction));
     }
 
     @Test
