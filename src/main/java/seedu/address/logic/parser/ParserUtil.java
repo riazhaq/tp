@@ -27,7 +27,7 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_AMOUNT = "Amount must be a positive number.";
 
     public static final String MESSAGE_INVALID_AMOUNT_PRECISION =
-            "Amount cannot have more than 2 decimal places.";
+            "Amount must use at most 2 decimal places and cannot end with a decimal point.";
 
     public static final String MESSAGE_INVALID_DESCRIPTION =
             "Description cannot be empty.";
@@ -144,15 +144,18 @@ public class ParserUtil {
         requireNonNull(description);
 
         String trimmedAmount = amount.trim();
+        if (!trimmedAmount.matches("-?\\d+(?:\\.\\d{1,2})?")) {
+            if (trimmedAmount.contains(".")) {
+                throw new ParseException(MESSAGE_INVALID_AMOUNT_PRECISION);
+            }
+            throw new ParseException(MESSAGE_INVALID_AMOUNT);
+        }
+
         BigDecimal parsedAmount;
         try {
             parsedAmount = new BigDecimal(trimmedAmount);
         } catch (NumberFormatException e) {
             throw new ParseException(MESSAGE_INVALID_AMOUNT);
-        }
-
-        if (parsedAmount.scale() > 2 && parsedAmount.signum() >= 0) {
-            throw new ParseException(MESSAGE_INVALID_AMOUNT_PRECISION);
         }
 
         if (parsedAmount.compareTo(BigDecimal.valueOf(0.01)) < 0) {

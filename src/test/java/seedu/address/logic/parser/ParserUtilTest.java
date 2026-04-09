@@ -211,6 +211,10 @@ public class ParserUtilTest {
                 ParserUtil.parseTransactionDescriptor("0.001", "lunch"));
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT_PRECISION, () ->
                 ParserUtil.parseTransactionDescriptor("50.505", "lunch"));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT_PRECISION, () ->
+                ParserUtil.parseTransactionDescriptor("50.", "lunch"));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT_PRECISION, () ->
+                ParserUtil.parseTransactionDescriptor(".5", "lunch"));
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
                 ParserUtil.parseTransactionDescriptor("0.00", "lunch"));
     }
