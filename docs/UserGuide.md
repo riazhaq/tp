@@ -40,25 +40,25 @@ With IOU, users can:
 1. Ensure you have Java `17` or above installed in your Computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/se-edu/addressbook-level3/releases).
+1. Download the latest `.jar` file from the [Releases page](https://github.com/Rakesh4574/tp/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for your AddressBook.
+1. Copy the file to the folder you want to use as the _home folder_ for IOU.
 
-1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar addressbook.jar` command to run the application.<br>
+1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar iou.jar` command to run the application.<br>
    A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
-  If no contact named `Me` exists yet, IOU inserts a default `Me` contact at the top of the list on startup.<br>
+  If no person named `Me` exists yet, IOU inserts a default `Me` person at the top of the list on startup.<br>
    ![Ui](images/Ui.png)
 
 1. Type the command in the command box and press Enter to execute it. e.g. typing **`help`** and pressing Enter will open the help window.<br>
    Some example commands you can try:
 
-   * `list` : Lists all contacts.
+   * `list` : Lists all entries.
 
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a contact named `John Doe` to the Address Book.
+   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a person named `John Doe` to IOU.
 
-   * `delete 3` : Deletes the 3rd contact shown in the current list.
+   * `delete 3` : Deletes the 3rd entry shown in the current list.
 
-   * `clear` : Deletes all contacts.
+   * `clear` : Deletes all entries.
 
    * `exit` : Exits the app.
 
@@ -681,7 +681,7 @@ Furthermore, certain edits can cause IOU to behave in unexpected ways if person 
 ## FAQ
 
 **Q**: How do I transfer my data to another Computer?<br>
-**A**: Install the app in the other computer and overwrite the empty data file it creates with the file that contains the data of your previous AddressBook home folder.
+**A**: Install the app on the other computer and overwrite the empty data file it creates with the file that contains the data from your previous IOU home folder.
 
 --------------------------------------------------------------------------------------------------------------------
 

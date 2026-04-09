@@ -84,7 +84,7 @@ run {
 }
 
 shadowJar {
-    archiveFileName = 'addressbook.jar'
+    archiveFileName = 'iou.jar'
 }
 
 defaultTasks 'clean', 'test'
