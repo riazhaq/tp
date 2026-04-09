@@ -17,7 +17,7 @@ import seedu.address.model.transaction.TransactionDescriptor;
  * Parses input arguments and creates a new AddTransactionCommand object.
  *
  * <p>Expected format:
- * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT [d/DESCRIPTION]}
+ * {@code addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION}
  * e.g. {@code addtxn 2 3 a/10 d/lunch}
  *
  * <p>The debtor and creditor indices refer to the one-based positions of persons

@@ -57,7 +57,7 @@ Errors may occur if the name field is missing, blank, contains special character
 The **Add Transaction** feature records that one person owes another person.
 
 Command format:
-`addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT [d/DESCRIPTION]`
+`addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION`
 
 Example:
 `addtxn 1 2 a/12.50 d/Dinner at Fish Market`
@@ -66,12 +66,14 @@ The debtor index refers to the person who owes the money, and the creditor index
 
 Multiple transactions between the same two people are allowed because users may need to track separate IOUs.
 
+The description is required and cannot be empty.
+
 If successful, the application displays a message like:
 ```text
 New transaction added (#1): Alex Lim owes Sarah Tan - Dinner at Fish Market
 ```
 
-Possible errors include invalid indices, the debtor and creditor being the same person, missing prefixes such as a/, negative or zero amounts, currency symbols in the amount field, or values exceeding two decimal places.
+Possible errors include invalid indices, the debtor and creditor being the same person, missing prefixes such as a/, an empty description, negative or zero amounts, currency symbols in the amount field, or values exceeding two decimal places.
 
 ---
 
@@ -191,7 +193,7 @@ If the application encounters an input/output error while saving, it will displa
 ## Command Summary
 
 add – Add a new person to the system
-addtxn – Record a transaction between two people
+addtxn – Record a transaction between two people (description required)
 list – Display all people
 settle – Mark a transaction as settled
 settleup – Settle all transactions within a group

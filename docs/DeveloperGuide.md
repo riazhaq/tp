@@ -501,7 +501,7 @@ testers are expected to do more *exploratory* testing.
        Expected: A transaction is added from person 1 to person 2 for an amount of 50 with no interest and no compounding type. Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
     1. Test case: `addtxn 1 2 a/50`<br>
-       Expected: A transaction is added with no description and no compounding type (optional fields omitted). Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
+       Expected: No transaction is added. Error details shown in the status message indicating that the description cannot be empty. Status bar remains the same.
 
     1. Test case: `addtxn 0 2 a/50`<br>
        Expected: No transaction is added. Error details shown in the status message indicating invalid index. Status bar remains the same.
