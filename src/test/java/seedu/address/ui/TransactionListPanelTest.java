@@ -467,6 +467,17 @@ public class TransactionListPanelTest {
         assertEquals("$75.00", onFx(() -> amountColumn.getCellObservableValue(0)).getValue());
     }
 
+    @Test
+    public void amountColumnComparator_treatsNullAndBlankAsZero() {
+        TransactionListPanel panel = onFx(TransactionListPanel::new);
+        TableColumn<Transaction, String> amountColumn = getField(panel, "amountColumn");
+
+        Comparator<String> comparator = amountColumn.getComparator();
+
+        assertTrue(comparator.compare(null, "$1.00") < 0);
+        assertEquals(0, comparator.compare("   ", null));
+    }
+
     private static void invokeUpdateItem(Object target, Class<?> parameterType, Object item, boolean empty) {
         try {
             Method method = target.getClass().getDeclaredMethod("updateItem", parameterType, boolean.class);
