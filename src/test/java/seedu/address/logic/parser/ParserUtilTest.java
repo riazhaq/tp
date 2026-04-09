@@ -251,6 +251,8 @@ public class ParserUtilTest {
                 ParserUtil.parseTransactionDescriptor("-1", "5", "lunch", ""));
         assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
                 ParserUtil.parseTransactionDescriptor("ten", "5", "lunch", ""));
+        assertThrows(ParseException.class, ParserUtil.MESSAGE_INVALID_AMOUNT, () ->
+                ParserUtil.parseTransactionDescriptor("0.001", "5", "lunch", ""));
     }
 
     @Test
