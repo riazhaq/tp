@@ -34,6 +34,8 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
     public AddTransactionCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(
                 args, PREFIX_AMOUNT, PREFIX_DESCRIPTION);
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_AMOUNT,
+                PREFIX_DESCRIPTION);
 
         String preamble = argMultimap.getPreamble().trim();
         String[] indices = preamble.split("\\s+", 2);

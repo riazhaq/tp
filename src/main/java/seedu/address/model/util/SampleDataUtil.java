@@ -20,6 +20,8 @@ import seedu.address.model.transaction.Transaction;
  */
 public class SampleDataUtil {
 
+    public static final String ME_NAME = "Me";
+
     public static Person[] getSamplePersons() {
         // Construct persons first with no transactions
         Person alex = new Person(new Name("Alex Yeoh"), new Phone("87438807"),
@@ -68,7 +70,7 @@ public class SampleDataUtil {
      */
     public static Person getMeContact() {
         return new Person(
-                new Name("Me"),
+                new Name(ME_NAME),
                 new Phone("00000000"),
                 new Email("me@example.com"),
                 new Address("My Address"),
