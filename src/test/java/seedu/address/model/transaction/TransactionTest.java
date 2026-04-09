@@ -165,7 +165,7 @@ public class TransactionTest {
         Transaction transaction = new Transaction(debtor(), creditor(), 100, "test");
 
         String expected = String.format(
-                "[Amount: %.2f, Desc: %s, Date: %s, Debtor: %s, Creditor: %s]",
+                "[Outstanding: %.2f, Desc: %s, Date: %s, Debtor: %s, Creditor: %s]",
                 100.00,
                 "test",
                 transaction.getDate(),

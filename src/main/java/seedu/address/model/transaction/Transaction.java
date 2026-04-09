@@ -19,7 +19,7 @@ import seedu.address.model.person.Person;
 public class Transaction {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Amount must be more than zero.";
+            "Transaction value must be more than zero.";
 
     /** The current outstanding amount owed by the debtor to the creditor. */
     protected double currAmount;
@@ -66,18 +66,15 @@ public class Transaction {
     }
 
     /**
-     * Updates the transaction's outstanding amount to account for accrued interest.
+     * Hook for adjusting the transaction's outstanding amount.
      *
-     * <p>The base implementation is a no-op. Subclasses should override this method
-     * to apply their specific interest model (e.g. simple interest, compound interest).
+     * <p>The base implementation is a no-op.
      */
     public void updateTransactionAmount() {
     }
 
     /**
-     * Applies a payment to reduce the outstanding amount. If the transaction has not
-     * been recalculated today, interest is first applied via {@link #updateTransactionAmount()}
-     * before deducting the payment. The last recalculated date is then updated to today.
+     * Applies a payment to reduce the outstanding amount owed.
      *
      * @param amount the payment amount to deduct from the outstanding balance
      */
@@ -197,7 +194,7 @@ public class Transaction {
      */
     @Override
     public String toString() {
-        return String.format("[Amount: %.2f, Desc: %s, Date: %s, Debtor: %s, Creditor: %s]",
+        return String.format("[Outstanding: %.2f, Desc: %s, Date: %s, Debtor: %s, Creditor: %s]",
                 currAmount, description, date, debtor.getName(), creditor.getName());
     }
 
