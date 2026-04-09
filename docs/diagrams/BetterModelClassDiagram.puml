@@ -20,7 +20,6 @@ Person *--> Email
 Person *--> Address
 
 Person *-right-> "*" Transaction
-Transaction -up-> "1" InterestRate
 Transaction "*" -up-> "1" Person : debtor
 Transaction "*" -up-> "1" Person : creditor
 @enduml

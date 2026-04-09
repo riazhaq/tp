@@ -55,6 +55,6 @@ public class TransactionDescriptor {
 
     @Override
     public String toString() {
-        return String.format("[Amount: %.2f, Desc: %s]", amount, description);
+        return String.format("[Value: %.2f, Desc: %s]", amount, description);
     }
 }
