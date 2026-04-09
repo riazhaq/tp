@@ -221,6 +221,8 @@ public class MainWindow extends UiPart<Stage> {
     public void handleHelp() {
         if (!helpWindow.isShowing()) {
             helpWindow.show();
+        } else if (helpWindow.isIconified()) {
+            helpWindow.restore();
         } else {
             helpWindow.focus();
         }
