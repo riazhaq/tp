@@ -37,12 +37,14 @@ public class CommandBox extends UiPart<Region> {
     @FXML
     private void handleCommandEntered() {
         String commandText = commandTextField.getText();
-        if (commandText.equals("")) {
+        String trimmedCommandText = commandText.trim();
+        if (trimmedCommandText.isEmpty()) {
+            commandTextField.setText("");
             return;
         }
 
         try {
-            commandExecutor.execute(commandText);
+            commandExecutor.execute(trimmedCommandText);
             commandTextField.setText("");
         } catch (CommandException | ParseException e) {
             setStyleToIndicateCommandFailure();

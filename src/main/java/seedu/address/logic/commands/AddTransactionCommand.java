@@ -45,6 +45,8 @@ public class AddTransactionCommand extends Command {
             + PREFIX_COMPOUNDING_TYPE + "m";
 
     public static final String MESSAGE_SUCCESS = "New transaction added: %1$s owes %2$s — %3$s";
+    public static final String MESSAGE_SUCCESS_WITH_TRANSACTION_NUMBER =
+            "New transaction added (#%1$d): %2$s owes %3$s - %4$s";
     public static final String MESSAGE_SAME_PERSON =
             "Debtor and creditor cannot be the same person.";
     public static final String MESSAGE_INVALID_DEBTOR_INDEX =
@@ -96,8 +98,20 @@ public class AddTransactionCommand extends Command {
         debtor.appendTransaction(transaction);
         creditor.appendTransaction(transaction);
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS,
-                Messages.format(debtor), Messages.format(creditor), descriptor.getDescription()));
+        long transactionNumber = countTransactionsBetween(debtor, creditor);
+        return new CommandResult(String.format(MESSAGE_SUCCESS_WITH_TRANSACTION_NUMBER,
+                transactionNumber, Messages.format(debtor), Messages.format(creditor), descriptor.getDescription()));
+    }
+
+    /**
+     * Counts the number of transactions from {@code debtor} to {@code creditor}.
+     */
+    private static long countTransactionsBetween(Person debtor, Person creditor) {
+        requireNonNull(debtor);
+        requireNonNull(creditor);
+        return debtor.getTransactions().stream()
+                .filter(t -> t.getDebtor().isSamePerson(debtor) && t.getCreditor().isSamePerson(creditor))
+                .count();
     }
 
     /**

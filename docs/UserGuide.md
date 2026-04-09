@@ -167,6 +167,7 @@ Format: `delete INDEX`
 * Deletes the person at the specified `INDEX`.
 * The index refers to the index number shown in the displayed person list.
 * The index **must be a positive integer** 1, 2, 3, …​
+* The special **Me** contact (always added at the front) cannot be deleted.
 
 Examples:
 * `list` followed by `delete 2` deletes the 2nd person in the address book.
@@ -209,6 +210,8 @@ Format: `settle PERSON_INDEX t/TRANSACTION_INDEX`
 * The person index refers to the displayed person list.
 * The transaction index refers to the displayed transaction panel for that selected person.
 * Settling sets the transaction amount to `$0.00` and marks it as `Settled`, but keeps the record visible in the transaction history.
+* The success message displays the original amount that was settled (e.g. Settled Transaction #1: $50.00 | lunch | Alice → Bob), 
+so you always have a clear record of what was paid.
 
 Example: `settle 1 t/2`
 
@@ -227,6 +230,22 @@ Format: `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`
 Examples:
 * `simplify 1 2 3`
 * `simplify 1 2 3 4`
+
+### Settling up a group : `settleup`
+
+Marks all unsettled in-group transactions as settled in one action for 3 or more selected people.
+
+Format: `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`
+
+* You must provide at least 3 distinct person indexes.
+* All indexes refer to the currently displayed person list.
+* Only transactions where **both** the debtor and the creditor are in the selected group are settled.
+* Transactions involving anyone outside the group are left unchanged.
+* The result display shows how many transactions were settled and the total amount.
+
+Examples:
+* `settleup 1 2 3`
+* `settleup 1 2 3 4 5`
 
 ### Deleting a transaction : `delete`
 
@@ -297,4 +316,5 @@ Action | Format, Examples
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
 **Simplify** | `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `simplify 1 2 3 4`
+**Settle Up** | `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `settleup 1 2 3 4`
 **Help** | `help`

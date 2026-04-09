@@ -17,6 +17,8 @@ public class SettleCommandParser implements Parser<SettleCommand> {
     public SettleCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_TRANSACTION_INDEX);
 
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_TRANSACTION_INDEX);
+
         try {
             Index targetIndex = ParserUtil.parseIndex(argMultimap.getPreamble());
 

@@ -392,16 +392,18 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1.  User requests to list persons.
-2.  IOU displays the list of persons.
-3.  User requests to view a particular person.
-4.  IOU shows the view of the person to the user.
-5.  User views a person's transaction list.
-6.  User requests to settle a transaction.
-7.  IOU marks the transaction as settled.
-8.  IOU recalculates the person’s balance.
-9.  IOU updates the UI.
-    Use case ends.
+1. User requests to list persons.
+2. IOU displays the list of persons.
+3. User requests to view a particular person.
+4. IOU shows the view of the person to the user.
+5. User views a person's transaction list.
+6. User requests to settle a transaction.
+7. IOU records the transaction's current outstanding amount before settling.
+8. IOU marks the transaction as settled and sets its outstanding balance to $0.00.
+9. IOU displays a success message showing the original amount that was settled, the description, and the parties involved.
+10. IOU recalculates the person's balance.
+11. IOU updates the UI.
+   Use case ends.
 
 Extensions
 

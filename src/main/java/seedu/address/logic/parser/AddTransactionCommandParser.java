@@ -37,6 +37,8 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
     public AddTransactionCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(
                 args, PREFIX_AMOUNT, PREFIX_INTEREST_RATE, PREFIX_DESCRIPTION, PREFIX_COMPOUNDING_TYPE);
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_AMOUNT, PREFIX_INTEREST_RATE,
+                PREFIX_DESCRIPTION, PREFIX_COMPOUNDING_TYPE);
 
         // Preamble must contain exactly "DEBTOR_INDEX CREDITOR_INDEX"
         String preamble = argMultimap.getPreamble().trim();

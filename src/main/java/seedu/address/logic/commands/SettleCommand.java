@@ -77,9 +77,11 @@ public class SettleCommand extends Command {
         if (transactionToSettle.isSettled()) {
             throw new CommandException(MESSAGE_ALREADY_SETTLED);
         }
+
+        double amountBeforeSettling = transactionToSettle.getCurrAmount();
         transactionToSettle.settleTransaction();
 
-        String transactionDetails = formatTransaction(transactionToSettle);
+        String transactionDetails = formatTransaction(transactionToSettle, amountBeforeSettling);
         return new CommandResult(
                 String.format(
                         MESSAGE_SETTLE_TRANSACTION_SUCCESS,
@@ -90,9 +92,9 @@ public class SettleCommand extends Command {
         );
     }
 
-    private String formatTransaction(Transaction t) {
+    private String formatTransaction(Transaction t, double settledAmount) {
         return String.format("$%.2f | %s | %s -> %s",
-                t.getCurrAmount(),
+                settledAmount,
                 t.getDescription(),
                 t.getDebtor().getName(),
                 t.getCreditor().getName());

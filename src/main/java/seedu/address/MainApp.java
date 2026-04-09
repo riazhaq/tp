@@ -94,7 +94,7 @@ public class MainApp extends Application {
         AddressBook addressBook = new AddressBook(initialData);
         boolean hasMeContact = addressBook.getPersonList()
                 .stream()
-                .anyMatch(p -> p.getName().fullName.equalsIgnoreCase("Me"));
+                .anyMatch(p -> p.getName().fullName.equalsIgnoreCase(SampleDataUtil.ME_NAME));
 
         if (!hasMeContact) {
             addressBook.addPersonAtFront(SampleDataUtil.getMeContact());

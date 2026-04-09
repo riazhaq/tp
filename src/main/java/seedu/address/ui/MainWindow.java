@@ -221,6 +221,8 @@ public class MainWindow extends UiPart<Stage> {
     public void handleHelp() {
         if (!helpWindow.isShowing()) {
             helpWindow.show();
+        } else if (helpWindow.isIconified()) {
+            helpWindow.restore();
         } else {
             helpWindow.focus();
         }
@@ -261,6 +263,11 @@ public class MainWindow extends UiPart<Stage> {
             // Ensure table rows reflect in-place transaction updates (e.g. addtxn)
             // even when the ListView selection has not changed.
             refreshTransactionPanelFromSelection();
+
+            // Force person list cards to re-render so balance labels reflect any
+            // in-place transaction mutations (e.g. settleup) without requiring a
+            // list-level change event.
+            personListPanel.refresh();
 
             if (commandResult.isShowHelp()) {
                 handleHelp();
