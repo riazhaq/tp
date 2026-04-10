@@ -24,7 +24,7 @@ IOU is especially suited for people who:
 
 ## What value does IOU provide?
 With IOU, users can:
-* Quickly record new debts and loans
+* Quickly record new transactions
 * Track outstanding balances at a glance
 * Keep financial records accurate and up-to-date
 * Replace cluttered spreadsheets with a smooth, efficient workflow
@@ -35,7 +35,7 @@ With IOU, users can:
 
 ### Add Person
 
-The **Add Person** feature allows users to create a profile for a friend or colleague so that debts and loans can be associated with them.
+The **Add Person** feature allows users to create a profile for a friend or colleague so that transactions can be associated with them.
 
 Command format:
 add n/NAME [p/PHONE] [e/EMAIL]
@@ -52,69 +52,41 @@ Errors may occur if the name field is missing, blank, contains special character
 
 ---
 
-### Add Debt (owe)
+### Add Transaction
 
-The **Add Debt** feature records money that the user owes to a specific person.
+The **Add Transaction** feature records that one person owes another person.
 
 Command format:
-`owe INDEX a/AMOUNT [d/DESCRIPTION]`
+`addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION`
 
 Example:
-`owe 1 a/12.50 d/Dinner at Fish Market`
+`addtxn 1 2 a/12.50 d/Dinner at Fish Market`
 
-The index refers to the person’s position in the current list displayed in the application. It must be a positive integer and must correspond to a valid person in the list. The amount must be a positive decimal value greater than zero and may contain up to two decimal places. Currency symbols are not allowed.
+The debtor index refers to the person who owes the money, and the creditor index refers to the person who is owed the money. Both indices must be positive integers and must correspond to valid people in the currently displayed list. The amount must be a positive decimal value greater than zero and may contain up to two decimal places. Currency symbols are not allowed.
 
-Multiple debts to the same person are allowed because users may owe money for different occasions such as meals, shared transport, or tickets.
+Multiple transactions between the same two people are allowed because users may need to track separate IOUs.
 
-If successful, the application displays
+The description is required and cannot be empty.
+
+If successful, the application displays a message like:
+```text
+New transaction added (#1): Alex Lim owes Sarah Tan - Dinner at Fish Market
 ```
-“Added debt of $12.50 to Alex Lim.”
-```
 
-Possible errors include invalid indices, missing prefixes such as a/, negative or zero amounts, currency symbols in the amount field, or values exceeding two decimal places.
+Possible errors include invalid indices, the debtor and creditor being the same person, missing prefixes such as a/, an empty description, negative or zero amounts, currency symbols in the amount field, or values exceeding two decimal places.
 
 ---
 
-### Add Loan (lent)
+### List People
 
-The **Add Loan** feature records money that another person owes to the user.
-
-Command format:
-`lent INDEX a/AMOUNT [d/DESCRIPTION]`
-
-Example:
-`lent 2 a/50 d/Borrowed for concert tickets`
-
-The validation rules for this command are identical to the **owe** command. The index must refer to a valid person in the list, and the amount must be a positive number with up to two decimal places.
-
-Multiple loan entries for the same person are allowed to capture separate transactions.
-
-If successful, the system displays:
-```
-“Recorded loan of $50.00 to Sarah Tan.”
-```
-
-Errors may occur if the index is invalid, if the amount is negative or zero, if the command syntax is incorrect, or if required prefixes are missing.
-
----
-
-### List Outstanding
-
-The **List Outstanding** command displays only the people who currently have non-zero balances, meaning either you owe them money or they owe you money.
+The **List** command restores the full person list in the interface. It clears any filtered view and shows every person again.
 
 Command format:
 `list`
 
-This command helps reduce clutter in the interface by hiding individuals whose balances are already settled.
-
 If the command is successful, the system displays:
 ```
-“Listed all people with outstanding balances.”
-```
-
-If no outstanding balances exist, the system will show the message:
-```
-“No outstanding balances found. You're all caught up.”
+Listed all persons.
 ```
 
 An error will occur if additional parameters are provided, since the command does not accept arguments.
@@ -123,7 +95,7 @@ An error will occur if additional parameters are provided, since the command doe
 
 ### Settle Transaction
 
-The **Settle Transaction** feature allows users to mark a specific debt or loan as settled without deleting the record from the system. This preserves transaction history while ensuring the balance is updated.
+The **Settle Transaction** feature allows users to mark a specific transaction as settled without deleting the record from the system. This preserves transaction history while ensuring the balance is updated.
 
 Command format:
 `settle PERSON_INDEX t/TRANSACTION_INDEX`
@@ -136,6 +108,38 @@ The person index identifies the individual in the main list, while the transacti
 Once a transaction is settled, its status is updated in the interface and the person’s overall balance is recalculated.
 
 Errors may occur if either index is invalid, if the transaction does not exist, if the command format is incorrect, or if the user attempts to settle a transaction that has already been settled.
+
+---
+
+### Settle Up
+
+The **Settle Up** command settles all unsettled transactions among three or more selected people in one action.
+
+Command format:
+`settleup PERSON_INDEX [MORE_PERSON_INDEXES...]`
+
+Example:
+`settleup 1 2 3 4`
+
+The command requires at least three distinct person indices, and every index must refer to a valid person in the current list. If successful, it marks every unsettled transaction that involves only the selected group as settled and reports how many transactions were updated.
+
+Errors may occur if fewer than three distinct indices are provided, if any index is invalid, or if a duplicate person index is used.
+
+---
+
+### Simplify
+
+The **Simplify** command computes a settlement plan for three or more selected people without changing any data.
+
+Command format:
+`simplify PERSON_INDEX [MORE_PERSON_INDEXES...]`
+
+Example:
+`simplify 1 2 3 4`
+
+The command requires at least three distinct person indices, and every index must refer to a valid person in the current list. It analyzes unsettled transactions among the selected group and outputs a simplified payment plan.
+
+Errors may occur if fewer than three distinct indices are provided, if any index is invalid, or if a duplicate person index is used.
 
 ---
 
@@ -172,26 +176,28 @@ Errors may occur if indices are out of range, non-numeric values are provided, o
 
 ### Auto-Save
 
-IOU automatically saves all changes to ensure that no data is lost if the application closes unexpectedly. The auto-save function is triggered after any command that modifies the data, such as adding a debt, recording a loan, settling a transaction, or deleting an entry.
+IOU automatically saves all changes to ensure that no data is lost if the application closes unexpectedly. The auto-save function is triggered after any command that modifies the data, such as adding a person, adding a transaction, settling transactions, simplifying a settlement plan, or deleting an entry.
 
-Data is stored in the file:
-data/iou.json
+Data is stored in the following files:
+* `data/addressbook.json`
+* `data/addressbook_transactions.json`
 
 If the system detects a corrupted data file when loading, it will display the message:
-“Data file corrupted. Starting with an empty list.”
+`Data file corrupted. Starting with an empty list.`
 
 If the application encounters an input/output error while saving, it will display:
-“ERROR: Unable to save data.”
+`ERROR: Unable to save data.`
 
 ---
 
 ## Command Summary
 
 add – Add a new person to the system
-owe – Record money that you owe someone
-lent – Record money that someone owes you
-list – Display people with outstanding balances
+addtxn – Record a transaction between two people (description required)
+list – Display all people
 settle – Mark a transaction as settled
+settleup – Settle all transactions within a group
+simplify – Show a simplified settlement plan for a group
 delete – Remove a person or transaction from the records
 
 ---
@@ -203,18 +209,20 @@ A typical workflow may look like this:
 add n/Alex Lim
 add n/Sarah Tan
 
-owe 1 a/12.50 d/Lunch
-lent 2 a/30 d/Movie tickets
+addtxn 1 2 a/12.50 d/Lunch
+addtxn 2 1 a/30 d/Movie tickets
 
 list
 
 settle 1 t/1
+simplify 1 2
+settleup 1 2
 ```
 
-This sequence adds two people, records a debt and a loan, displays outstanding balances, and then settles one transaction.
+This sequence adds two people, records two transactions, restores the full list, settles one transaction, previews a simplified plan, and then settles all transactions within the selected group.
 
 ---
 
 ## Project Information
 
-IOU is a command-driven financial tracking application developed as part of a software engineering project. The system focuses on simplicity and speed, allowing users to record transactions quickly while maintaining a clear overview of outstanding balances.
+IOU is a command-driven financial tracking application developed as part of a software engineering project. The system focuses on simplicity and speed, allowing users to record transactions quickly while maintaining a clear overview of balances and settlement history.

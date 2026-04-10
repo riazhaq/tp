@@ -3,7 +3,7 @@ layout: page
 title: Developer Guide
 ---
 * Table of Contents
-  {:toc}
+{:toc}
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ The `Model` component,
 * stores each person's transactions inside the `Person` object as a `Set<Transaction>`.
 * treats a transaction as a shared domain object referenced by both the debtor and the creditor, so UI and commands view the same record from either person's perspective.
 * stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
-* stores a `UserPref` object that represents the user's preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
+* stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
 To avoid recursive equality and hash-code issues between `Person` and `Transaction`, `Person.equals()` and `Person.hashCode()` intentionally exclude transactions. This allows transactions to safely keep references to `Person` objects while still being stored in sets and rebound after edits or deserialisation.
@@ -224,9 +224,9 @@ Both commands accept three or more person indexes and operate over the in-group 
 
 The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
 
-* `VersionedAddressBook#commit()` — Saves the current address book state in its history.
-* `VersionedAddressBook#undo()` — Restores the previous address book state from its history.
-* `VersionedAddressBook#redo()` — Restores a previously undone address book state from its history.
+* `VersionedAddressBook#commit()` — Saves the current address book state in its history.
+* `VersionedAddressBook#undo()` — Restores the previous address book state from its history.
+* `VersionedAddressBook#redo()` — Restores a previously undone address book state from its history.
 
 These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
 
@@ -269,7 +269,7 @@ Similarly, how an undo operation goes through the `Model` component is shown bel
 
 ![UndoSequenceDiagram](images/UndoSequenceDiagram-Model.png)
 
-The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
+The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
 
 <div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
 
@@ -292,13 +292,13 @@ The following activity diagram summarizes what happens when a user executes a ne
 **Aspect: How undo & redo executes:**
 
 * **Alternative 1 (current choice):** Saves the entire address book.
-    * Pros: Easy to implement.
-    * Cons: May have performance issues in terms of memory usage.
+  * Pros: Easy to implement.
+  * Cons: May have performance issues in terms of memory usage.
 
 * **Alternative 2:** Individual command knows how to undo/redo by
   itself.
-    * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
-    * Cons: We must ensure that the implementation of each individual command are correct.
+  * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
+  * Cons: We must ensure that the implementation of each individual command are correct.
 
 _{more aspects and alternatives to be added}_
 
@@ -419,9 +419,9 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 1.  User requests to list persons.
 2.  IOU displays the list of persons.
-3.  User requests to record a debt using two person indexes and an amount (with optional description).
-4.  IOU records the debt under both the debtor and the creditor.
-5.  IOU updates the outstanding balance for both persons.
+3.  User requests to record a debt using the person index, amount, and description.
+4.  IOU records the debt under the selected person with the given amount and description.
+5.  IOU updates the outstanding balance.
 
     Use case ends.
 
@@ -506,7 +506,7 @@ Use case ends.
 
     * 1c1. IOU shows a validation error message.
 
-      Use case ends.
+    Use case ends.
 
 
 **Use Case: Simplify group debts**
@@ -599,15 +599,15 @@ testers are expected to do more *exploratory* testing.
 
 1. Initial launch
 
-    1. Download the jar file and copy into an empty folder
+   1. Download the jar file and copy into an empty folder
 
-    1. Double-click the jar file. Expected: Shows the GUI with a set of sample contacts. A `Me` contact appears at index 1. The window size may not be optimum.
+   1. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
 
 1. Saving window preferences
 
-    1. Resize the window to an optimum size. Move the window to a different location. Close the window.
+   1. Resize the window to an optimum size. Move the window to a different location. Close the window.
 
-    1. Re-launch the app by double-clicking the jar file.<br>
+   1. Re-launch the app by double-clicking the jar file.<br>
        Expected: The most recent window size and location is retained.
 
 1. _{ more test cases …​ }_
@@ -616,19 +616,16 @@ testers are expected to do more *exploratory* testing.
 
 1. Deleting a person while all persons are being shown
 
-    1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
+   1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
 
-    1. Test case: `delete 2` (any index other than 1)<br>
-       Expected: The contact is deleted from the list. All transactions referencing that contact are also removed from counterparties' panels. Details of the deleted contact shown in the status message. Timestamp in the status bar is updated.
+   1. Test case: `delete 1`<br>
+      Expected: First contact is deleted from the list. Details of the deleted contact shown in the status message. Timestamp in the status bar is updated.
 
-    1. Test case: `delete 1`<br>
-       Expected: No person is deleted. Error details shown in the status message indicating the Me contact cannot be deleted.
+   1. Test case: `delete 0`<br>
+      Expected: No person is deleted. Error details shown in the status message. Status bar remains the same.
 
-    1. Test case: `delete 0`<br>
-       Expected: No person is deleted. Error details shown in the status message. Status bar remains the same.
-
-    1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-       Expected: Similar to previous.
+   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
+      Expected: Similar to previous.
 
 1. _{ more test cases …​ }_
 
@@ -639,22 +636,22 @@ testers are expected to do more *exploratory* testing.
     1. Prerequisites: List all persons using the `list` command. Multiple persons (at least 2) in the list.
 
     1. Test case: `addtxn 1 2 a/50 d/dinner`<br>
-       Expected: A transaction is added from person 1 to person 2 for $50 with description "dinner". Details of the added transaction shown in the status message. Transaction appears in both persons' panels. Timestamp in the status bar is updated.
+       Expected: A transaction is added from person 1 to person 2 for an amount of 50 with description "dinner". Details of the added transaction shown in the status message. Timestamp in the status bar is updated.
 
     1. Test case: `addtxn 1 2 a/50`<br>
-       Expected: A transaction is added with no description. Details of the added transaction shown in the status message.
+       Expected: No transaction is added. Error details shown in the status message indicating that the description cannot be empty. Status bar remains the same.
 
     1. Test case: `addtxn 0 2 a/50`<br>
-       Expected: No transaction is added. Error details shown in the status message indicating invalid index.
+       Expected: No transaction is added. Error details shown in the status message indicating invalid index. Status bar remains the same.
 
     1. Test case: `addtxn 1 1 a/50`<br>
-       Expected: No transaction is added. Error details shown in the status message indicating debtor and creditor cannot be the same person.
+       Expected: No transaction is added. Error details shown in the status message indicating debtor and creditor cannot be the same person. Status bar remains the same.
 
     1. Test case: `addtxn 1 2 a/-50`<br>
-       Expected: No transaction is added. Error details shown in the status message indicating amount must be a positive value.
-
-    1. Test case: `addtxn 1 2 a/50.505`<br>
-       Expected: No transaction is added. Error message indicates a maximum of 2 decimal places is allowed.
+       Expected: No transaction is added. Error details shown in the status message indicating amount must be a positive value. Status bar remains the same.
+   
+    1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn 1 2 a/50`, `addtxn x 2 a/50 i/5` (where x is larger than the list size)<br>
+       Expected: Similar to previous. Error details shown in the status message. Status bar remains the same.
 
     1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn x 2 a/50` (where x is larger than the list size)<br>
        Expected: Error details shown in the status message. Status bar remains the same.
@@ -729,10 +726,10 @@ testers are expected to do more *exploratory* testing.
 
 1. Dealing with missing/corrupted data files
 
-    1. Delete `data/addressbook.json` and `data/addressbook_transactions.json`, then start the app.<br>
-       Expected: The app recreates the data files from sample data and inserts the default `Me` contact if needed.
+   1. Delete `data/addressbook.json` and `data/addressbook_transactions.json`, then start the app.<br>
+      Expected: The app recreates the data files from sample data and inserts the default `Me` contact if needed.
 
-    1. Corrupt either JSON file by introducing invalid JSON syntax, then start the app.<br>
-       Expected: The app logs a data loading warning and starts with an empty address book instead of partially loading corrupted data.
+   1. Corrupt either JSON file by introducing invalid JSON syntax, then start the app.<br>
+      Expected: The app logs a data loading warning and starts with an empty address book instead of partially loading corrupted data.
 
 1. _{ more test cases …​ }_

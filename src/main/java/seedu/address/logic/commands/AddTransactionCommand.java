@@ -30,7 +30,7 @@ public class AddTransactionCommand extends Command {
             + "in the displayed person list.\n"
             + "Parameters: DEBTOR_INDEX CREDITOR_INDEX (both must be positive integers) "
             + PREFIX_AMOUNT + "AMOUNT "
-            + "[" + PREFIX_DESCRIPTION + "DESCRIPTION]\n"
+            + PREFIX_DESCRIPTION + "DESCRIPTION\n"
             + "Example: " + COMMAND_WORD + " 2 3 "
             + PREFIX_AMOUNT + "10 "
             + PREFIX_DESCRIPTION + "lunch";

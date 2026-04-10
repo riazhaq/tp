@@ -40,25 +40,25 @@ With IOU, users can:
 1. Ensure you have Java `17` or above installed in your Computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/se-edu/addressbook-level3/releases).
+1. Download the latest `.jar` file from the [Releases page](https://github.com/Rakesh4574/tp/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for your AddressBook.
+1. Copy the file to the folder you want to use as the _home folder_ for IOU.
 
-1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar addressbook.jar` command to run the application.<br>
+1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar iou.jar` command to run the application.<br>
    A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
-  If no contact named `Me` exists yet, IOU inserts a default `Me` contact at the top of the list on startup.<br>
+  If no person named `Me` exists yet, IOU inserts a default `Me` person at the top of the list on startup.<br>
    ![Ui](images/Ui.png)
 
 1. Type the command in the command box and press Enter to execute it. e.g. typing **`help`** and pressing Enter will open the help window.<br>
    Some example commands you can try:
 
-   * `list` : Lists all contacts.
+   * `list` : Lists all entries.
 
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a contact named `John Doe` to the Address Book.
+   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a person named `John Doe` to IOU.
 
-   * `delete 3` : Deletes the 3rd contact shown in the current list.
+   * `delete 3` : Deletes the 3rd entry shown in the current list.
 
-   * `clear` : Deletes all contacts.
+   * `clear` : Deletes all entries.
 
    * `exit` : Exits the app.
 
@@ -365,20 +365,20 @@ After deleting a person from a filtered list, the list refreshes. Transaction in
 
 Adds a transaction between two persons in the address book.
 
-Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT [d/DESCRIPTION]`
+Format: `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION`
 
 * Adds a transaction from the debtor to the creditor at the specified indexes.
 * The indexes refer to the index numbers shown in the displayed person list.
 * Both indexes **must be positive integers** 1, 2, 3, …
 * Both indexes **must be different** (a person cannot transact with themselves).
 * `AMOUNT` must be a positive number.
+* `DESCRIPTION` must be provided and cannot be empty.
 * The transaction appears in the transaction panel for both people involved.
-* Items in square brackets are optional.
 
 Examples:
 * `addtxn 1 2 a/50 d/lunch` adds a transaction where person 1 owes person 2 $50 for lunch.
 * `addtxn 2 3 a/10 d/lunch` adds a transaction where person 2 owes person 3 $10 for lunch.
-* `addtxn 1 2 a/100` adds a transaction where person 1 owes person 2 $100 with no description.
+* `addtxn 1 2 a/100 d/groceries` adds a transaction where person 1 owes person 2 $100 for groceries.
 
 #### Common Scenarios:
 
@@ -681,14 +681,13 @@ Furthermore, certain edits can cause IOU to behave in unexpected ways if person 
 ## FAQ
 
 **Q**: How do I transfer my data to another Computer?<br>
-**A**: Install the app in the other computer and overwrite the empty data file it creates with the file that contains the data of your previous AddressBook home folder.
+**A**: Install the app on the other computer and overwrite the empty data file it creates with the file that contains the data from your previous IOU home folder.
 
 --------------------------------------------------------------------------------------------------------------------
 
 ## Known issues
 
 1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
-2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -697,11 +696,13 @@ Furthermore, certain edits can cause IOU to behave in unexpected ways if person 
 Action | Format, Examples
 --------|------------------
 **Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
+**Add Transaction** | `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION`<br> e.g., `addtxn 1 2 a/12.50 d/Dinner at Fish Market`
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
+**Settle** | `settle PERSON_INDEX t/TRANSACTION_INDEX`<br> e.g., `settle 1 t/2`
 **Simplify** | `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `simplify 1 2 3 4`
 **Settle Up** | `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `settleup 1 2 3 4`
 **Help** | `help`

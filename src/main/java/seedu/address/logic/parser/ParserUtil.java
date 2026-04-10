@@ -2,6 +2,7 @@ package seedu.address.logic.parser;
 
 import static java.util.Objects.requireNonNull;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,9 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index is not a non-zero unsigned integer.";
 
     public static final String MESSAGE_INVALID_AMOUNT = "Amount must be a positive number.";
+
+    public static final String MESSAGE_INVALID_AMOUNT_PRECISION =
+            "Amount must use at most 2 decimal places and cannot end with a decimal point.";
 
     public static final String MESSAGE_INVALID_DESCRIPTION =
             "Description cannot be empty.";
@@ -139,15 +143,22 @@ public class ParserUtil {
         requireNonNull(amount);
         requireNonNull(description);
 
-        double parsedAmount;
-
         String trimmedAmount = amount.trim();
-        try {
-            parsedAmount = Double.parseDouble(trimmedAmount);
-            if (parsedAmount < 0.01) {
-                throw new ParseException(MESSAGE_INVALID_AMOUNT);
+        if (!trimmedAmount.matches("-?\\d+(?:\\.\\d{1,2})?")) {
+            if (trimmedAmount.contains(".")) {
+                throw new ParseException(MESSAGE_INVALID_AMOUNT_PRECISION);
             }
+            throw new ParseException(MESSAGE_INVALID_AMOUNT);
+        }
+
+        BigDecimal parsedAmount;
+        try {
+            parsedAmount = new BigDecimal(trimmedAmount);
         } catch (NumberFormatException e) {
+            throw new ParseException(MESSAGE_INVALID_AMOUNT);
+        }
+
+        if (parsedAmount.compareTo(BigDecimal.valueOf(0.01)) < 0) {
             throw new ParseException(MESSAGE_INVALID_AMOUNT);
         }
 
@@ -156,7 +167,7 @@ public class ParserUtil {
             throw new ParseException(MESSAGE_INVALID_DESCRIPTION);
         }
 
-        return new TransactionDescriptor(parsedAmount, trimmedDescription);
+        return new TransactionDescriptor(parsedAmount.doubleValue(), trimmedDescription);
     }
 
 }
