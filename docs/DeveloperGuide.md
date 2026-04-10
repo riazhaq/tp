@@ -175,6 +175,49 @@ When a person is edited, `EditCommand` creates a replacement `Person` object and
 
 At startup, IOU also ensures there is always a `Me` contact at the front of the address book if one does not already exist.
 
+### Find command (multi-criteria filtering)
+
+The `find` command supports filtering by multiple attributes simultaneously. `FindCommandParser` recognises the prefixes `n/`, `d/`, `min/`, `max/`, and `t/` and builds a composite `Predicate<Person>` that ANDs all supplied sub-predicates together.
+
+* **Name filter (`n/`)** — performs case-insensitive partial matching against the full name string.
+* **Description filter (`d/`)** — checks whether any of the person's transactions contains the keyword (case-insensitive, partial match).
+* **Amount filters (`min/`, `max/`)** — check whether any transaction's current amount satisfies the bound. Both can be supplied together to define a range; `FindCommandParser` validates that `min` ≤ `max` before constructing the command.
+* **Tag filter (`t/`)** — performs case-insensitive partial matching against tag names.
+
+At least one prefix must be supplied; supplying none causes `FindCommandParser` to throw a `ParseException`. After filtering, the displayed list indices update to reflect only the matched persons, and all subsequent index-based commands operate on those filtered indices.
+
+### Settle feature
+
+`SettleCommand` targets a single transaction identified by a person index and a transaction index. The transaction index corresponds to the descending-amount ordering used in the transaction panel.
+
+On execution:
+1. The command retrieves the `Person` at the given person index from the filtered list.
+2. It obtains the sorted transaction list for that person and selects the transaction at the given transaction index.
+3. If the transaction is already settled, a `CommandException` is thrown with the message `"This transaction has already been settled."`.
+4. Otherwise, the shared `Transaction` object's status is set to `Settled` and its outstanding amount is zeroed. Because the same object is referenced by both the debtor and creditor, both sides reflect the change immediately.
+5. The success message includes the original amount, description, and both parties so the user has a clear record of what was settled.
+
+Settled transactions remain in history and are visible in the transaction panel. They cannot be unsettled.
+
+### Simplify and SettleUp features
+
+Both commands accept three or more person indexes and operate over the in-group transactions (transactions where both the debtor and the creditor are in the selected set).
+
+`SimplifyCommand` computes a minimal set of net transfers using a greedy creditor-debtor matching algorithm:
+1. Net balances are computed for each person by summing all unsettled in-group transaction amounts (positive for amounts owed to them, negative for amounts they owe).
+2. Persons with positive net balances are placed in a max-heap (creditors); persons with negative net balances are placed in a min-heap (debtors).
+3. At each step the largest creditor and largest debtor are matched; a transfer equal to the smaller of the two absolute values is recorded, and the remaining balance is pushed back into the appropriate heap.
+4. The resulting transfer list is displayed in the result panel. No transactions are modified.
+
+`SettleUpCommand` uses the same in-group transaction set but marks every unsettled transaction directly as settled, rather than computing a simplified plan. The result message reports how many transactions were settled and their combined total.
+
+### Delete (person and transaction)
+
+`DeleteCommand` handles two modes distinguished by the presence of the `t/` prefix:
+
+* **Person deletion** — removes the `Person` at the given index from `UniquePersonList` and also removes all `Transaction` objects that reference that person from every other person's transaction set. This prevents dangling references. The protected `Me` contact (index 1) cannot be deleted; attempting to do so throws a `CommandException`.
+* **Transaction deletion** — resolves the shared `Transaction` object via the person-index and transaction-index pair, then removes it from both the debtor's and creditor's transaction sets in a single operation.
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation
@@ -295,22 +338,25 @@ _{Explain here how the data archiving feature will be implemented}_
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                 | I want to …​                           | So that I can…​                                                        |
-|----------|-------------------------|----------------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                | see usage instructions                 | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                    | add a new person                       | track debts with specific people                                       |
-| `* * *`  | user                    | delete a person                        | remove entries that I no longer need                                   |
-| `* * *`  | user                    | record money I owe someone             | remember my debts                                                      |
-| `* * *`  | user                    | record money someone owes me           | keep track of loans I gave                                             |
-| `* * *`  | user                    | list outstanding balances              | quickly see who owes what                                              |
-| `* * *`  | user                    | settle a transaction                   | mark debts as paid                                                     |
-| `* * *`  | user                    | delete an incorrect entry              | remove mistakes                                                        |
-| `* * *`  | user                    | find a person by name                  | locate details of persons without having to go through the entire list |
-| `* *`    | user                    | add descriptions to transactions       | remember why the transaction happened                                  |
-| `* *`    | user                    | view transaction history with a person | track past financial interactions                                      |
-| `* *`    | user                    | hide private contact details           | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many contacts | sort persons by name                   | locate a person easily to see their debts and loans                    |
-| `*`      | careful user            | undo recent changes                    | recover from mistakes                                                  |
+| Priority | As a …​                 | I want to …​                                        | So that I can…​                                                        |
+|----------|-------------------------|-----------------------------------------------------|------------------------------------------------------------------------|
+| `* * *`  | new user                | see usage instructions                              | refer to instructions when I forget how to use the App                 |
+| `* * *`  | user                    | add a new person                                    | track debts with specific people                                       |
+| `* * *`  | user                    | delete a person                                     | remove entries that I no longer need                                   |
+| `* * *`  | user                    | record money I owe someone                          | remember my debts                                                      |
+| `* * *`  | user                    | record money someone owes me                        | keep track of loans I gave                                             |
+| `* * *`  | user                    | list outstanding balances                           | quickly see who owes what                                              |
+| `* * *`  | user                    | settle a transaction                                | mark debts as paid                                                     |
+| `* * *`  | user                    | delete an incorrect entry                           | remove mistakes                                                        |
+| `* * *`  | user                    | find a person by name                               | locate details of persons without having to go through the entire list |
+| `* *`    | user                    | add descriptions to transactions                    | remember why the transaction happened                                  |
+| `* *`    | user                    | view transaction history with a person              | track past financial interactions                                       |
+| `* *`    | user                    | filter persons by transaction description or amount | locate specific transactions quickly                                   |
+| `* *`    | user                    | hide private contact details                        | minimize chance of someone else seeing them by accident                |
+| `* *`    | user                    | simplify debts among a group                        | see a minimal set of transfers needed to settle up                     |
+| `* *`    | user                    | settle all transactions in a group at once          | close out shared expenses in one action                                |
+| `*`      | user with many contacts | sort persons by name                                | locate a person easily to see their debts and loans                    |
+| `*`      | careful user            | undo recent changes                                 | recover from mistakes                                                  |
 
 
 *{More to be added}*
@@ -344,7 +390,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 1.  User requests to list persons
 2.  IOU shows a list of persons
 3.  User requests to delete a specific person in the list
-4.  IOU deletes the person
+4.  IOU deletes the person and removes all transactions involving that person from all other persons' panels
 
     Use case ends.
 
@@ -357,6 +403,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 3a. The given index is invalid.
 
     * 3a1. IOU shows an error message.
+
+      Use case resumes at step 2.
+
+* 3b. The given index refers to the protected `Me` contact.
+
+    * 3b1. IOU shows an error message indicating the Me contact cannot be deleted.
 
       Use case resumes at step 2.
 
@@ -375,15 +427,21 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **Extensions**
 
-* 4a. Invalid person index.
+* 4a. Invalid person index (debtor or creditor).
 
     * 4a1. IOU displays an error message.
 
       Use case resumes at step 2.
 
-* 4b. Invalid amount format.
+* 4b. Debtor and creditor indexes are the same.
 
-    * 4b1. IOU displays validation error message.
+    * 4b1. IOU displays an error message indicating a person cannot transact with themselves.
+
+      Use case ends.
+
+* 4c. Invalid amount format (e.g. negative, zero, or too many decimals).
+
+    * 4c1. IOU displays validation error message.
 
       Use case ends.
 
@@ -394,30 +452,107 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 1. User requests to list persons.
 2. IOU displays the list of persons.
-3. User requests to view a particular person.
-4. IOU shows the view of the person to the user.
-5. User views a person's transaction list.
-6. User requests to settle a transaction using a transaction index.
-7. IOU records the transaction's current outstanding amount before settling.
-8. IOU marks the transaction as settled and sets its outstanding balance to $0.00.
-9. IOU displays a success message showing the original amount that was settled, the description, and the parties involved.
-10. IOU recalculates the person's balance.
-11. IOU updates the UI.
+3. User selects a person to view their transaction panel.
+4. IOU displays the person's transactions sorted by amount (largest first).
+5. User requests to settle a specific transaction by person index and transaction index.
+6. IOU records the transaction's current outstanding amount before settling.
+7. IOU marks the transaction as settled and sets its outstanding balance to $0.00.
+8. IOU displays a success message showing the original amount that was settled, the description, and the parties involved.
+9. IOU recalculates the person's active debt balance.
+10. IOU updates the UI.
+
+Use case ends.
+
+**Extensions**
+
+* 5a. Transaction index is invalid.
+
+    * 5a1. IOU displays an error message.
+
+  Use case ends.
+
+* 5b. Transaction is already settled.
+
+    * 5b1. IOU informs the user the transaction is already settled.
+
+  Use case ends.
+
+
+**Use Case: Find persons by multiple criteria**
+
+**MSS**
+
+1. User issues a `find` command with one or more filter prefixes (`n/`, `d/`, `min/`, `max/`, `t/`).
+2. IOU filters the person list to those matching all supplied criteria.
+3. IOU displays the filtered list.
+
    Use case ends.
 
-Extensions
+**Extensions**
 
-* 6a. Transaction index invalid.
+* 1a. No filter prefixes are supplied.
 
-    * 6a1. IOU displays error message.
+    * 1a1. IOU shows an error message requiring at least one filter.
+
+      Use case ends.
+
+* 1b. `min/` value is greater than `max/` value.
+
+    * 1b1. IOU shows an error message indicating min cannot exceed max.
+
+      Use case ends.
+
+* 1c. Amount value for `min/` or `max/` is not a positive number.
+
+    * 1c1. IOU shows a validation error message.
 
     Use case ends.
 
-* 6b. Transaction already settled.
 
-    * 6b1. IOU informs user the transaction is already settled.
+**Use Case: Simplify group debts**
 
-    Use case ends.
+**MSS**
+
+1. User issues a `simplify` command with three or more person indexes.
+2. IOU computes net balances for all selected persons based on their unsettled in-group transactions.
+3. IOU produces a minimal set of transfers using a greedy matching algorithm.
+4. IOU displays the transfer plan in the result panel without modifying any transactions.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. Fewer than three indexes are provided.
+
+    * 1a1. IOU shows an error message.
+
+      Use case ends.
+
+* 1b. A duplicate or invalid index is provided.
+
+    * 1b1. IOU shows an error message.
+
+      Use case ends.
+
+
+**Use Case: Settle up a group**
+
+**MSS**
+
+1. User issues a `settleup` command with three or more person indexes.
+2. IOU identifies all unsettled transactions where both parties are within the selected group.
+3. IOU marks each such transaction as settled.
+4. IOU displays the number of transactions settled and the combined total amount.
+
+   Use case ends.
+
+**Extensions**
+
+* 1a. Fewer than three indexes are provided.
+
+    * 1a1. IOU shows an error message.
+
+      Use case ends.
 
 *{More to be added}*
 
@@ -443,8 +578,11 @@ Extensions
 * **Loan**: Money that another person owes the user.
 * **Transaction**: A record representing either a debt or a loan between the user and another person.
 * **Outstanding Balance**: The total amount currently owed or receivable that has not yet been settled.
+* **Settled Transaction**: A transaction that has been marked as paid. Its outstanding balance is $0.00 but the record is preserved in history.
 * **Person Index**: The numerical position of a person in the current displayed list.
-* **Transaction Index**: The position of a transaction within a person’s transaction history.
+* **Transaction Index**: The position of a transaction within a person's transaction panel, ordered by current amount descending.
+* **Me contact**: A protected built-in contact representing the app user. Always present at index 1 and cannot be deleted.
+* **In-group transaction**: A transaction where both the debtor and the creditor are among a set of selected persons (relevant to `simplify` and `settleup`).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -514,6 +652,73 @@ testers are expected to do more *exploratory* testing.
    
     1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn 1 2 a/50`, `addtxn x 2 a/50 i/5` (where x is larger than the list size)<br>
        Expected: Similar to previous. Error details shown in the status message. Status bar remains the same.
+
+    1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn x 2 a/50` (where x is larger than the list size)<br>
+       Expected: Error details shown in the status message. Status bar remains the same.
+
+    1. _{ more test cases … }_
+
+### Settling a Transaction
+
+1. Settling an unsettled transaction
+
+    1. Prerequisites: List all persons using the `list` command. Select a person who has at least one unsettled transaction.
+
+    1. Test case: `settle 2 t/1`<br>
+       Expected: The first transaction (by descending amount) for person 2 is marked as settled. Outstanding balance updates to $0.00 for that transaction. Success message shows original amount, description, and parties. Both debtor and creditor panels reflect the settled status.
+
+    1. Test case: `settle 2 t/1` (repeated on the same now-settled transaction)<br>
+       Expected: Error message indicating the transaction is already settled. No change to data.
+
+    1. Test case: `settle 2 t/0`<br>
+       Expected: Error message indicating invalid transaction index.
+
+    1. _{ more test cases … }_
+
+### Finding persons
+
+1. Finding by single filter
+
+    1. Test case: `find n/alex`<br>
+       Expected: Persons whose names contain "alex" (case-insensitive) are listed.
+
+    1. Test case: `find d/dinner`<br>
+       Expected: Persons who have at least one transaction with "dinner" in the description are listed.
+
+    1. Test case: `find min/100`<br>
+       Expected: Persons who have at least one transaction of $100 or more are listed.
+
+    1. Test case: `find`<br>
+       Expected: Error message requiring at least one filter. List unchanged.
+
+1. Finding by multiple filters
+
+    1. Test case: `find t/friend min/50`<br>
+       Expected: Only persons tagged "friend" (partial match) AND having at least one transaction ≥ $50 are listed.
+
+    1. Test case: `find min/100 max/50`<br>
+       Expected: Error message indicating min cannot be greater than max. List unchanged.
+
+    1. _{ more test cases … }_
+
+### Simplify and SettleUp
+
+1. Simplifying group debts
+
+    1. Prerequisites: At least 3 persons with unsettled transactions between them.
+
+    1. Test case: `simplify 1 2 3`<br>
+       Expected: A minimal transfer plan is shown in the result display. No transactions are modified.
+
+    1. Test case: `simplify 1 2`<br>
+       Expected: Error message requiring at least 3 indexes.
+
+1. Settling up a group
+
+    1. Prerequisites: At least 3 persons with unsettled in-group transactions.
+
+    1. Test case: `settleup 1 2 3`<br>
+       Expected: All unsettled transactions where both parties are among persons 1, 2, and 3 are marked settled. Result message shows count and total amount settled.
 
     1. _{ more test cases … }_
 
