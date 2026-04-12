@@ -71,7 +71,7 @@ public class SampleDataUtil {
     public static Person getMeContact() {
         return new Person(
                 new Name(ME_NAME),
-                new Phone("00000000"),
+                new Phone("90000000"),
                 new Email("me@example.com"),
                 new Address("My Address"),
                 new HashSet<>(),
