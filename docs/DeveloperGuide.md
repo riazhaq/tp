@@ -564,9 +564,8 @@ Use case ends.
 4.  Typical commands should execute within 1 second under normal conditions.
 5.  The application should automatically save data after each modifying command to prevent data loss.
 6.  The system should store data in a human-readable JSON format.
-7.  A user with average typing speed should be able to record transactions faster using commands than mouse interactions.
-8.  The application should continue functioning even if optional fields such as phone or email are missing.
-9.  The application should provide clear error messages when invalid commands are entered.
+7.  The application should continue functioning even if optional fields such as phone or email are missing.
+8.  The application should provide clear error messages when invalid commands are entered.
 
 *{More to be added}*
 
