@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <fx:root type="javafx.stage.Stage" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-         title="IOU - Debt Tracker v1.0" minWidth="450" minHeight="600" onCloseRequest="#handleExit">
+         title="IOU - Debt Tracker v1.0" minWidth="1260" minHeight="645" onCloseRequest="#handleExit">
   <icons>
     <Image url="@/images/clock.png" />
   </icons>
