@@ -46,7 +46,8 @@ With IOU, users can:
 
 1. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar iou.jar` command to run the application.<br>
    A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
-  If no person named `Me` exists yet, IOU inserts a default `Me` person at the top of the list on startup.<br>
+   If no person named `Me` exists yet, IOU inserts a default `Me` person at the top of the list on startup.<br>
+
    ![Ui](images/Ui.png)
 
 1. Type the command in the command box and press Enter to execute it. e.g. typing **`help`** and pressing Enter will open the help window.<br>
@@ -94,7 +95,7 @@ With IOU, users can:
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 </div>
 
-### Viewing help : `help`
+### View help : `help`
 
 Shows a message explaining how to access the help page.
 
@@ -103,7 +104,7 @@ Shows a message explaining how to access the help page.
 Format: `help`
 
 
-### Adding a person: `add`
+### Add a person: `add`
 
 Adds a person to the address book.
 
@@ -117,13 +118,13 @@ Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
 * `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
 
-### Listing all persons : `list`
+### List all persons : `list`
 
 Shows a list of all persons in the address book.
 
 Format: `list`
 
-### Editing a person : `edit`
+### Edit a person : `edit`
 
 Edits an existing person in the address book.
 
