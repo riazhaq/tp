@@ -41,17 +41,17 @@ public class PersonTest {
         editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).build();
         assertTrue(ALICE.isSamePerson(editedAlice));
 
-        // different phone only -> returns true (name same, and phone+email+address no longer all match)
-        editedAlice = new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).build();
-        assertTrue(ALICE.isSamePerson(editedAlice));
+        // different name and phone only -> returns false (phone+email+address no longer all match)
+        editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).withPhone(VALID_PHONE_BOB).build();
+        assertFalse(ALICE.isSamePerson(editedAlice));
 
-        // different email only -> returns true (name same, and phone+email+address no longer all match)
-        editedAlice = new PersonBuilder(ALICE).withEmail(VALID_EMAIL_BOB).build();
-        assertTrue(ALICE.isSamePerson(editedAlice));
+        // different name and email only -> returns false (phone+email+address no longer all match)
+        editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).withEmail(VALID_EMAIL_BOB).build();
+        assertFalse(ALICE.isSamePerson(editedAlice));
 
-        // different address only -> returns true (name same, and phone+email+address no longer all match)
-        editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).build();
-        assertTrue(ALICE.isSamePerson(editedAlice));
+        // different name and address only -> returns false (phone+email+address no longer all match)
+        editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).withAddress(VALID_ADDRESS_BOB).build();
+        assertFalse(ALICE.isSamePerson(editedAlice));
 
         // name differs in case only -> returns true (normalised name comparison is case-insensitive)
         Person editedBob = new PersonBuilder(BOB).withName(VALID_NAME_BOB.toLowerCase()).build();
