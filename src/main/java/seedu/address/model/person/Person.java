@@ -97,7 +97,7 @@ public class Person {
 
     /**
      * Returns true if {@code otherPerson} represents the same real-world individual,
-     * defined as having the same name (case-insensitive, whitespace-normalised),
+     * defined as having the same name (case-insensitive, whitespace-normalised) or same
      * phone, email, and address.
      *
      * <p>This is a weaker notion of equality than {@link #equals(Object)}, which also

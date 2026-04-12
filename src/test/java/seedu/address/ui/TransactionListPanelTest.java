@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +61,15 @@ public class TransactionListPanelTest {
     }
 
     private static Person person(String name) {
-        return new PersonBuilder().withName(name).build();
+        if (name.equals(ALEX)) {
+            return new PersonBuilder().withName(name).withPhone("91111111")
+                    .withEmail("alex@example.com").withAddress("Alex Street").build();
+        } else if (name.equals(BERNICE)) {
+            return new PersonBuilder().withName(name).withPhone("92222222")
+                    .withEmail("bernice@example.com").withAddress("Bernice Street").build();
+        } else {
+            return new PersonBuilder().build();
+        }
     }
 
     private static Person personWithTransactions(String name, Transaction... transactions) {

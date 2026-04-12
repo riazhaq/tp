@@ -17,8 +17,16 @@ public class JsonSerializableTransactionBookTest {
 
     @Test
     public void loadInto_transactionsAreReboundToLivePersons() throws Exception {
-        Person sourceDebtor = new PersonBuilder().withName("Alice Pauline").build();
-        Person sourceCreditor = new PersonBuilder().withName("Bob Choo").build();
+        Person sourceDebtor = new PersonBuilder().withName("Alice Pauline")
+                .withPhone("91111111")
+                .withEmail("alice@example.com")
+                .withAddress("Alice Street")
+                .build();
+        Person sourceCreditor = new PersonBuilder().withName("Bob Choo")
+                .withPhone("92222222")
+                .withEmail("bob@example.com")
+                .withAddress("Bob Street")
+                .build();
         Transaction transaction = new Transaction(sourceDebtor, sourceCreditor, 42.0, "Lunch");
         transaction.setSettled(true);
 
@@ -55,8 +63,16 @@ public class JsonSerializableTransactionBookTest {
 
     @Test
     public void loadInto_missingMatchedPerson_skipsInvalidTransaction() {
-        Person debtor = new PersonBuilder().withName("Alice Pauline").build();
-        Person creditor = new PersonBuilder().withName("Bob Choo").build();
+        Person debtor = new PersonBuilder().withName("Alice Pauline")
+                .withPhone("91111111")
+                .withEmail("alice@example.com")
+                .withAddress("Alice Street")
+                .build();
+        Person creditor = new PersonBuilder().withName("Bob Choo")
+                .withPhone("92222222")
+                .withEmail("bob@example.com")
+                .withAddress("Bob Street")
+                .build();
 
         JsonAdaptedTransaction adaptedTransaction = new JsonAdaptedTransaction(
                 10.0, 0.0, "Lunch", new JsonAdaptedPerson(debtor), new JsonAdaptedPerson(creditor), false);
