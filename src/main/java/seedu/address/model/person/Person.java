@@ -97,7 +97,7 @@ public class Person {
 
     /**
      * Returns true if {@code otherPerson} represents the same real-world individual,
-     * defined as having the same name (case-insensitive, whitespace-normalised),
+     * defined as having the same name (case-insensitive, whitespace-normalised) or same
      * phone, email, and address.
      *
      * <p>This is a weaker notion of equality than {@link #equals(Object)}, which also
@@ -113,9 +113,9 @@ public class Person {
         String thisNameNormalised = normaliseName(getName().toString());
         String otherNameNormalised = normaliseName(otherPerson.getName().toString());
         return thisNameNormalised.equalsIgnoreCase(otherNameNormalised)
-                && phone.equals(otherPerson.phone)
+                || (phone.equals(otherPerson.phone)
                 && email.equals(otherPerson.email)
-                && address.equals(otherPerson.address);
+                && address.equals(otherPerson.address));
     }
 
     private String normaliseName(String name) {
