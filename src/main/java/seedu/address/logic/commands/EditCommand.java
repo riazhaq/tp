@@ -78,6 +78,18 @@ public class EditCommand extends Command {
         }
 
         Person personToEdit = lastShownList.get(index.getZeroBased());
+
+        // Validate name uniqueness BEFORE createEditedPerson mutates any transactions
+        if (editPersonDescriptor.getName().isPresent()) {
+            Name incomingName = editPersonDescriptor.getName().get();
+            boolean nameAlreadyTaken = lastShownList.stream()
+                    .filter(p -> !p.isSamePerson(personToEdit))
+                    .anyMatch(p -> p.getName().equals(incomingName));
+            if (nameAlreadyTaken) {
+                throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+            }
+        }
+
         Person editedPerson = createEditedPerson(personToEdit, editPersonDescriptor);
 
         if (!personToEdit.isSamePerson(editedPerson) && model.hasPerson(editedPerson)) {
