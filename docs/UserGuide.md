@@ -401,7 +401,8 @@ Result: Records that Sarah owes you $200
 
 **Scenario 3: Splitting group purchases**
 ```
-Situation: You bought concert tickets for $150 each. Your friend Bob (index 4) needs to pay you back.
+Situation: You bought concert tickets for $150 each.
+Your friend Bob (index 4) needs to pay you back.
 Command: addtxn 4 1 a/150 d/Concert tickets - Taylor Swift
 Result: Records that Bob owes you $150 for tickets
 ```
@@ -709,3 +710,4 @@ Action | Format, Examples
 **Simplify** | `simplify PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `simplify 1 2 3 4`
 **Settle Up** | `settleup PERSON_INDEX [MORE_PERSON_INDEXES]...`<br> e.g., `settleup 1 2 3 4`
 **Help** | `help`
+**Exit** | `exit`
