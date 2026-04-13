@@ -701,7 +701,7 @@ Action | Format, Examples
 **Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Add Transaction** | `addtxn DEBTOR_INDEX CREDITOR_INDEX a/AMOUNT d/DESCRIPTION`<br> e.g., `addtxn 1 2 a/12.50 d/Dinner at Fish Market`
 **Clear** | `clear`
-**Delete** | `delete INDEX`<br> e.g., `delete 3`
+**Delete** | `delete INDEX`<br> e.g., `delete 3`<br><br>`delete INDEX t/TRANSACTION_INDEX`<br> e.g., `delete 3 t/1`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
 **Find** | `find [n/NAME] [d/DESCRIPTION] [min/MIN_AMOUNT] [max/MAX_AMOUNT] [t/TAG]`
 **List** | `list`
