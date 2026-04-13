@@ -2,6 +2,7 @@ package seedu.address.logic.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.util.List;
@@ -43,5 +44,15 @@ public class SettleUpCommandParserTest {
     public void parse_invalidIndex_throwsParseException() {
         String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, SettleUpCommand.MESSAGE_USAGE);
         assertThrows(ParseException.class, expectedMessage, () -> parser.parse("1 two 3"));
+    }
+
+    @Test
+    public void parse_zeroIndex_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () -> parser.parse("0 1 2"));
+    }
+
+    @Test
+    public void parse_negativeIndex_throwsParseException() {
+        assertThrows(ParseException.class, MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () -> parser.parse("-1 1 2"));
     }
 }

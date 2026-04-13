@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.SettleUpCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
@@ -32,6 +33,9 @@ public class SettleUpCommandParser implements Parser<SettleUpCommand> {
             try {
                 parsedIndex = ParserUtil.parseIndex(token);
             } catch (ParseException pe) {
+                if (token.trim().matches("-?\\d+")) {
+                    throw new ParseException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, pe);
+                }
                 throw new ParseException(
                         String.format(MESSAGE_INVALID_COMMAND_FORMAT, SettleUpCommand.MESSAGE_USAGE), pe);
             }
