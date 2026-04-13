@@ -90,6 +90,14 @@ public class AddTransactionCommandParserTest {
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, MESSAGE_USAGE));
     }
 
+    @Test
+    public void parse_extraPreambleTokens_failure() {
+        String userInput = "1 2 1 " + PREFIX_AMOUNT + "10 " + PREFIX_DESCRIPTION + "lunch";
+
+        assertParseFailure(parser, userInput,
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, MESSAGE_USAGE));
+    }
+
     // ========== Invalid Amount Cases ==========
 
     @Test

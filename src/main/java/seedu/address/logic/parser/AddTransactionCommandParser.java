@@ -38,7 +38,7 @@ public class AddTransactionCommandParser implements Parser<AddTransactionCommand
                 PREFIX_DESCRIPTION);
 
         String preamble = argMultimap.getPreamble().trim();
-        String[] indices = preamble.split("\\s+", 2);
+        String[] indices = preamble.split("\\s+");
 
         if (indices.length != 2) {
             throw new ParseException(
