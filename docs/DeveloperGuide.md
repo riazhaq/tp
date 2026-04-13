@@ -609,8 +609,6 @@ testers are expected to do more *exploratory* testing.
    1. Re-launch the app by double-clicking the jar file.<br>
        Expected: The most recent window size and location is retained.
 
-1. _{ more test cases …​ }_
-
 ### Deleting a person
 
 1. Deleting a person while all persons are being shown
@@ -625,8 +623,6 @@ testers are expected to do more *exploratory* testing.
 
    1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
       Expected: Similar to previous.
-
-1. _{ more test cases …​ }_
 
 ### Adding a Transaction
 
@@ -655,8 +651,6 @@ testers are expected to do more *exploratory* testing.
     1. Other incorrect `addtxn` commands to try: `addtxn`, `addtxn 1 2`, `addtxn x 2 a/50` (where x is larger than the list size)<br>
        Expected: Error details shown in the status message. Status bar remains the same.
 
-    1. _{ more test cases … }_
-
 ### Settling a Transaction
 
 1. Settling an unsettled transaction
@@ -671,8 +665,6 @@ testers are expected to do more *exploratory* testing.
 
     1. Test case: `settle 2 t/0`<br>
        Expected: Error message indicating invalid transaction index.
-
-    1. _{ more test cases … }_
 
 ### Finding persons
 
@@ -698,8 +690,6 @@ testers are expected to do more *exploratory* testing.
     1. Test case: `find min/100 max/50`<br>
        Expected: Error message indicating min cannot be greater than max. List unchanged.
 
-    1. _{ more test cases … }_
-
 ### Simplify and SettleUp
 
 1. Simplifying group debts
@@ -719,8 +709,6 @@ testers are expected to do more *exploratory* testing.
     1. Test case: `settleup 1 2 3`<br>
        Expected: All unsettled transactions where both parties are among persons 1, 2, and 3 are marked settled. Result message shows count and total amount settled.
 
-    1. _{ more test cases … }_
-
 ### Saving data
 
 1. Dealing with missing/corrupted data files
@@ -731,4 +719,3 @@ testers are expected to do more *exploratory* testing.
    1. Corrupt either JSON file by introducing invalid JSON syntax, then start the app.<br>
       Expected: The app logs a data loading warning and starts with an empty address book instead of partially loading corrupted data.
 
-1. _{ more test cases …​ }_
