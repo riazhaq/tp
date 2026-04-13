@@ -92,9 +92,8 @@ public class MainApp extends Application {
 
         // Ensure "me" contact is always first
         AddressBook addressBook = new AddressBook(initialData);
-        boolean hasMeContact = addressBook.getPersonList()
-                .stream()
-                .anyMatch(p -> p.getName().fullName.equalsIgnoreCase(SampleDataUtil.ME_NAME));
+        // Use the same identity semantics as the model to avoid inserting a duplicate "Me" contact.
+        boolean hasMeContact = addressBook.hasPerson(SampleDataUtil.getMeContact());
 
         if (!hasMeContact) {
             addressBook.addPersonAtFront(SampleDataUtil.getMeContact());
