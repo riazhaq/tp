@@ -387,61 +387,57 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1.  User requests to list persons
-2.  IOU shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  IOU deletes the person and removes all transactions involving that person from all other persons' panels
+1.  User requests to delete a specific person in the displayed list
+2.  IOU deletes the person and removes all transactions involving that person from all other persons' panels
 
     Use case ends.
 
 **Extensions**
 
-* 2a. The list is empty.
+* 1a. The list is empty.
 
   Use case ends.
 
-* 3a. The given index is invalid.
+* 1b. The given index is invalid.
 
-    * 3a1. IOU shows an error message.
+    * 1b1. IOU shows an error message.
 
-      Use case resumes at step 2.
+      Use case resumes at step 1.
 
-* 3b. The given index refers to the protected `Me` contact.
+* 1c. The given index refers to the protected `Me` contact.
 
-    * 3b1. IOU shows an error message indicating the Me contact cannot be deleted.
+    * 1c1. IOU shows an error message indicating the Me contact cannot be deleted.
 
-      Use case resumes at step 2.
+      Use case resumes at step 1.
 
 
 **Use Case: Record a debt**
 
 **MSS**
 
-1.  User requests to list persons.
-2.  IOU displays the list of persons.
-3.  User requests to record a debt using the person index, amount, and description.
-4.  IOU records the debt under the selected person with the given amount and description.
-5.  IOU updates the outstanding balance.
+1.  User requests to record a debt using the person index, amount, and description.
+2.  IOU records the debt under the selected person with the given amount and description.
+3.  IOU updates the outstanding balance.
 
     Use case ends.
 
 **Extensions**
 
-* 4a. Invalid person index (debtor or creditor).
+* 1a. Invalid person index (debtor or creditor).
 
-    * 4a1. IOU displays an error message.
+    * 1a1. IOU displays an error message.
 
-      Use case resumes at step 2.
+      Use case resumes at step 1.
 
-* 4b. Debtor and creditor indexes are the same.
+* 1b. Debtor and creditor indexes are the same.
 
-    * 4b1. IOU displays an error message indicating a person cannot transact with themselves.
+    * 1b1. IOU displays an error message indicating a person cannot transact with themselves.
 
       Use case ends.
 
-* 4c. Invalid amount format (e.g. negative, zero, or too many decimals).
+* 1c. Invalid amount format (e.g. negative, zero, or too many decimals).
 
-    * 4c1. IOU displays validation error message.
+    * 1c1. IOU displays validation error message.
 
       Use case ends.
 
@@ -450,30 +446,28 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. User requests to list persons.
-2. IOU displays the list of persons.
-3. User selects a person to view their transaction panel.
-4. IOU displays the person's transactions sorted by amount (largest first).
-5. User requests to settle a specific transaction by person index and transaction index.
-6. IOU records the transaction's current outstanding amount before settling.
-7. IOU marks the transaction as settled and sets its outstanding balance to $0.00.
-8. IOU displays a success message showing the original amount that was settled, the description, and the parties involved.
-9. IOU recalculates the person's active debt balance.
-10. IOU updates the UI.
+1. User selects a person to view their transaction panel.
+2. IOU displays the person's transactions sorted by amount (largest first).
+3. User requests to settle a specific transaction by person index and transaction index.
+4. IOU records the transaction's current outstanding amount before settling.
+5. IOU marks the transaction as settled and sets its outstanding balance to $0.00.
+6. IOU displays a success message showing the original amount that was settled, the description, and the parties involved.
+7. IOU recalculates the person's active debt balance.
+8. IOU updates the UI.
 
 Use case ends.
 
 **Extensions**
 
-* 5a. Transaction index is invalid.
+* 3a. Transaction index is invalid.
 
-    * 5a1. IOU displays an error message.
+    * 3a1. IOU displays an error message.
 
-  Use case ends.
+      Use case resumes at step 3.
 
-* 5b. Transaction is already settled.
+* 3b. Transaction is already settled.
 
-    * 5b1. IOU informs the user the transaction is already settled.
+    * 3b1. IOU informs the user the transaction is already settled.
 
   Use case ends.
 
